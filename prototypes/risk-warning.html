@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>风险预警 - 江西省建筑工人实名制管理服务信息平台</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif; background:#f0f2f5; color:#333; }
+    a { text-decoration:none; color:inherit; }
+
+    .header { height:56px; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,0.08); display:flex; align-items:center; justify-content:space-between; padding:0 24px; position:fixed; top:0; left:0; right:0; z-index:100; }
+    .header-left { display:flex; align-items:center; gap:12px; }
+    .logo { width:32px; height:32px; background:linear-gradient(135deg,#1890ff,#096dd9); border-radius:4px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; font-size:14px; }
+    .header-title { font-size:15px; font-weight:500; }
+    .header-right { display:flex; align-items:center; gap:12px; color:#666; font-size:13px; }
+    .user-info { display:flex; align-items:center; gap:6px; cursor:pointer; }
+    .avatar { width:28px; height:28px; border-radius:50%; background:#1890ff; color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; }
+
+    .layout { display:flex; min-height:100vh; padding-top:56px; }
+    .sidebar { width:200px; background:#001529; color:rgba(255,255,255,0.65); position:fixed; top:56px; bottom:0; left:0; overflow-y:auto; padding:8px 0; font-size:13px; }
+    .menu-item { padding:0 16px; height:40px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; }
+    .menu-item:hover { color:#fff; }
+    .menu-item.active { background:#1890ff; color:#fff; }
+    .menu-item .left { display:flex; align-items:center; gap:8px; }
+    .menu-icon { width:14px; height:14px; flex-shrink:0; }
+    .submenu { background:#000c17; display:none; }
+    .submenu.show { display:block; }
+    .submenu-item { padding:0 24px 0 40px; height:36px; display:flex; align-items:center; cursor:pointer; }
+    .submenu-item:hover { color:#fff; }
+    .submenu-item.active { color:#fff; background:rgba(24,144,255,0.2); border-right:3px solid #1890ff; }
+
+    .main { margin-left:200px; flex:1; padding:20px; }
+    .page-header { background:#fff; padding:14px 20px; border-radius:4px; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; }
+    .page-header h2 { font-size:16px; font-weight:500; }
+    .breadcrumb { font-size:12px; color:#999; margin-top:4px; }
+    .page-header-right { display:flex; align-items:center; gap:10px; }
+    .page-header-right label { font-size:12px; color:#999; }
+    .page-header-right select { padding:5px 10px; border:1px solid #d9d9d9; border-radius:4px; font-size:12px; }
+
+    .card { background:#fff; border-radius:4px; box-shadow:0 1px 4px rgba(0,0,0,0.04); margin-bottom:16px; }
+    .card-body { padding:20px; }
+
+    .tabs { display:flex; border-bottom:2px solid #f0f0f0; }
+    .tab { padding:10px 20px; cursor:pointer; font-size:14px; color:#666; border-bottom:2px solid transparent; margin-bottom:-2px; transition:all 0.2s; }
+    .tab:hover { color:#1890ff; }
+    .tab.active { color:#1890ff; border-bottom-color:#1890ff; font-weight:500; }
+    .tab-content { display:none; }
+    .tab-content.active { display:block; }
+
+    .score-bar-wrap { display:flex; align-items:center; gap:8px; }
+    .score-bar { flex:1; height:10px; background:#f0f0f0; border-radius:5px; overflow:hidden; min-width:80px; }
+    .score-fill { height:100%; border-radius:5px; }
+    .score-fill.red { background:linear-gradient(90deg,#ff4d4f,#ff7875); }
+    .score-fill.orange { background:linear-gradient(90deg,#fa8c16,#ffd591); }
+    .score-num { width:36px; text-align:right; font-size:14px; font-weight:700; flex-shrink:0; }
+
+    .filter-bar { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:16px; }
+    .filter-item { display:flex; align-items:center; gap:6px; font-size:13px; }
+    .filter-item label { color:#666; white-space:nowrap; }
+    .filter-item select,.filter-item input { padding:5px 10px; border:1px solid #d9d9d9; border-radius:4px; font-size:13px; outline:none; }
+    .btn { padding:5px 14px; border-radius:4px; font-size:13px; cursor:pointer; border:1px solid; }
+    .btn-primary { background:#1890ff; color:#fff; border-color:#1890ff; }
+    .btn-default { background:#fff; border-color:#d9d9d9; color:#666; }
+
+    .table { width:100%; border-collapse:collapse; font-size:13px; }
+    .table th { background:#fafafa; color:#666; font-weight:500; text-align:left; padding:10px 12px; border-bottom:1px solid #f0f0f0; white-space:nowrap; }
+    .table td { padding:10px 12px; border-bottom:1px solid #f0f0f0; }
+    .table tr:hover td { background:#fafafa; }
+    .risk-tag { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:12px; font-size:11px; font-weight:600; }
+    .risk-high { background:#fff1f0; color:#ff4d4f; }
+    .risk-mid { background:#fff7e6; color:#fa8c16; }
+    .risk-low { background:#f6ffed; color:#52c41a; }
+    .action-link { color:#1890ff; cursor:pointer; font-size:12px; margin-right:8px; }
+
+    .pagination { display:flex; justify-content:flex-end; align-items:center; gap:6px; margin-top:14px; font-size:13px; color:#666; }
+    .pagination button { padding:4px 10px; border:1px solid #d9d9d9; background:#fff; border-radius:4px; cursor:pointer; font-size:12px; }
+    .pagination button:hover { border-color:#1890ff; }
+    .pagination button.active { background:#1890ff; color:#fff; border-color:#1890ff; }
+
+    .algorithm-info { background:#fafafa; border-radius:4px; padding:12px 18px; margin-bottom:16px; font-size:12px; color:#666; line-height:1.8; }
+    .algorithm-info strong { color:#333; }
+  </style>
+</head>
+<body>
+<div class="header">
+  <div class="header-left"><div class="logo">赣</div><span class="header-title">江西省建筑工人实名制管理服务信息平台</span></div>
+  <div class="header-right"><div class="user-info"><div class="avatar">管</div><span>南昌市管理员</span></div></div>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg> 工程一张图</span></div>
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> BI数据看板</span></div>
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/></svg> 实名制管理</span></div>
+    <div class="menu-item active open">
+      <span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M17 9h.01"/><circle cx="12" cy="13" r="4"/></svg> 双人打卡管理</span>
+    </div>
+    <div class="submenu show">
+      <div class="submenu-item"><a href="index.html">数据看板</a></div>
+      <div class="submenu-item"><a href="rule-global.html">规则配置</a></div>
+      <div class="submenu-item"><a href="records.html">抽验记录</a></div>
+      <div class="submenu-item"><a href="summary.html">抽验汇总</a></div>
+      <div class="submenu-item active"><a href="risk-warning.html">风险预警</a></div>
+    </div>
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 22V2h12v20"/><path d="M18 22H6"/></svg> 工程发检监管</span></div>
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12a2 2 0 0 0 2 2h14v-4"/></svg> 劳务用工监管</span></div>
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> 系统管理</span></div>
+  </div>
+
+  <div class="main">
+    <div class="page-header">
+      <div>
+        <h2>双人打卡 · 风险预警</h2>
+        <div class="breadcrumb">首页 / 双人打卡管理 / 风险预警 · 统计周期：近 30 天（截至 2026-07-28）</div>
+      </div>
+      <div class="page-header-right">
+        <label>当前账号：</label>
+        <select onchange="switchLevel(this.value)">
+          <option value="province">省级账号 · 江西省</option>
+          <option value="nanchang" selected>市级账号 · 南昌市</option>
+          <option value="ganzhou">市级账号 · 赣州市</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('person')">人员风险</div>
+        <div class="tab" onclick="switchTab('project')">项目风险</div>
+      </div>
+
+      <!-- Tab 1: 人员风险 -->
+      <div class="tab-content active" id="tabPerson">
+        <div class="card-body">
+          <div class="algorithm-info">
+            <strong>评分算法（近 30 天滚动）</strong>：拒绝配合率(30%) + 抽验未通过率(25%) + 超时/降级率(20%) + GPS偏离次数(15%) + 核验重试率(10%) = 综合风险分
+          </div>
+          <div class="filter-bar">
+            <div class="filter-item"><label>风险等级：</label><select><option>全部</option><option>高风险 ≥80</option><option>中风险 50-79</option><option>低风险 &lt;50</option></select></div>
+            <div class="filter-item"><label>项目区划：</label><select><option>全部</option><option>南昌市-经开区</option><option>南昌市-红谷滩区</option><option>赣州市-龙南市</option></select></div>
+            <div class="filter-item"><label>岗位：</label><select><option>全部</option><option>项目经理</option><option>安全员</option><option>施工员</option></select></div>
+            <div class="filter-item"><label>项目：</label><input type="text" placeholder="项目名称"></div>
+            <button class="btn-primary">查询</button>
+          </div>
+          <table class="table">
+            <thead>
+              <tr><th>排名</th><th>姓名</th><th>岗位</th><th>项目区划</th><th>所属项目</th><th>拒绝配合率</th><th>抽验未通过率</th><th>超时/降级</th><th>GPS偏离</th><th>核验重试</th><th>风险分</th><th>等级</th><th>操作</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>1</strong></td>
+                <td>德小拓<div style="font-size:11px;color:#999;">3622********1234</div></td>
+                <td>项目经理</td><td>南昌市-经开区</td><td>豫章师范学院实训大楼</td>
+                <td style="color:#ff4d4f;font-weight:600;">60%</td>
+                <td style="color:#ff4d4f;font-weight:600;">40%</td>
+                <td>2次</td><td>3次</td><td>2次</td>
+                <td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill red" style="width:85%;"></div></div><span class="score-num" style="color:#ff4d4f;">85</span></div></td>
+                <td><span class="risk-tag risk-high">🔴 高风险</span></td>
+                <td><a href="warning-detail.html" class="action-link">详情</a></td>
+              </tr>
+              <tr>
+                <td><strong>2</strong></td>
+                <td>王经理<div style="font-size:11px;color:#999;">3601********5678</div></td>
+                <td>项目经理</td><td>南昌市-红谷滩区</td><td>南昌西站配套工程</td>
+                <td style="color:#ff4d4f;font-weight:600;">50%</td>
+                <td style="color:#fa8c16;font-weight:600;">25%</td>
+                <td>3次</td><td>1次</td><td>1次</td>
+                <td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill red" style="width:82%;"></div></div><span class="score-num" style="color:#ff4d4f;">82</span></div></td>
+                <td><span class="risk-tag risk-high">🔴 高风险</span></td>
+                <td><a href="warning-detail.html" class="action-link">详情</a></td>
+              </tr>
+              <tr>
+                <td><strong>3</strong></td>
+                <td>赵监理<div style="font-size:11px;color:#999;">3601********9012</div></td>
+                <td>监理工程师</td><td>南昌市-红谷滩区</td><td>绿地国际博览城二期</td>
+                <td style="color:#fa8c16;font-weight:600;">33%</td><td>20%</td>
+                <td>1次</td><td style="color:#ff4d4f;font-weight:600;">5次</td><td>1次</td>
+                <td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill red" style="width:81%;"></div></div><span class="score-num" style="color:#ff4d4f;">81</span></div></td>
+                <td><span class="risk-tag risk-high">🔴 高风险</span></td>
+                <td><a href="warning-detail.html" class="action-link">详情</a></td>
+              </tr>
+              <tr>
+                <td><strong>4</strong></td>
+                <td>李技术<div style="font-size:11px;color:#999;">3601********3456</div></td>
+                <td>技术负责人</td><td>南昌市-红谷滩区</td><td>绿地国际博览城二期</td>
+                <td>25%</td><td style="color:#ff4d4f;font-weight:600;">33%</td>
+                <td>1次</td><td>2次</td><td>1次</td>
+                <td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill orange" style="width:68%;"></div></div><span class="score-num" style="color:#fa8c16;">68</span></div></td>
+                <td><span class="risk-tag risk-mid">🟠 中风险</span></td>
+                <td><a href="warning-detail.html" class="action-link">详情</a></td>
+              </tr>
+              <tr>
+                <td><strong>5</strong></td>
+                <td>马工<div style="font-size:11px;color:#999;">3601********7890</div></td>
+                <td>施工员</td><td>南昌市-红谷滩区</td><td>南昌西站配套工程</td>
+                <td>20%</td><td>17%</td><td>2次</td><td>1次</td><td>0次</td>
+                <td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill orange" style="width:55%;"></div></div><span class="score-num" style="color:#fa8c16;">55</span></div></td>
+                <td><span class="risk-tag risk-mid">🟠 中风险</span></td>
+                <td><a href="warning-detail.html" class="action-link">详情</a></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="pagination"><span>共 38 人</span><button>&lt;</button><button class="active">1</button><button>2</button><button>&gt;</button></div>
+        </div>
+      </div>
+
+      <!-- Tab 2: 项目风险 -->
+      <div class="tab-content" id="tabProject">
+        <div class="card-body">
+          <div class="algorithm-info">
+            <strong>评分算法（近 30 天滚动）</strong>：关键岗位拒绝率(30%) + 抽验未通过率(25%) + 超时/降级率(20%) + 合拍人集中度(15%) + 异常打卡人次比(10%) = 综合风险分
+          </div>
+          <div class="filter-bar">
+            <div class="filter-item"><label>风险等级：</label><select><option>全部</option><option>高风险 ≥80</option><option>中风险 50-79</option><option>低风险 &lt;50</option></select></div>
+            <div class="filter-item"><label>项目区划：</label><select><option>全部</option><option>经开区</option><option>红谷滩区</option></select></div>
+            <div class="filter-item"><label>项目名称：</label><input type="text" placeholder="请输入"></div>
+            <button class="btn-primary">查询</button>
+          </div>
+          <table class="table">
+            <thead>
+              <tr><th>排名</th><th>项目名称</th><th>项目区划</th><th>关键岗位拒绝率</th><th>抽验未通过率</th><th>超时/降级</th><th>合拍人集中度</th><th>异常打卡比</th><th>风险分</th><th>等级</th><th>操作</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>1</strong></td>
+                <td>豫章师范学院实训大楼一期<div style="font-size:11px;color:#999;">360100202406270101</div></td>
+                <td>经开区</td>
+                <td style="color:#ff4d4f;font-weight:600;">55%</td>
+                <td style="color:#ff4d4f;font-weight:600;">35%</td>
+                <td>4次</td><td style="color:#fa8c16;">中</td>
+                <td style="color:#ff4d4f;font-weight:600;">18%</td>
+                <td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill red" style="width:88%;"></div></div><span class="score-num" style="color:#ff4d4f;">88</span></div></td>
+                <td><span class="risk-tag risk-high">🔴 高风险</span></td>
+                <td><a href="project-warning-detail.html" class="action-link">详情</a></td>
+              </tr>
+              <tr>
+                <td><strong>2</strong></td>
+                <td>南昌西站交通枢纽配套工程<div style="font-size:11px;color:#999;">360100202406270310</div></td>
+                <td>红谷滩区</td>
+                <td style="color:#ff4d4f;font-weight:600;">40%</td>
+                <td style="color:#fa8c16;font-weight:600;">28%</td>
+                <td>5次</td><td style="color:#ff4d4f;font-weight:600;">高</td>
+                <td>12%</td>
+                <td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill red" style="width:83%;"></div></div><span class="score-num" style="color:#ff4d4f;">83</span></div></td>
+                <td><span class="risk-tag risk-high">🔴 高风险</span></td>
+                <td><a href="project-warning-detail.html" class="action-link">详情</a></td>
+              </tr>
+              <tr>
+                <td><strong>3</strong></td>
+                <td>绿地国际博览城二期<div style="font-size:11px;color:#999;">360100202406270205</div></td>
+                <td>红谷滩区</td>
+                <td>20%</td><td>25%</td><td>3次</td><td style="color:#fa8c16;">中</td><td>10%</td>
+                <td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill orange" style="width:65%;"></div></div><span class="score-num" style="color:#fa8c16;">65</span></div></td>
+                <td><span class="risk-tag risk-mid">🟠 中风险</span></td>
+                <td><a href="project-warning-detail.html" class="action-link">详情</a></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="pagination"><span>共 17 个项目</span><button>&lt;</button><button class="active">1</button><button>2</button><button>&gt;</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(function(t,i){ t.classList.toggle('active',(tab==='person'&&i===0)||(tab==='project'&&i===1)); });
+  document.getElementById('tabPerson').classList.toggle('active',tab==='person');
+  document.getElementById('tabProject').classList.toggle('active',tab==='project');
+}
+function switchLevel(v) { console.log('切换至:',v); }
+</script>
+</body>
+</html>

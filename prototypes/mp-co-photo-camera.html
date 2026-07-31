@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>双人合拍 - 赣建宝</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+      background:#e8ecf1; display:flex; justify-content:center; align-items:center;
+      min-height:100vh; padding:20px;
+    }
+
+    /* ====== Phone Frame (横版 · 小米15 Pro 比例) ====== */
+    .phone-frame {
+      background:#1a1c1e; border-radius:22px; padding:10px;
+      box-shadow:0 0 0 2px #2d2f31,0 0 0 5px #1a1c1e,0 10px 45px rgba(0,0,0,0.45);
+      position:relative; display:inline-block;
+    }
+    .phone-screen {
+      width:780px; height:351px; border-radius:14px;
+      overflow:hidden; position:relative; border:1px solid #333;
+      background:#0d1117;
+    }
+    .punch-hole {
+      position:absolute; top:50%; left:12px; transform:translateY(-50%);
+      width:9px; height:9px; background:#111; border:1px solid #333;
+      border-radius:50%; z-index:100;
+    }
+    .home-bar {
+      position:absolute; right:6px; top:50%; transform:translateY(-50%);
+      width:3px; height:100px; background:rgba(255,255,255,0.22);
+      border-radius:2px; z-index:100;
+    }
+    .side-btn { position:absolute; background:#2d2f31; border-radius:2px; opacity:0.7; }
+    .btn-power { top:-3px; left:240px; width:48px; height:2px; }
+    .btn-vol-up { bottom:-3px; left:210px; width:35px; height:2px; }
+    .btn-vol-down { bottom:-3px; left:255px; width:35px; height:2px; }
+
+    /* ====== Camera View ====== */
+    .camera-view {
+      width:100%; height:100%;
+      background:linear-gradient(180deg,#0b1622 0%,#141f2d 50%,#101b27 100%);
+      position:relative; overflow:hidden;
+    }
+    .camera-grid {
+      position:absolute; inset:0;
+      background:
+        linear-gradient(rgba(255,255,255,0.03) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,0.03) 1px,transparent 1px);
+      background-size:28px 28px;
+    }
+    .scan-line {
+      position:absolute; top:0; left:0; right:0; height:2px;
+      background:linear-gradient(90deg,transparent,rgba(76,175,80,0.5),transparent);
+      animation:scan 2.5s ease-in-out infinite;
+    }
+    @keyframes scan { 0%,100%{top:0} 50%{top:calc(100% - 2px)} }
+
+    /* ====== Top bar (只保留返回) ====== */
+    .camera-top {
+      position:absolute; top:0; left:0; right:0;
+      padding:10px 14px; display:flex; align-items:center; justify-content:space-between;
+      z-index:10; pointer-events:none;
+    }
+    .camera-top > * { pointer-events:auto; }
+    .back-btn {
+      width:30px; height:30px; background:rgba(0,0,0,0.35); border-radius:50%;
+      display:flex; align-items:center; justify-content:center; cursor:pointer;
+      text-decoration:none;
+    }
+    .back-btn svg { width:15px; height:15px; stroke:#fff; }
+
+    /* ====== 人脸引导框（虚线头肩轮廓） ====== */
+    .face-frame {
+      position:absolute; top:50%; transform:translateY(-50%);
+      width:175px; height:215px;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .face-frame.left { left:90px; }
+    .face-frame.right { right:90px; }
+
+    .face-frame svg {
+      width:100%; height:100%;
+      filter:drop-shadow(0 0 8px rgba(255,255,255,0.15));
+    }
+    .head-outline {
+      fill:none;
+      stroke:rgba(255,255,255,0.9);
+      stroke-width:2.5;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+      stroke-dasharray:6 5;
+    }
+
+    /* ====== Watermark ====== */
+    .watermark {
+      position:absolute; bottom:10px; left:12px;
+      background:rgba(0,0,0,0.5); border-radius:6px;
+      padding:6px 10px; z-index:10; pointer-events:none;
+    }
+    .watermark-row {
+      font-size:9px; color:rgba(255,255,255,0.8); line-height:1.7;
+      white-space:nowrap;
+    }
+
+    /* ====== Bottom hint ====== */
+    .camera-hint {
+      position:absolute; bottom:14px; left:50%; transform:translateX(-50%);
+      color:rgba(255,255,255,0.5); font-size:11px; z-index:5;
+      pointer-events:none;
+    }
+
+    /* ====== Capture Button ====== */
+    .capture-area {
+      position:absolute; right:22px; top:50%; transform:translateY(-50%);
+      z-index:10;
+    }
+    .capture-btn {
+      width:52px; height:52px; border-radius:50%;
+      background:#fff; border:4px solid rgba(37,99,255,0.5);
+      cursor:pointer; position:relative;
+      display:flex; align-items:center; justify-content:center;
+      text-decoration:none;
+      box-shadow:0 0 14px rgba(37,99,255,0.25);
+      transition:transform 0.15s;
+    }
+    .capture-btn:active { transform:scale(0.92); }
+    .capture-btn::after {
+      content:''; width:38px; height:38px; border-radius:50%;
+      background:linear-gradient(135deg,#2563ff,#1e90ff);
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="phone-screen">
+      <div class="punch-hole"></div>
+      <div class="camera-view">
+        <div class="camera-grid"></div>
+        <div class="scan-line"></div>
+
+        <!-- 顶部栏 -->
+        <div class="camera-top">
+          <a href="javascript:history.back()" class="back-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><polyline points="15,18 9,12 15,6"/></svg>
+          </a>
+          <div style="width:30px;"></div>
+        </div>
+
+        <!-- 左侧：虚线头肩轮廓 -->
+        <div class="face-frame left">
+          <svg viewBox="0 0 200 240" preserveAspectRatio="xMidYMid meet">
+            <path class="head-outline" d="
+              M 60,225
+              C 35,220 15,205 10,185
+              C 8,175 12,165 25,158
+              C 38,150 48,142 52,132
+              C 48,120 46,108 46,95
+              C 46,50 68,20 100,20
+              C 132,20 154,50 154,95
+              C 154,108 152,120 148,132
+              C 152,142 162,150 175,158
+              C 188,165 192,175 190,185
+              C 185,205 165,220 140,225
+              C 120,228 80,228 60,225
+              Z
+            "/>
+          </svg>
+        </div>
+
+        <!-- 右侧：虚线头肩轮廓 -->
+        <div class="face-frame right">
+          <svg viewBox="0 0 200 240" preserveAspectRatio="xMidYMid meet">
+            <path class="head-outline" d="
+              M 60,225
+              C 35,220 15,205 10,185
+              C 8,175 12,165 25,158
+              C 38,150 48,142 52,132
+              C 48,120 46,108 46,95
+              C 46,50 68,20 100,20
+              C 132,20 154,50 154,95
+              C 154,108 152,120 148,132
+              C 152,142 162,150 175,158
+              C 188,165 192,175 190,185
+              C 185,205 165,220 140,225
+              C 120,228 80,228 60,225
+              Z
+            "/>
+          </svg>
+        </div>
+
+        <!-- 水印 -->
+        <div class="watermark">
+          <div class="watermark-row">📍 115.854162, 28.683456</div>
+          <div class="watermark-row">🏗 绿地国际博览城二期</div>
+          <div class="watermark-row">👤 德小拓（项目经理）</div>
+          <div class="watermark-row">📅 2026-07-28 11:05:32</div>
+        </div>
+
+        <!-- 底部提示 -->
+        <div class="camera-hint">👥 请将头部对准框内，保持两人同时入镜</div>
+
+        <!-- 快门按钮 -->
+        <div class="capture-area">
+          <a href="mp-co-photo-success.html" class="capture-btn"></a>
+        </div>
+      </div>
+      <div class="home-bar"></div>
+    </div>
+    <div class="side-btn btn-power"></div>
+    <div class="side-btn btn-vol-up"></div>
+    <div class="side-btn btn-vol-down"></div>
+  </div>
+</body>
+</html>

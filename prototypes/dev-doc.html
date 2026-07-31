@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>江西实名制双人打卡 — 技术交底文档</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:#f0f2f5;color:#333;line-height:1.75}
+.topbar{height:56px;background:linear-gradient(135deg,#1a1a2e,#16213e);display:flex;align-items:center;padding:0 32px;color:#fff}
+.topbar .brand{font-size:16px;font-weight:600}
+.topbar .sub{font-size:12px;color:rgba(255,255,255,.7);margin-left:16px}
+.wrapper{max-width:1000px;margin:0 auto;padding:32px 24px 60px}
+
+.title-block{background:#fff;border-radius:8px;padding:32px 36px;margin-bottom:20px;border-left:4px solid #722ed1}
+.title-block h1{font-size:24px;font-weight:700;color:#1a1a1a;margin-bottom:8px}
+.title-block .meta{font-size:13px;color:#999;display:flex;gap:20px;flex-wrap:wrap}
+
+.section{background:#fff;border-radius:8px;padding:28px 36px;margin-bottom:16px}
+.section h2{font-size:18px;font-weight:600;color:#1a1a1a;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid #f0f0f0;display:flex;align-items:center;gap:10px}
+.section h2 .dot{width:8px;height:8px;border-radius:50%;background:#722ed1;flex-shrink:0}
+.section h3{font-size:15px;font-weight:600;color:#333;margin:22px 0 10px}
+.section h4{font-size:14px;font-weight:600;color:#555;margin:14px 0 8px}
+.section p{font-size:14px;color:#555;margin-bottom:12px}
+.section ul,.section ol{margin:8px 0 12px 20px;font-size:14px;color:#555}
+.section li{margin-bottom:6px}
+
+.callout{background:#f9f0ff;border:1px solid #d3adf7;border-radius:4px;padding:12px 16px;margin:16px 0;font-size:13px;color:#531dab}
+.callout.info{background:#e6f7ff;border-color:#91d5ff;color:#0050b3}
+.callout.warn{background:#fff7e6;border-color:#ffd591;color:#ad6800}
+.callout.danger{background:#fff1f0;border-color:#ffa39e;color:#cf1322}
+
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}
+table th,table td{border:1px solid #e8e8e8;padding:9px 14px;text-align:left}
+table th{background:#fafafa;font-weight:600;color:#333;white-space:nowrap}
+table td{color:#555}
+table td code{background:#f5f5f5;padding:1px 6px;border-radius:3px;font-size:12px;color:#d4380d}
+
+.tag{display:inline-block;padding:2px 8px;border-radius:3px;font-size:11px;font-weight:600}
+.tag.red{background:#fff1f0;color:#cf1322}
+.tag.orange{background:#fff7e6;color:#d46b08}
+.tag.green{background:#f6ffed;color:#389e0d}
+.tag.blue{background:#e6f7ff;color:#096dd9}
+
+.file-tree{background:#1e1e2e;color:#cdd6f4;font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;font-size:12px;padding:14px 18px;border-radius:6px;line-height:1.85;margin:10px 0;overflow-x:auto}
+.file-tree .entry{color:#89b4fa}
+.file-tree .dir{color:#cba6f7}
+.file-tree .comment{color:#6c7086}
+
+.footer{text-align:center;color:#bbb;font-size:12px;padding:20px 0}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="brand">江西省建筑工人实名制管理服务信息平台</div><div class="sub">面向研发团队 · 技术交底文档 v1.0</div></div>
+<div class="wrapper">
+
+<div class="title-block">
+<h1>实名制双人打卡 — 技术交底文档</h1>
+<div class="meta"><span>版本 v1.0</span><span>2026-07-30</span><span>范围：监管端Web + 赣建宝小程序</span></div>
+</div>
+
+<!-- 1. 系统概述 -->
+<div class="section">
+<h2><span class="dot"></span>一、系统概述与术语</h2>
+<p>在现有实名制打卡基础上，新增<strong>双人合拍验证</strong>机制。核心逻辑：打卡人完成常规打卡后，系统按规则随机要求打卡人与工地上另一人完成双人实时合影验证。监管端提供数据看板、规则配置、抽验记录、抽验汇总、风险预警五大模块。</p>
+
+<h3>术语定义</h3>
+<table>
+<tr><th>术语</th><th>英文/字段名</th><th>定义</th></tr>
+<tr><td>打卡人</td><td><code>checkin_user</code></td><td>被系统随机抽中需完成双人合拍的实名制人员，用自己的手机进行合拍拍照</td></tr>
+<tr><td>合拍人</td><td><code>partner_user</code></td><td>从候选人池随机抽取，需配合打卡人完成双人合拍的人员。合拍人只需到场，拍照由打卡人手机完成</td></tr>
+<tr><td>抽验</td><td><code>co-photo-verification</code></td><td>"双人合拍验证"的简称，在常规打卡基础上增加的随机验证环节</td></tr>
+<tr><td>候选人池</td><td><code>candidate_pool</code></td><td>可供抽取作为合拍人的在册人员集合，分上班卡/下班卡不同范围</td></tr>
+<tr><td>确认窗口</td><td><code>confirm_window</code></td><td>合拍人响应时限 = <strong>5分钟</strong>，写死不可配置</td></tr>
+<tr><td>执行窗口</td><td><code>execution_window</code></td><td>从被抽中到完成合拍的总时限 = <strong>15分钟</strong>，写死不可配置</td></tr>
+<tr><td>降级打卡</td><td><code>downgrade</code></td><td>候选人池枯竭或执行窗口超时后，降级为单人打卡并标记异常</td></tr>
+<tr><td>项目规则例外</td><td><code>rule_exception</code></td><td>特定项目的独立规则配置，标记 <code>is_locked=true</code>，不被上级组织域下发覆盖</td></tr>
+</table>
+
+<h3>角色体系</h3>
+<table>
+<tr><th>角色</th><th>端</th><th>主要操作</th></tr>
+<tr><td>打卡人</td><td>小程序</td><td>单人打卡 → 被抽中 → 查看合拍通知 → 联系合拍人 → 双人合拍拍照 → 查看核验结果</td></tr>
+<tr><td>合拍人</td><td>小程序</td><td>收到通知 → 查看邀请 → 接受/拒绝 → （接受后）前往汇合 → 配合拍照</td></tr>
+<tr><td>省级监管</td><td>监管端</td><td>全省看板 → 配置省级默认规则 → 下发至地市 → 风险预警全局视图</td></tr>
+<tr><td>市级监管</td><td>监管端</td><td>本市看板 → 微调规则 → 本市风险预警 → 下发督办</td></tr>
+<tr><td>区县监管</td><td>监管端</td><td>本区看板 → 查看风险详情 → 标记处理</td></tr>
+</table>
+</div>
+
+<!-- 2. 文件 -->
+<div class="section">
+<h2><span class="dot"></span>二、原型文件清单</h2>
+<div class="file-tree">
+<span class="dir">prototypes/</span><br>
+&nbsp;&nbsp;<span class="comment"># === 监管端 (10 个文件) ===</span><br>
+&nbsp;&nbsp;<span class="entry">index.html</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># 数据看板</span><br>
+&nbsp;&nbsp;<span class="entry">rule-global.html</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># 规则配置（全局+项目例外 双页签）</span><br>
+&nbsp;&nbsp;<span class="entry">records.html</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># 抽验记录（含账号级别切换过滤）</span><br>
+&nbsp;&nbsp;<span class="entry">record-detail.html</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># 抽验记录详情（核验轨迹 + 拍照缩略图）</span><br>
+&nbsp;&nbsp;<span class="entry">summary.html</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># 抽验汇总（人员/项目 双页签）</span><br>
+&nbsp;&nbsp;<span class="entry">summary-person-detail.html</span>&nbsp;<span class="comment"># 人员汇总详情</span><br>
+&nbsp;&nbsp;<span class="entry">summary-project-detail.html</span><span class="comment"># 项目汇总详情</span><br>
+&nbsp;&nbsp;<span class="entry">risk-warning.html</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># 风险预警（人员/项目 双页签）</span><br>
+&nbsp;&nbsp;<span class="entry">warning-detail.html</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># 人员风险详情</span><br>
+&nbsp;&nbsp;<span class="entry">project-warning-detail.html</span><span class="comment"># 项目风险详情</span><br>
+&nbsp;&nbsp;<span class="comment"># === 小程序端 (15 个文件) ===</span><br>
+&nbsp;&nbsp;<span class="entry">mp-my.html</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># 我的（打卡人/合拍人 双角色 demo 切换）</span><br>
+&nbsp;&nbsp;<span class="entry">mp-co-photo-trigger.html</span>&nbsp;&nbsp;&nbsp;<span class="comment"># 合拍触发通知页（6模块/6情景 hash路由）</span><br>
+&nbsp;&nbsp;<span class="entry">mp-co-photo-records.html</span>&nbsp;&nbsp;&nbsp;<span class="comment"># 合拍验证记录（抽验记录/协助记录）</span><br>
+&nbsp;&nbsp;<span class="entry">mp-message.html</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># 消息公告（含合拍请求类型消息）</span><br>
+&nbsp;&nbsp;<span class="entry">mp-partner-invitation.html</span>&nbsp;<span class="comment"># 合拍邀请处理页（5分钟倒计时+拒绝原因）</span><br>
+&nbsp;&nbsp;<span class="entry">mp-co-photo-accept.html</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># 接受确认（汇合指引，非拍照）</span><br>
+&nbsp;&nbsp;<span class="entry">mp-co-photo-refuse.html</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># 拒绝结果页</span><br>
+&nbsp;&nbsp;<span class="entry">mp-co-photo-camera.html</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># 合拍拍照（横版取景 780×351 + 人脸引导框 + 水印）</span><br>
+&nbsp;&nbsp;<span class="entry">mp-co-photo-success.html</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># 核验结果（加载→通过→未通过 三态切换）</span><br>
+&nbsp;&nbsp;<span class="entry">mp-checkin-[1-5].html</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># 单人打卡流程（5步）</span><br>
+&nbsp;&nbsp;<span class="entry">mp-project.html</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># 工程项目概览</span><br>
+&nbsp;&nbsp;<span class="comment"># === 导航与文档 ===</span><br>
+&nbsp;&nbsp;<span class="entry">nav.html</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># 原型导航页</span><br>
+&nbsp;&nbsp;<span class="entry">client-doc.html</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># 客户方案说明书</span><br>
+&nbsp;&nbsp;<span class="entry">dev-doc.html</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># 技术交底文档（本文件）</span><br>
+&nbsp;&nbsp;<span class="entry">rules-v1.1.html</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># 需求规则明细 修正版</span>
+</div>
+</div>
+
+<!-- 3. 小程序交互 -->
+<div class="section">
+<h2><span class="dot"></span>三、小程序端 — 完整交互规范</h2>
+
+<h3>3.1 合拍触发通知页（mp-co-photo-trigger.html）</h3>
+<p>打卡人完成单人打卡后被系统抽中，进入此页。页面通过 URL hash 切换 6 种情景：</p>
+<table>
+<tr><th>Hash</th><th>情景</th><th>触发条件</th><th>模块②</th><th>模块④</th><th>模块⑤</th><th>模块⑥</th></tr>
+<tr><td><code>#normal</code></td><td>正常等待</td><td>抽中，等待确认</td><td>—（不显示）</td><td>显示</td><td>待确认（旋转）</td><td>占位15:00</td></tr>
+<tr><td><code>#confirmed</code></td><td>已确认</td><td>合拍人接受</td><td>—（不显示）</td><td>不显示</td><td>绿色勾+时间</td><td>实际倒计时</td></tr>
+<tr><td><code>#swapped</code></td><td>被拒换人</td><td>第1人拒绝，系统换第2人</td><td>1人拒绝→换人提示</td><td>显示</td><td>待确认（旋转）</td><td>占位15:00</td></tr>
+<tr><td><code>#lastperson</code></td><td>最后一人</td><td>第2人拒绝，最后机会</td><td>2人拒绝轨迹</td><td>显示</td><td>待确认（旋转）</td><td>占位15:00</td></tr>
+<tr><td><code>#exhausted</code></td><td>候选人枯竭</td><td>池中无可用候选人</td><td>—（不显示）</td><td>不显示</td><td>不显示</td><td>不显示</td></tr>
+<tr><td><code>#offduty</code></td><td>下班卡抽中</td><td>下班卡被抽中</td><td>—（不显示）</td><td>显示</td><td>待确认（旋转）</td><td>占位15:00</td></tr>
+</table>
+<div class="callout info"><strong>开发要点：</strong>6种情景通过 hash 路由切换，模块②④⑤⑥按上述规则显隐。合拍人姓名/头像/手机号为 demo 静态数据，实际开发需从接口获取。</div>
+
+<h3>3.2 合拍邀请处理页（mp-partner-invitation.html）</h3>
+<ul>
+<li><strong>5分钟确认倒计时：</strong>页面顶部实时倒计时，超时自动触发拒绝逻辑</li>
+<li><strong>接受流程：</strong>点击"接受，前往汇合" → 跳转 <code>mp-co-photo-accept.html</code>（汇合指引页，非拍照页）</li>
+<li><strong>拒绝流程：</strong>点击"拒绝（需填写原因）" → 弹出拒绝原因面板（5个预设选项+自定义输入） → 确定 → 跳转 <code>mp-co-photo-refuse.html</code></li>
+</ul>
+
+<h3>3.3 合拍拍照页（mp-co-photo-camera.html）</h3>
+<table>
+<tr><th>项</th><th>规范</th></tr>
+<tr><td>屏幕尺寸</td><td>手机外框 390×680px（竖屏），取景区域 780×351px（横构图）</td></tr>
+<tr><td>人脸引导框</td><td>两个虚线头肩轮廓 SVG（白色描边），无文字标签</td></tr>
+<tr><td>水印叠加</td><td>GPS坐标 + 项目名称 + 打卡人姓名 + 时间戳，拍照时自动叠加在照片底部</td></tr>
+<tr><td>快门按钮</td><td>白色圆环 + 蓝色内圈，位于取景框右侧</td></tr>
+<tr><td>禁止相册</td><td>调用 <code>wx.chooseMedia({ sourceType: ['camera'] })</code>，不传 album</td></tr>
+</table>
+
+<h3>3.4 核验结果页（mp-co-photo-success.html）</h3>
+<ul>
+<li><strong>三态切换：</strong>demo 面板按钮控制加载→通过→未通过三种状态</li>
+<li><strong>加载态：</strong>2步流程（照片已拍摄 → 正在核验人脸信息），不暴露后端技术细节</li>
+<li><strong>通过态：</strong>"考勤打卡成功"，不展示核验分数/GPS/核验详情</li>
+<li><strong>未通过态：</strong>原因说明 + 重新拍摄 + 降级单人打卡选项</li>
+<li><strong>严禁暴露：</strong>所有文案中不出现"百度API""后端上传""第三方接口"等字眼</li>
+</ul>
+
+<h3>3.5 小程序"我的"页面（mp-my.html）</h3>
+<ul>
+<li><strong>角色切换：</strong>手机框外有 demo 切换按钮，实际开发通过登录态自动判定</li>
+<li><strong>人员信息：</strong>无"打卡人"/"合拍人"角色标签</li>
+<li><strong>合拍验证模块：</strong>全局可见（两个角色均有），合拍请求不在主页展示卡片</li>
+</ul>
+
+<h3>3.6 消息公告页（mp-message.html）</h3>
+<ul>
+<li>无顶部页签区分，合拍请求混入通知列表</li>
+<li>合拍请求消息按钮为"去处理"，跳转 <code>mp-partner-invitation.html</code></li>
+</ul>
+
+<h3>3.7 合拍验证记录（mp-co-photo-records.html）</h3>
+<ul>
+<li>Tab1 <strong>抽验记录：</strong>我作为打卡人的记录（验证通过/未通过）</li>
+<li>Tab2 <strong>协助记录：</strong>我作为合拍人的记录（同意协助/拒绝请求）</li>
+<li>无"查看详情"按钮；每条记录字段统一固定</li>
+</ul>
+</div>
+
+<!-- 4. 监管端 -->
+<div class="section">
+<h2><span class="dot"></span>四、监管端 — 完整交互规范</h2>
+
+<h3>4.1 侧边栏菜单结构</h3>
+<table>
+<tr><th>一级菜单</th><th>子菜单</th><th>对应文件</th></tr>
+<tr><td>工程一张图</td><td>—</td><td>—</td></tr>
+<tr><td>BI数据看板</td><td>—</td><td>—</td></tr>
+<tr><td>实名制管理</td><td>—</td><td>—</td></tr>
+<tr><td rowspan="5">双人打卡管理</td><td><strong>数据看板</strong></td><td>index.html</td></tr>
+<tr><td><strong>规则配置</strong></td><td>rule-global.html</td></tr>
+<tr><td><strong>抽验记录</strong></td><td>records.html</td></tr>
+<tr><td><strong>抽验汇总</strong></td><td>summary.html</td></tr>
+<tr><td><strong>风险预警</strong></td><td>risk-warning.html</td></tr>
+<tr><td>工程发检监管</td><td>—</td><td>—</td></tr>
+<tr><td>劳务用工监管</td><td>—</td><td>—</td></tr>
+<tr><td>系统管理</td><td>—</td><td>—</td></tr>
+</table>
+
+<h3>4.2 数据看板（index.html）</h3>
+<p>包含 5 大区块（从上到下）：</p>
+<ol>
+<li><strong>统计卡片（5个）：</strong>启用区县数 / 抽验触发人次 / 抽验通过率 / 预警人次 / 高风险人员数，每卡片右下角有对应子菜单链接</li>
+<li><strong>项目统计表格（左）+ 预警分布（右）：</strong>双栏布局。项目表格含风险等级标签；预警分布含4类计数+TOP3高风险人员</li>
+<li><strong>辖区动态表格：</strong>账号级别切换控制显示内容（省级→地市 / 市级→区县 / 区县→不显示）</li>
+<li><strong>30天通过率趋势图：</strong>SVG折线图，自适应宽度。标注最高/最低点 + 70%参考线</li>
+</ol>
+
+<h3>4.3 规则配置（rule-global.html）</h3>
+<p><strong>双页签（同页面内切换，非跳页）：</strong></p>
+<ul>
+<li><strong>全局配置：</strong>表格列：组织域/级别/上班卡抽取率/下班卡抽取率/候选人池阈值/人员更换限制/抽验有效期/操作。配置弹窗含：组织域信息（只读）、抽取率、候选人池阈值、下发组织域（树形下拉多选）</li>
+<li><strong>项目规则例外：</strong>表格列：项目名称|施工许可/项目区划/上级默认规则对比/项目实际规则（橙色🔒标记例外项）/操作。新增例外→模糊搜索选项目；修改例外→项目名只读</li>
+</ul>
+<div class="callout warn"><strong>关键逻辑：</strong>项目规则例外标记 <code>is_locked=true</code>，全局规则下发时跳过这些记录（UPDATE 语句加 WHERE is_locked=false）。</div>
+
+<h3>4.4 抽验记录（records.html）</h3>
+<ul>
+<li>单一表格（去掉页签），列顺序：序号 → 项目名称|施工许可证号 → 项目区划 → 打卡人 → 合拍人 → 类型 → 验证结果 → 未通过原因 → 验证时间 → 操作（详情）</li>
+<li>账号级别切换下拉框过滤数据（省级→全部 / 市级→本市 / 区县→本区）</li>
+</ul>
+
+<h3>4.5 抽验记录详情（record-detail.html）</h3>
+<ul>
+<li><strong>双场景支持：</strong>默认（拍照重试轨迹）和 <code>?scenario=swap</code>（换人轨迹）</li>
+<li>核验轨迹 Timeline：每次拍照不通过含照片缩略图（点击可查看大图）</li>
+<li>三列信息卡片布局（人员/项目/照片），无右侧空白</li>
+</ul>
+
+<h3>4.6 抽验汇总（summary.html）</h3>
+<ul>
+<li>统计周期：<strong>上线至今</strong></li>
+<li>人员汇总 + 项目汇总 双页签</li>
+</ul>
+
+<h3>4.7 风险预警（risk-warning.html）</h3>
+<ul>
+<li>人员风险 + 项目风险 双页签</li>
+<li>统计周期：<strong>近30天滚动</strong>（页面头部标注）</li>
+<li>人员筛选项：风险等级/岗位/项目区划/项目名称</li>
+<li>项目筛选项：风险等级/项目区划/项目名称</li>
+</ul>
+</div>
+
+<!-- 5. 数据 -->
+<div class="section">
+<h2><span class="dot"></span>五、数据流与接口规范</h2>
+
+<h3>5.1 核心接口时序</h3>
+<table>
+<tr><th>步骤</th><th>触发方</th><th>方法</th><th>路径</th><th>关键参数</th></tr>
+<tr><td>单人打卡完成</td><td>打卡人</td><td>POST</td><td><code>/api/checkin/complete</code></td><td>userId, gps, projectId, checkinType</td></tr>
+<tr><td>判定触发抽验</td><td>后端</td><td>—</td><td>—</td><td>按组织域规则+项目例外规则判定</td></tr>
+<tr><td>抽取合拍人</td><td>后端</td><td>—</td><td>—</td><td>候选人池查询+随机+分布式锁</td></tr>
+<tr><td>推送通知</td><td>后端</td><td>WS</td><td><code>push co-photo:notify</code></td><td>requestId, partnerUserId, expireAt</td></tr>
+<tr><td>合拍人确认</td><td>合拍人</td><td>POST</td><td><code>/api/co-photo/confirm</code></td><td>requestId, action, reason</td></tr>
+<tr><td>提交合拍照片</td><td>打卡人</td><td>POST</td><td><code>/api/co-photo/submit</code></td><td>requestId, image(base64), gps, timestamp</td></tr>
+<tr><td>调用人脸核验</td><td>后端</td><td>POST</td><td><code>/api/co-photo/verify</code></td><td>内部调用第三方核验API</td></tr>
+<tr><td>返回核验结果</td><td>后端→打卡人</td><td>WS</td><td><code>push co-photo:result</code></td><td>result, score, failReason</td></tr>
+</table>
+
+<h3>5.2 核心数据表</h3>
+<table>
+<tr><th>表名</th><th>核心字段</th><th>说明</th></tr>
+<tr><td><code>co_photo_request</code></td><td>id, checkin_user_id, partner_user_id, project_id, status(pending/confirmed/rejected/timeout), confirm_at, confirm_deadline, expire_at(15min), result(pass/fail/downgrade), final_score</td><td>合拍请求主表</td></tr>
+<tr><td><code>co_photo_record</code></td><td>id, request_id, attempt_no, image_url, score, result, fail_reason, gps, camera_device, created_at</td><td>每次拍照记录（含失败重拍）</td></tr>
+<tr><td><code>co_photo_reject_log</code></td><td>id, request_id, user_id, candidate_order, reason, rejected_at</td><td>拒绝/超时记录</td></tr>
+<tr><td><code>co_photo_rule</code></td><td>id, org_id, org_level, shangban_rate, xiaban_rate, pool_threshold, valid_from, valid_to</td><td>组织域规则配置</td></tr>
+<tr><td><code>co_photo_rule_exception</code></td><td>id, project_id, rule_overrides(json), is_locked, created_by, created_at</td><td>项目规则例外</td></tr>
+<tr><td><code>co_photo_risk_score</code></td><td>id, target_type(person/project), target_id, score, indicators(json), period_start, period_end, calc_at</td><td>风险评分（每日凌晨更新）</td></tr>
+<tr><td><code>checkin_record</code></td><td>现有表增加字段：<code>co_photo_request_id</code>, <code>is_co_photo_verified</code>, <code>co_photo_result</code></td><td>现有考勤表扩展</td></tr>
+</table>
+
+<h3>5.3 定时任务</h3>
+<table>
+<tr><th>任务</th><th>频率</th><th>逻辑</th></tr>
+<tr><td>确认窗口超时扫描</td><td>每 30 秒</td><td>扫描 <code>status=pending AND now() > confirm_deadline</code>，自动标记 timeout 并触发换人</td></tr>
+<tr><td>执行窗口超时扫描</td><td>每 30 秒</td><td>扫描 <code>status=confirmed AND now() > expire_at AND result IS NULL</code>，标记 downgrade</td></tr>
+<tr><td>风险评分计算</td><td>每日 02:00</td><td>计算近30天数据，生成 person/project 评分</td></tr>
+</table>
+
+<div class="callout info"><strong>并发控制：</strong>抽取合拍人时使用 Redis 分布式锁 (<code>lock:partner:{userId}</code>, TTL=15min)，防止同一人被多个打卡人同时抽中。</div>
+</div>
+
+<!-- 6. 硬编码常量 -->
+<div class="section">
+<h2><span class="dot"></span>六、写死常量</h2>
+<table>
+<tr><th>常量</th><th>值</th><th>适用范围</th></tr>
+<tr><td>确认窗口</td><td><code>5 * 60</code>（秒）</td><td>合拍人响应时限</td></tr>
+<tr><td>执行窗口</td><td><code>15 * 60</code>（秒）</td><td>从抽中到完成合拍总时限</td></tr>
+<tr><td>候选人更换上限</td><td><code>2</code>（可换2次，共3个候选人）</td><td>换人限制</td></tr>
+<tr><td>风险评分周期</td><td><code>30</code>（天）</td><td>近30天滚动</td></tr>
+<tr><td>GPS偏离阈值</td><td><code>500</code>（米）</td><td>超过计入偏离</td></tr>
+<tr><td>高风险线</td><td><code>80</code></td><td>综合风险分≥80</td></tr>
+<tr><td>中风险线</td><td><code>50</code></td><td>综合风险分 50-79</td></tr>
+<tr><td>模糊搜索触发字数</td><td><code>2</code></td><td>项目名称输入≥2字触发搜索</td></tr>
+</table>
+</div>
+
+<!-- 7. 设计规范 -->
+<div class="section">
+<h2><span class="dot"></span>七、UI设计规范</h2>
+
+<h3>7.1 监管端</h3>
+<table>
+<tr><th>项</th><th>值</th></tr>
+<tr><td>主色调</td><td>#1677ff（Ant Design 蓝）</td></tr>
+<tr><td>风险色</td><td>红 #ff4d4f / 橙 #fa8c16 / 绿 #52c41a</td></tr>
+<tr><td>侧边栏宽</td><td>200px</td></tr>
+<tr><td>卡片圆角</td><td>4-6px</td></tr>
+<tr><td>字体</td><td>-apple-system, PingFang SC, Microsoft YaHei</td></tr>
+<tr><td>折线图</td><td>原型用静态 SVG，正式开发建议 ECharts</td></tr>
+</table>
+
+<h3>7.2 小程序端</h3>
+<table>
+<tr><th>项</th><th>值</th></tr>
+<tr><td>屏幕比例</td><td>20:9（小米15 Pro 390×844px 等比例）</td></tr>
+<tr><td>横版取景框</td><td>780×351px（20:9横向）</td></tr>
+<tr><td>人脸引导框</td><td>虚线头肩轮廓 SVG，白色 #fff 描边</td></tr>
+<tr><td>角色名统一</td><td>德小拓（原德拓科技，避免误读为单位名）</td></tr>
+</table>
+</div>
+
+<!-- 8. 开发注意事项 -->
+<div class="section">
+<h2><span class="dot"></span>八、开发注意事项</h2>
+<div class="callout danger"><strong>严禁向用户暴露任何第三方服务商名称。</strong>所有UI文案中不得出现"百度API""百度人脸核验""后端上传""阿里云"等字样。统一使用"人脸核验""系统"等笼统表述。</div>
+<ol>
+<li>打卡人<strong>不能拒绝/更换</strong>系统分配的合拍人，无对应UI和API</li>
+<li>合拍拍照<strong>强制实时拍摄</strong>，调用 <code>wx.chooseMedia({ sourceType: ['camera'] })</code></li>
+<li>照片上传前客户端加水印（GPS+项目+人员+时间）</li>
+<li>规则下发时排除 <code>is_locked=true</code> 的项目例外记录</li>
+<li>风险评分定时任务每日凌晨执行，避免实时计算</li>
+<li>所有时间字段存储为 UTC timestamp，前端展示时按用户时区转换</li>
+<li>侧边栏 7 个菜单图标以 <code>index.html</code> 为基准（统一样式）</li>
+<li>账号级别切换功能在原型中为 demo 下拉框，实际开发通过登录态 <code>org_level</code> 判定</li>
+<li>项目搜索使用 LIKE 模糊匹配（<code>WHERE project_name LIKE '%keyword%'</code>），输入 ≥2 字触发</li>
+<li>折线图/图表类组件建议使用 ECharts，原型的静态 SVG 仅供参考布局</li>
+</ol>
+</div>
+
+</div>
+<div class="footer">江西省建筑工人实名制管理服务信息平台 · 研发交底文档 · v1.0</div>
+</body>
+</html>

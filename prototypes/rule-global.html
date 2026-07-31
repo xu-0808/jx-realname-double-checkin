@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>规则配置 - 江西省建筑工人实名制管理服务信息平台</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif; background:#f0f2f5; color:#333; }
+    a { text-decoration:none; color:inherit; }
+
+    .header { height:56px; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,0.08); display:flex; align-items:center; justify-content:space-between; padding:0 24px; position:fixed; top:0; left:0; right:0; z-index:100; }
+    .header-left { display:flex; align-items:center; gap:12px; }
+    .logo { width:32px; height:32px; background:linear-gradient(135deg,#1890ff,#096dd9); border-radius:4px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; font-size:14px; }
+    .header-title { font-size:15px; font-weight:500; color:#333; }
+    .header-sub { font-size:12px; color:#999; margin-left:8px; }
+    .header-right { display:flex; align-items:center; gap:20px; color:#666; font-size:13px; }
+    .user-info { display:flex; align-items:center; gap:6px; cursor:pointer; }
+    .avatar { width:28px; height:28px; border-radius:50%; background:#1890ff; color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; }
+
+    .layout { display:flex; min-height:100vh; padding-top:56px; }
+    .sidebar { width:200px; background:#001529; color:rgba(255,255,255,0.65); position:fixed; top:56px; bottom:0; left:0; overflow-y:auto; padding:8px 0; font-size:13px; }
+    .menu-item { padding:0 16px; height:40px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; transition:all 0.2s; }
+    .menu-item:hover { color:#fff; }
+    .menu-item.active { background:#1890ff; color:#fff; }
+    .menu-item .left { display:flex; align-items:center; gap:8px; }
+    .menu-icon { width:14px; height:14px; flex-shrink:0; }
+    .submenu { background:#000c17; display:none; }
+    .submenu.show { display:block; }
+    .submenu-item { padding:0 24px 0 40px; height:36px; display:flex; align-items:center; cursor:pointer; transition:all 0.2s; }
+    .submenu-item:hover { color:#fff; }
+    .submenu-item.active { color:#fff; background:rgba(24,144,255,0.2); border-right:3px solid #1890ff; }
+
+    .main { margin-left:200px; flex:1; padding:20px; }
+    .page-header { background:#fff; padding:14px 20px; border-radius:4px; margin-bottom:16px; }
+    .page-header h2 { font-size:16px; font-weight:500; }
+    .breadcrumb { font-size:12px; color:#999; margin-top:4px; }
+
+    .card { background:#fff; border-radius:4px; box-shadow:0 1px 4px rgba(0,0,0,0.04); }
+    .card-header { padding:14px 20px; border-bottom:1px solid #f0f0f0; display:flex; justify-content:space-between; align-items:center; }
+    .card-title { font-size:15px; font-weight:500; }
+    .card-body { padding:20px; }
+
+    .tabs { display:flex; border-bottom:1px solid #f0f0f0; }
+    .tab { padding:10px 20px; cursor:pointer; font-size:13px; color:#666; border-bottom:2px solid transparent; margin-bottom:-1px; transition:all 0.2s; }
+    .tab:hover { color:#1890ff; }
+    .tab.active { color:#1890ff; border-bottom-color:#1890ff; font-weight:500; }
+    .tab-content { display:none; }
+    .tab-content.active { display:block; }
+
+    .filter-bar { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:16px; }
+    .filter-item { display:flex; align-items:center; gap:6px; font-size:13px; }
+    .filter-item label { color:#666; white-space:nowrap; }
+    .filter-item select,.filter-item input { padding:5px 10px; border:1px solid #d9d9d9; border-radius:4px; font-size:13px; outline:none; }
+    .filter-item select:focus,.filter-item input:focus { border-color:#1890ff; }
+    .btn { padding:5px 14px; border-radius:4px; font-size:13px; cursor:pointer; border:1px solid; }
+    .btn-primary { background:#1890ff; color:#fff; border-color:#1890ff; }
+    .btn-primary:hover { background:#40a9ff; }
+    .btn-default { background:#fff; border-color:#d9d9d9; color:#666; }
+    .btn-default:hover { border-color:#1890ff; color:#1890ff; }
+    .btn-danger { background:#fff; color:#ff4d4f; border-color:#ff4d4f; }
+    .btn-danger:hover { background:#ff4d4f; color:#fff; }
+
+    .table { width:100%; border-collapse:collapse; font-size:13px; }
+    .table th { background:#fafafa; color:#666; font-weight:500; text-align:left; padding:10px 12px; border-bottom:1px solid #f0f0f0; white-space:nowrap; }
+    .table td { padding:10px 12px; border-bottom:1px solid #f0f0f0; }
+    .table tr:hover td { background:#fafafa; }
+    .tag { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:500; }
+    .tag-green { background:#f6ffed; color:#52c41a; border:1px solid #b7eb8f; }
+    .tag-red { background:#fff1f0; color:#ff4d4f; border:1px solid #ffa39e; }
+    .tag-orange { background:#fff7e6; color:#fa8c16; border:1px solid #ffd591; }
+    .action-link { color:#1890ff; cursor:pointer; font-size:12px; }
+    .action-link:hover { color:#40a9ff; }
+    .action-link.danger { color:#ff4d4f; cursor:pointer; }
+    .action-link.danger:hover { color:#ff7875; }
+
+    .pagination { display:flex; justify-content:flex-end; align-items:center; gap:6px; margin-top:14px; font-size:13px; color:#666; }
+    .pagination button { padding:4px 10px; border:1px solid #d9d9d9; background:#fff; border-radius:4px; cursor:pointer; font-size:12px; }
+    .pagination button:hover { border-color:#1890ff; color:#1890ff; }
+    .pagination button.active { background:#1890ff; color:#fff; border-color:#1890ff; }
+
+    .lock-badge { display:inline-flex; align-items:center; gap:2px; font-size:11px; color:#fa8c16; }
+    .lock-badge svg { width:13px; height:13px; }
+
+    .info-banner {
+      background:#fffbe6; border:1px solid #ffe58f; border-radius:4px; padding:12px 16px;
+      margin-bottom:16px; display:flex; align-items:flex-start; gap:10px; font-size:12px; color:#8c6d00; line-height:1.7;
+    }
+    .info-banner .banner-icon { font-size:15px; flex-shrink:0; margin-top:1px; }
+    .info-banner strong { color:#5c4500; }
+
+    /* Modal */
+    .modal-overlay { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.45); z-index:1000; align-items:center; justify-content:center; }
+    .modal-overlay.show { display:flex; }
+    .modal { background:#fff; border-radius:4px; width:620px; max-height:90vh; overflow-y:auto; box-shadow:0 4px 12px rgba(0,0,0,0.15); }
+    .modal-header { padding:14px 20px; border-bottom:1px solid #f0f0f0; display:flex; justify-content:space-between; align-items:center; }
+    .modal-title { font-size:15px; font-weight:500; }
+    .modal-close { font-size:18px; color:#999; cursor:pointer; background:none; border:none; }
+    .modal-body { padding:20px; }
+    .modal-footer { padding:12px 20px; border-top:1px solid #f0f0f0; display:flex; justify-content:flex-end; gap:10px; }
+
+    .form-row { display:flex; gap:16px; margin-bottom:16px; }
+    .form-item { flex:1; }
+    .form-item.half { flex:0 0 48%; }
+    .form-item label { display:block; font-size:13px; color:#666; margin-bottom:6px; }
+    .form-item label .required { color:#ff4d4f; }
+    .form-item input,.form-item select { width:100%; padding:7px 10px; border:1px solid #d9d9d9; border-radius:4px; font-size:13px; outline:none; }
+    .form-item input:focus { border-color:#1890ff; }
+    .form-item .hint { font-size:11px; color:#aaa; margin-top:4px; }
+    .form-item .static-text { padding:7px 10px; background:#fafafa; border:1px solid #eee; border-radius:4px; font-size:13px; color:#555; }
+
+    .switch { position:relative; display:inline-block; width:40px; height:20px; vertical-align:middle; }
+    .switch input { opacity:0; width:0; height:0; }
+    .slider { position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background:#ccc; transition:.3s; border-radius:20px; }
+    .slider:before { position:absolute; content:""; height:16px; width:16px; left:2px; bottom:2px; background:white; transition:.3s; border-radius:50%; }
+    input:checked+.slider { background:#1890ff; }
+    input:checked+.slider:before { transform:translateX(20px); }
+
+    /* Tree select */
+    .org-section { position:relative; }
+    .tree-select {
+      border:1px solid #d9d9d9; border-radius:4px; padding:5px 8px;
+      min-height:36px; display:flex; flex-wrap:wrap; gap:4px; align-items:center;
+      cursor:pointer; transition:border-color 0.2s;
+    }
+    .tree-select:hover,.tree-select.open { border-color:#1890ff; }
+    .tree-select .tag-item { background:#e6f7ff; color:#1890ff; border:1px solid #91d5ff; border-radius:3px; padding:1px 6px; font-size:12px; display:flex; align-items:center; gap:4px; }
+    .tree-select .tag-item .remove { cursor:pointer; color:#999; font-size:14px; line-height:1; }
+    .tree-select .tag-item .remove:hover { color:#ff4d4f; }
+    .tree-select .placeholder { color:#bbb; font-size:13px; }
+    .tree-dropdown { display:none; position:absolute; top:100%; left:0; right:0; z-index:200; background:#fff; border:1px solid #d9d9d9; border-top:none; border-radius:0 0 4px 4px; box-shadow:0 4px 12px rgba(0,0,0,0.12); max-height:320px; overflow-y:auto; }
+    .tree-dropdown.show { display:block; }
+    .tree-node .node-row { display:flex; align-items:center; gap:6px; padding:5px 12px; cursor:pointer; font-size:13px; }
+    .tree-node .node-row:hover { background:#f5f5f5; }
+    .tree-node .node-row.lv1 { font-weight:500; }
+    .tree-node .node-row.lv2 { padding-left:34px; color:#555; }
+    .tree-node .node-row.lv3 { padding-left:56px; color:#777; font-size:12px; }
+    .tree-node .expand-icon { width:16px; height:16px; display:inline-flex; align-items:center; justify-content:center; font-size:10px; color:#999; transition:transform 0.2s; flex-shrink:0; }
+    .tree-node.expanded>.node-row .expand-icon { transform:rotate(90deg); }
+    .tree-node .children { display:none; }
+    .tree-node.expanded>.children { display:block; }
+    .tree-dropdown-footer { padding:8px 12px; border-top:1px solid #f0f0f0; display:flex; justify-content:flex-end; gap:8px; }
+    .tree-dropdown-footer .btn-link { font-size:12px; color:#1890ff; background:none; border:none; cursor:pointer; }
+
+    /* Search dropdown */
+    .search-wrap { position:relative; }
+    .search-dropdown { display:none; position:absolute; top:100%; left:0; right:0; background:#fff; border:1px solid #d9d9d9; border-top:none; border-radius:0 0 4px 4px; box-shadow:0 4px 12px rgba(0,0,0,0.12); max-height:200px; overflow-y:auto; z-index:200; }
+    .search-dropdown.show { display:block; }
+    .search-result { padding:8px 12px; cursor:pointer; font-size:13px; }
+    .search-result:hover { background:#e6f7ff; }
+    .search-result .sub { font-size:11px; color:#999; }
+  </style>
+</head>
+<body>
+<div class="header">
+  <div class="header-left">
+    <div class="logo">赣</div>
+    <div><span class="header-title">江西省建筑工人实名制管理服务信息平台</span><span class="header-sub">双人打卡管理</span></div>
+  </div>
+  <div class="header-right">
+    <div class="user-info"><div class="avatar">管</div><span>南昌市管理员</span></div>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> 工程一张图</span></div>
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="13" width="4" height="8"/><rect x="10" y="9" width="4" height="12"/><rect x="17" y="5" width="4" height="16"/></svg> BI数据看板</span></div>
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg> 实名制管理</span></div>
+    <div class="menu-item active open">
+      <span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M17 9h.01"/></svg> 双人打卡管理</span>
+    </div>
+    <div class="submenu show">
+      <div class="submenu-item"><a href="index.html">数据看板</a></div>
+      <div class="submenu-item active"><a href="rule-global.html">规则配置</a></div>
+      <div class="submenu-item"><a href="records.html">抽验记录</a></div>
+      <div class="submenu-item"><a href="summary.html">抽验汇总</a></div>
+      <div class="submenu-item"><a href="risk-warning.html">风险预警</a></div>
+    </div>
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><circle cx="8" cy="17" r="1"/></svg> 工程发检监管</span></div>
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="9" y1="10" x2="15" y2="10"/></svg> 劳务用工监管</span></div>
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="9" stroke-dasharray="4 3"/></svg> 系统管理</span></div>
+  </div>
+
+  <div class="main">
+    <div class="page-header">
+      <h2>双人打卡 · 规则配置</h2>
+      <div class="breadcrumb">首页 / 双人打卡管理 / 规则配置</div>
+    </div>
+
+    <div class="card">
+      <!-- Tabs -->
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('global')">全局配置</div>
+        <div class="tab" onclick="switchTab('project')">项目规则例外</div>
+      </div>
+
+      <!-- ========== Tab 1: 全局配置 ========== -->
+      <div class="tab-content active" id="tabGlobal">
+        <div class="card-body">
+          <div class="filter-bar">
+            <div class="filter-item"><label>组织域级别：</label><select><option>全部</option><option>省级</option><option>地市级</option><option>区县级</option></select></div>
+            <div class="filter-item"><label>组织域名称：</label><input type="text" placeholder="请输入"></div>
+            <button class="btn-primary">查询</button><button class="btn-default">重置</button>
+          </div>
+
+          <table class="table">
+            <thead>
+              <tr><th>序号</th><th>组织域名称</th><th>级别</th><th>状态</th><th>上班卡抽取率</th><th>下班卡抽取率</th><th>候选人池阈值</th><th>可更换次数</th><th>操作</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td>江西省</td><td>省级</td><td><span class="tag tag-green">已启用</span></td><td>100%</td><td>50%</td><td>≥ 2 人</td><td>3次</td><td><span class="action-link" onclick="openGlobalModal()">规则配置</span></td></tr>
+              <tr><td>2</td><td>南昌市</td><td>地市级</td><td><span class="tag tag-green">已启用</span></td><td>100%</td><td>50%</td><td>≥ 2 人</td><td>3次</td><td><span class="action-link" onclick="openGlobalModal()">规则配置</span></td></tr>
+              <tr><td>3</td><td>赣州市</td><td>地市级</td><td><span class="tag tag-green">已启用</span></td><td>100%</td><td>40%</td><td>≥ 3 人</td><td>3次</td><td><span class="action-link" onclick="openGlobalModal()">规则配置</span></td></tr>
+              <tr><td>4</td><td>九江市</td><td>地市级</td><td><span class="tag tag-red">未启用</span></td><td>—</td><td>—</td><td>—</td><td>—</td><td><span class="action-link" onclick="openGlobalModal()">规则配置</span></td></tr>
+              <tr><td>5</td><td>红谷滩区</td><td>区县级</td><td><span class="tag tag-green">已启用</span></td><td>100%</td><td>60%</td><td>≥ 2 人</td><td>3次</td><td><span class="action-link" onclick="openGlobalModal()">规则配置</span></td></tr>
+              <tr><td>6</td><td>经开区</td><td>区县级</td><td><span class="tag tag-green">已启用</span></td><td>100%</td><td>50%</td><td>≥ 2 人</td><td>2次</td><td><span class="action-link" onclick="openGlobalModal()">规则配置</span></td></tr>
+              <tr><td>7</td><td>浔阳区</td><td>区县级</td><td><span class="tag tag-red">未启用</span></td><td>—</td><td>—</td><td>—</td><td>—</td><td><span class="action-link" onclick="openGlobalModal()">规则配置</span></td></tr>
+              <tr><td>8</td><td>龙南市</td><td>区县级</td><td><span class="tag tag-green">已启用</span></td><td>90%</td><td>40%</td><td>≥ 2 人</td><td>3次</td><td><span class="action-link" onclick="openGlobalModal()">规则配置</span></td></tr>
+            </tbody>
+          </table>
+          <div class="pagination"><span>共 11 条</span><button>&lt;</button><button class="active">1</button><button>2</button><button>&gt;</button></div>
+        </div>
+      </div>
+
+      <!-- ========== Tab 2: 项目规则例外 ========== -->
+      <div class="tab-content" id="tabProject">
+        <div class="info-banner">
+          <span class="banner-icon">🔒</span>
+          <div>
+            <strong>项目规则例外说明</strong><br>
+            列入本清单的项目，其合拍规则<strong>独立于组织域全局配置</strong>。当上级修改全局规则并下发时，例外项目的规则不会被覆盖。如需恢复跟随全局配置，请操作"解除例外"。
+          </div>
+        </div>
+        <div class="card-body" style="padding-top:0;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <div class="filter-bar" style="margin-bottom:0;">
+              <div class="filter-item"><label>项目名称：</label><input type="text" placeholder="请输入"></div>
+              <div class="filter-item"><label>管理区域：</label><select><option>全部</option><option>红谷滩区</option><option>经开区</option></select></div>
+              <button class="btn-default">查询</button>
+            </div>
+            <button class="btn-primary" onclick="openAddModal()">+ 新增例外项目</button>
+          </div>
+
+          <table class="table">
+            <thead>
+              <tr><th>项目名称</th><th>所属区县</th><th>上级组织域规则</th><th>上班卡抽取率</th><th>下班卡抽取率</th><th>候选人池阈值</th><th>生效时间</th><th>操作</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>绿地国际博览城二期</td><td>红谷滩区</td>
+                <td><span style="font-size:11px;color:#aaa;">南昌市：上100 下50 ≥2人 3次</span></td>
+                <td><span style="color:#fa8c16;font-weight:600;">100%</span> <span class="lock-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>例外</span></td>
+                <td>50%</td>
+                <td><span style="color:#fa8c16;font-weight:600;">≥ 3 人</span> <span class="lock-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>例外</span></td>
+                <td>2026-07-10</td>
+                <td><span class="action-link" onclick="openEditModal('绿地国际博览城二期')">修改</span><span class="action-link danger">解除例外</span></td>
+              </tr>
+              <tr>
+                <td>豫章师范学院实训大楼一期</td><td>经开区</td>
+                <td><span style="font-size:11px;color:#aaa;">南昌市：上100 下50 ≥2人 3次</span></td>
+                <td><span style="color:#fa8c16;font-weight:600;">100%</span> <span class="lock-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>例外</span></td>
+                <td><span style="color:#fa8c16;font-weight:600;">80%</span> <span class="lock-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>例外</span></td>
+                <td>≥ 2 人</td>
+                <td>2026-07-15</td>
+                <td><span class="action-link" onclick="openEditModal('豫章师范学院实训大楼一期')">修改</span><span class="action-link danger">解除例外</span></td>
+              </tr>
+              <tr>
+                <td>南昌西站交通枢纽配套工程</td><td>红谷滩区</td>
+                <td><span style="font-size:11px;color:#aaa;">南昌市：上100 下50 ≥2人 3次</span></td>
+                <td>100%</td><td>50%</td>
+                <td><span style="color:#fa8c16;font-weight:600;">≥ 5 人</span> <span class="lock-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>例外</span></td>
+                <td>2026-07-20</td>
+                <td><span class="action-link" onclick="openEditModal('南昌西站交通枢纽配套工程')">修改</span><span class="action-link danger">解除例外</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="pagination"><span>共 3 条</span><button>&lt;</button><button class="active">1</button><button>&gt;</button></div>
+        </div>
+      </div>
+
+    </div><!-- .card -->
+  </div>
+</div>
+
+<!-- ====== 全局配置弹窗 ====== -->
+<div class="modal-overlay" id="globalModal">
+  <div class="modal"><div class="modal-header"><div class="modal-title">配置合拍规则 - 南昌市</div><button class="modal-close" onclick="closeModal('globalModal')">&times;</button></div>
+    <div class="modal-body">
+      <div class="form-row"><div class="form-item half"><label>是否启用</label><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></div></div>
+      <div class="form-row"><div class="form-item"><label><span class="required">*</span>上班卡抽取率</label><input type="number" min="0" max="100" value="100"><div class="hint">0-100%，100%表示每位非首人上班打卡均触发抽验</div></div><div class="form-item"><label><span class="required">*</span>下班卡抽取率</label><input type="number" min="0" max="100" value="50"></div></div>
+      <div class="form-row"><div class="form-item"><label><span class="required">*</span>候选人池阈值</label><input type="number" min="1" value="2"><div class="hint">低于此值不触发抽验</div></div><div class="form-item"><label><span class="required">*</span>可更换次数</label><input type="number" min="0" value="3"></div></div>
+      <div class="form-row"><div class="form-item half"><label>是否要求同一公司</label><label class="switch"><input type="checkbox"><span class="slider"></span></label><div class="hint">开启后优先同公司人员</div></div></div>
+      <div class="form-item" style="margin-top:8px;">
+        <label>下发至下级组织域</label>
+        <div class="org-section">
+          <div class="tree-select" id="treeSelect" onclick="toggleTree()">
+            <span class="tag-item">红谷滩区<span class="remove" onclick="event.stopPropagation();removeTag('红谷滩区')">&times;</span></span>
+            <span class="tag-item">经开区<span class="remove" onclick="event.stopPropagation();removeTag('经开区')">&times;</span></span>
+            <span class="placeholder" id="treePlaceholder" style="display:none;">请选择下发的组织域</span>
+          </div>
+          <div class="tree-dropdown" id="treeDropdown">
+            <div class="tree-node expanded">
+              <div class="node-row lv1" onclick="toggleNode(event,this.parentElement)"><span class="expand-icon">▶</span> 江西省<span style="color:#999;font-weight:400;">（当前）</span></div>
+              <div class="children">
+                <div class="tree-node"><div class="node-row lv2" onclick="toggleNode(event,this.parentElement)"><span class="expand-icon">▶</span> 南昌市</div><div class="children">
+                  <div class="node-row lv3"><input type="checkbox" checked data-name="红谷滩区" onchange="onCheck(this)"> 红谷滩区</div>
+                  <div class="node-row lv3"><input type="checkbox" checked data-name="经开区" onchange="onCheck(this)"> 经开区</div>
+                  <div class="node-row lv3"><input type="checkbox" data-name="南昌县" onchange="onCheck(this)"> 南昌县</div>
+                  <div class="node-row lv3"><input type="checkbox" data-name="东湖区" onchange="onCheck(this)"> 东湖区</div>
+                  <div class="node-row lv3"><input type="checkbox" data-name="西湖区" onchange="onCheck(this)"> 西湖区</div>
+                  <div class="node-row lv3"><input type="checkbox" data-name="青云谱区" onchange="onCheck(this)"> 青云谱区</div>
+                  <div class="node-row lv3"><input type="checkbox" data-name="青山湖区" onchange="onCheck(this)"> 青山湖区</div>
+                  <div class="node-row lv3"><input type="checkbox" data-name="新建区" onchange="onCheck(this)"> 新建区</div>
+                  <div class="node-row lv3"><input type="checkbox" data-name="进贤县" onchange="onCheck(this)"> 进贤县</div>
+                  <div class="node-row lv3"><input type="checkbox" data-name="安义县" onchange="onCheck(this)"> 安义县</div>
+                </div></div>
+                <div class="tree-node"><div class="node-row lv2" onclick="toggleNode(event,this.parentElement)"><span class="expand-icon">▶</span> 赣州市</div><div class="children">
+                  <div class="node-row lv3"><input type="checkbox" data-name="章贡区" onchange="onCheck(this)"> 章贡区</div>
+                  <div class="node-row lv3"><input type="checkbox" data-name="龙南市" onchange="onCheck(this)"> 龙南市</div>
+                </div></div>
+                <div class="tree-node"><div class="node-row lv2" onclick="toggleNode(event,this.parentElement)"><span class="expand-icon">▶</span> 九江市</div><div class="children">
+                  <div class="node-row lv3"><input type="checkbox" data-name="浔阳区" onchange="onCheck(this)"> 浔阳区</div>
+                </div></div>
+              </div>
+            </div>
+            <div class="tree-dropdown-footer"><button class="btn-link" onclick="checkAll()">全选</button><button class="btn-link" onclick="clearAll()">清空</button><span style="flex:1;"></span><button class="btn btn-primary" style="padding:3px 12px;font-size:12px;" onclick="closeTree()">确定</button></div>
+          </div>
+        </div>
+        <div class="hint" style="margin-top:8px;">保存后将同步更新所选中下级组织域的合拍配置规则</div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn-default" onclick="closeModal('globalModal')">取消</button><button class="btn-primary" onclick="closeModal('globalModal')">保存</button></div>
+  </div>
+</div>
+
+<!-- ====== 新增例外项目弹窗 ====== -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal"><div class="modal-header"><div class="modal-title">新增项目规则例外</div><button class="modal-close" onclick="closeModal('addModal')">&times;</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-item">
+          <label><span class="required">*</span>选择项目</label>
+          <div class="search-wrap">
+            <input type="text" placeholder="输入项目名称搜索..." id="projectSearch" oninput="searchProject(this.value)" onfocus="searchProject(this.value)" autocomplete="off">
+            <div class="search-dropdown" id="searchDropdown">
+              <div class="search-result" onclick="selectProject('绿地国际博览城二期','红谷滩区')">绿地国际博览城二期<div class="sub">红谷滩区</div></div>
+              <div class="search-result" onclick="selectProject('豫章师范学院新建教育实验实训大楼一期','经开区')">豫章师范学院新建教育实验实训大楼一期<div class="sub">经开区</div></div>
+              <div class="search-result" onclick="selectProject('南昌西站交通枢纽配套工程','红谷滩区')">南昌西站交通枢纽配套工程<div class="sub">红谷滩区</div></div>
+              <div class="search-result" onclick="selectProject('红谷滩万达广场A区','红谷滩区')">红谷滩万达广场A区<div class="sub">红谷滩区</div></div>
+            </div>
+          </div>
+          <div class="hint">请输入至少2个字进行模糊匹配</div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-item">
+          <label>上级组织域当前规则</label>
+          <div class="static-text">南昌市：上班卡100% / 下班卡50% / 阈值≥2人 / 可换3次</div>
+        </div>
+      </div>
+      <div class="form-row"><div class="form-item"><label>上班卡抽取率</label><input type="number" min="0" max="100" placeholder="留空跟随上级"><div class="hint">只填需要例外的字段，留空则跟随上级组织域规则</div></div><div class="form-item"><label>下班卡抽取率</label><input type="number" min="0" max="100" placeholder="留空跟随上级"></div></div>
+      <div class="form-row"><div class="form-item"><label>候选人池阈值</label><input type="number" min="1" placeholder="留空跟随上级"></div><div class="form-item"><label>可更换次数</label><input type="number" min="0" placeholder="留空跟随上级"></div></div>
+      <div class="form-item"><label>例外说明</label><input type="text" placeholder="选填：记录设置例外的原因"></div>
+    </div>
+    <div class="modal-footer"><button class="btn-default" onclick="closeModal('addModal')">取消</button><button class="btn-primary" onclick="closeModal('addModal')">保存例外</button></div>
+  </div>
+</div>
+
+<!-- ====== 修改例外项目弹窗（项目名固定） ====== -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal"><div class="modal-header"><div class="modal-title">修改例外规则 - <span id="editProjectName"></span></div><button class="modal-close" onclick="closeModal('editModal')">&times;</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-item">
+          <label>项目名称</label>
+          <div class="static-text" id="editProjectDisplay"></div>
+        </div>
+        <div class="form-item">
+          <label>上级组织域当前规则</label>
+          <div class="static-text">南昌市：上班卡100% / 下班卡50% / 阈值≥2人 / 可换3次</div>
+        </div>
+      </div>
+      <div class="form-row"><div class="form-item"><label>上班卡抽取率</label><input type="number" min="0" max="100" value="100"><div class="hint">只填需要例外的字段，留空则跟随上级组织域规则</div></div><div class="form-item"><label>下班卡抽取率</label><input type="number" min="0" max="100" value="80"></div></div>
+      <div class="form-row"><div class="form-item"><label>候选人池阈值</label><input type="number" min="1" value="3"></div><div class="form-item"><label>可更换次数</label><input type="number" min="0" value="3"></div></div>
+      <div class="form-item"><label>例外说明</label><input type="text" placeholder="选填" value="重点项目，需严格抽验"></div>
+    </div>
+    <div class="modal-footer"><button class="btn-default" onclick="closeModal('editModal')">取消</button><button class="btn-primary" onclick="closeModal('editModal')">保存修改</button></div>
+  </div>
+</div>
+
+<script>
+// Tab switch
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(function(t,i){ t.classList.toggle('active', (tab==='global'&&i===0)||(tab==='project'&&i===1)); });
+  document.getElementById('tabGlobal').classList.toggle('active', tab==='global');
+  document.getElementById('tabProject').classList.toggle('active', tab==='project');
+}
+
+// Modal
+function openGlobalModal(){ document.getElementById('globalModal').classList.add('show'); }
+function openAddModal(){ document.getElementById('addModal').classList.add('show'); }
+function openEditModal(name){ document.getElementById('editProjectName').textContent=name; document.getElementById('editProjectDisplay').textContent=name; document.getElementById('editModal').classList.add('show'); }
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+
+// Search project
+function searchProject(val) {
+  var dd = document.getElementById('searchDropdown');
+  dd.classList.toggle('show', val.length >= 2);
+}
+function selectProject(name, district) {
+  document.getElementById('projectSearch').value = name;
+  document.getElementById('searchDropdown').classList.remove('show');
+}
+document.addEventListener('click',function(e){
+  var wrap = document.querySelector('.search-wrap');
+  if (wrap && !wrap.contains(e.target)) document.getElementById('searchDropdown').classList.remove('show');
+});
+
+// Tree select (same as before)
+function toggleTree(){ document.getElementById('treeDropdown').classList.toggle('show'); document.getElementById('treeSelect').classList.toggle('open'); }
+function closeTree(){ document.getElementById('treeDropdown').classList.remove('show'); document.getElementById('treeSelect').classList.remove('open'); }
+function toggleNode(e,node){ e.stopPropagation(); node.classList.toggle('expanded'); }
+function onCheck(cb){
+  var name=cb.dataset.name, ts=document.getElementById('treeSelect'), ph=document.getElementById('treePlaceholder');
+  if(cb.checked){ var s=document.createElement('span'); s.className='tag-item'; s.innerHTML=name+'<span class="remove" onclick="event.stopPropagation();removeTag(\''+name+'\')">&times;</span>'; ts.insertBefore(s,ph); }
+  else removeTag(name);
+  updatePlaceholder();
+}
+function removeTag(name){
+  document.querySelectorAll('#treeSelect .tag-item').forEach(function(t){ if(t.textContent.replace(/×/,'').trim()===name) t.remove(); });
+  var cb=document.querySelector('.tree-dropdown input[data-name="'+name+'"]'); if(cb) cb.checked=false;
+  updatePlaceholder();
+}
+function updatePlaceholder(){ document.getElementById('treePlaceholder').style.display = document.querySelectorAll('#treeSelect .tag-item').length===0 ? 'inline':'none'; }
+function checkAll(){ document.querySelectorAll('.tree-dropdown input[type=checkbox]').forEach(function(cb){ cb.checked=true; onCheck(cb); }); }
+function clearAll(){ document.querySelectorAll('.tree-dropdown input[type=checkbox]').forEach(function(cb){ cb.checked=false; }); document.querySelectorAll('#treeSelect .tag-item').forEach(function(t){ t.remove(); }); updatePlaceholder(); }
+document.addEventListener('click',function(e){ var s=document.querySelector('.org-section'); if(s&&!s.contains(e.target)) closeTree(); });
+</script>
+</body>
+</html>

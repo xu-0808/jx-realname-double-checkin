@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>项目规则例外 - 江西省建筑工人实名制管理服务信息平台</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif; background:#f0f2f5; color:#333; }
+    a { text-decoration:none; color:inherit; }
+
+    .header { height:56px; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,0.08); display:flex; align-items:center; justify-content:space-between; padding:0 24px; position:fixed; top:0; left:0; right:0; z-index:100; }
+    .header-left { display:flex; align-items:center; gap:12px; }
+    .logo { width:32px; height:32px; background:linear-gradient(135deg,#1890ff,#096dd9); border-radius:4px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; font-size:14px; }
+    .header-title { font-size:15px; font-weight:500; color:#333; }
+    .header-sub { font-size:12px; color:#999; margin-left:8px; }
+    .header-right { display:flex; align-items:center; gap:20px; color:#666; font-size:13px; }
+    .user-info { display:flex; align-items:center; gap:6px; cursor:pointer; }
+    .avatar { width:28px; height:28px; border-radius:50%; background:#1890ff; color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; }
+
+    .layout { display:flex; min-height:100vh; padding-top:56px; }
+    .sidebar { width:200px; background:#001529; color:rgba(255,255,255,0.65); position:fixed; top:56px; bottom:0; left:0; overflow-y:auto; padding:8px 0; font-size:13px; }
+    .menu-item { padding:0 16px; height:40px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; transition:all 0.2s; }
+    .menu-item:hover { color:#fff; }
+    .menu-item.active { background:#1890ff; color:#fff; }
+    .menu-item .left { display:flex; align-items:center; gap:8px; }
+    .menu-icon { width:14px; height:14px; flex-shrink:0; }
+    .submenu { background:#000c17; display:none; }
+    .submenu.show { display:block; }
+    .submenu-item { padding:0 24px 0 40px; height:36px; display:flex; align-items:center; cursor:pointer; transition:all 0.2s; }
+    .submenu-item:hover { color:#fff; }
+    .submenu-item.active { color:#fff; background:rgba(24,144,255,0.2); border-right:3px solid #1890ff; }
+
+    .main { margin-left:200px; flex:1; padding:20px; }
+    .page-header { background:#fff; padding:14px 20px; border-radius:4px; margin-bottom:16px; }
+    .page-header h2 { font-size:16px; font-weight:500; }
+    .breadcrumb { font-size:12px; color:#999; margin-top:4px; }
+
+    .info-banner {
+      background:#fffbe6; border:1px solid #ffe58f; border-radius:4px; padding:12px 16px;
+      margin-bottom:16px; display:flex; align-items:flex-start; gap:10px; font-size:12px; color:#8c6d00; line-height:1.7;
+    }
+    .info-banner .banner-icon { font-size:16px; flex-shrink:0; margin-top:1px; }
+    .info-banner strong { color:#5c4500; }
+
+    .card { background:#fff; border-radius:4px; box-shadow:0 1px 4px rgba(0,0,0,0.04); }
+    .card-header { padding:14px 20px; border-bottom:1px solid #f0f0f0; display:flex; justify-content:space-between; align-items:center; }
+    .card-title { font-size:15px; font-weight:500; }
+    .card-body { padding:20px; }
+
+    .filter-bar { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:16px; }
+    .filter-item { display:flex; align-items:center; gap:6px; font-size:13px; }
+    .filter-item label { color:#666; white-space:nowrap; }
+    .filter-item select,.filter-item input { padding:5px 10px; border:1px solid #d9d9d9; border-radius:4px; font-size:13px; outline:none; }
+    .filter-item select:focus,.filter-item input:focus { border-color:#1890ff; }
+    .btn { padding:5px 14px; border-radius:4px; font-size:13px; cursor:pointer; border:1px solid; }
+    .btn-primary { background:#1890ff; color:#fff; border-color:#1890ff; }
+    .btn-primary:hover { background:#40a9ff; }
+    .btn-default { background:#fff; border-color:#d9d9d9; color:#666; }
+    .btn-default:hover { border-color:#1890ff; color:#1890ff; }
+    .btn-danger { background:#fff; color:#ff4d4f; border-color:#ff4d4f; }
+    .btn-danger:hover { background:#ff4d4f; color:#fff; }
+
+    .table { width:100%; border-collapse:collapse; font-size:13px; }
+    .table th { background:#fafafa; color:#666; font-weight:500; text-align:left; padding:10px 12px; border-bottom:1px solid #f0f0f0; white-space:nowrap; }
+    .table td { padding:10px 12px; border-bottom:1px solid #f0f0f0; }
+    .table tr:hover td { background:#fafafa; }
+    .tag { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:500; }
+    .tag-green { background:#f6ffed; color:#52c41a; border:1px solid #b7eb8f; }
+    .tag-orange { background:#fff7e6; color:#fa8c16; border:1px solid #ffd591; }
+    .tag-gray { background:#f5f5f5; color:#999; border:1px solid #e8e8e8; }
+    .action-link { color:#1890ff; cursor:pointer; font-size:12px; margin-right:8px; }
+    .action-link:hover { color:#40a9ff; }
+    .action-link.danger { color:#ff4d4f; }
+    .action-link.danger:hover { color:#ff7875; }
+
+    /* Lock icon */
+    .lock-badge { display:inline-flex; align-items:center; gap:3px; font-size:11px; color:#fa8c16; }
+    .lock-badge svg { width:14px; height:14px; }
+
+    .pagination { display:flex; justify-content:flex-end; align-items:center; gap:6px; margin-top:14px; font-size:13px; color:#666; }
+    .pagination button { padding:4px 10px; border:1px solid #d9d9d9; background:#fff; border-radius:4px; cursor:pointer; font-size:12px; }
+    .pagination button:hover { border-color:#1890ff; color:#1890ff; }
+    .pagination button.active { background:#1890ff; color:#fff; border-color:#1890ff; }
+
+    /* Modal */
+    .modal-overlay { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.45); z-index:1000; align-items:center; justify-content:center; }
+    .modal-overlay.show { display:flex; }
+    .modal { background:#fff; border-radius:4px; width:600px; max-height:90vh; overflow-y:auto; box-shadow:0 4px 12px rgba(0,0,0,0.15); }
+    .modal-header { padding:14px 20px; border-bottom:1px solid #f0f0f0; display:flex; justify-content:space-between; align-items:center; }
+    .modal-title { font-size:15px; font-weight:500; }
+    .modal-close { font-size:18px; color:#999; cursor:pointer; background:none; border:none; }
+    .modal-body { padding:20px; }
+    .modal-footer { padding:12px 20px; border-top:1px solid #f0f0f0; display:flex; justify-content:flex-end; gap:10px; }
+
+    .form-row { display:flex; gap:16px; margin-bottom:16px; }
+    .form-item { flex:1; }
+    .form-item.half { flex:0 0 48%; }
+    .form-item label { display:block; font-size:13px; color:#666; margin-bottom:6px; }
+    .form-item label .required { color:#ff4d4f; }
+    .form-item input,.form-item select { width:100%; padding:7px 10px; border:1px solid #d9d9d9; border-radius:4px; font-size:13px; outline:none; }
+    .form-item input:focus,.form-item select:focus { border-color:#1890ff; }
+    .form-item .hint { font-size:11px; color:#aaa; margin-top:4px; }
+
+    .switch { position:relative; display:inline-block; width:40px; height:20px; vertical-align:middle; }
+    .switch input { opacity:0; width:0; height:0; }
+    .slider { position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background:#ccc; transition:.3s; border-radius:20px; }
+    .slider:before { position:absolute; content:""; height:16px; width:16px; left:2px; bottom:2px; background:white; transition:.3s; border-radius:50%; }
+    input:checked+.slider { background:#1890ff; }
+    input:checked+.slider:before { transform:translateX(20px); }
+  </style>
+</head>
+<body>
+<div class="header">
+  <div class="header-left">
+    <div class="logo">赣</div>
+    <div><span class="header-title">江西省建筑工人实名制管理服务信息平台</span><span class="header-sub">双人打卡管理</span></div>
+  </div>
+  <div class="header-right">
+    <div class="user-info"><div class="avatar">管</div><span>南昌市管理员</span></div>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg> 工程一张图</span></div>
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> BI数据看板</span></div>
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> 实名制管理</span></div>
+    <div class="menu-item active open">
+      <span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> 双人打卡管理</span>
+    </div>
+    <div class="submenu show">
+      <div class="submenu-item"><a href="index.html">数据看板</a></div>
+      <div class="submenu-item active"><a href="rule-global.html">规则配置</a></div>
+      <div class="submenu-item"><a href="records.html">抽验记录</a></div>
+      <div class="submenu-item"><a href="attendance-warning.html">异常预警</a></div>
+    </div>
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 22V2h12v20"/></svg> 工程发检监管</span></div>
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V8H6a2 2 0 0 1-2-2"/></svg> 劳务用工监管</span></div>
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06"/></svg> 系统管理</span></div>
+  </div>
+
+  <div class="main">
+    <div class="page-header">
+      <h2>双人打卡 · 项目规则例外</h2>
+      <div class="breadcrumb">首页 / 双人打卡管理 / 规则配置 / 项目规则例外</div>
+    </div>
+
+    <!-- Info Banner -->
+    <div class="info-banner">
+      <span class="banner-icon">🔒</span>
+      <div>
+        <strong>项目规则例外说明</strong><br>
+        列入本清单的项目，其合拍规则<strong>独立于组织域全局配置</strong>。当上级修改全局规则并下发至下级组织域时，<strong>例外项目的规则不会被覆盖</strong>。如需恢复跟随全局配置，请操作"解除例外"。
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">例外项目列表（南昌市）</div>
+        <button class="btn-primary" onclick="openModal()">+ 新增例外项目</button>
+      </div>
+      <div class="card-body">
+        <div class="filter-bar">
+          <div class="filter-item"><label>项目名称：</label><input type="text" placeholder="请输入"></div>
+          <div class="filter-item"><label>管理区域：</label><select><option>全部</option><option>红谷滩区</option><option>经开区</option></select></div>
+          <button class="btn-default">查询</button>
+        </div>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th>项目名称</th>
+              <th>所属区县</th>
+              <th>上级组织域规则</th>
+              <th>上班卡抽取率</th>
+              <th>下班卡抽取率</th>
+              <th>候选人池阈值</th>
+              <th>例外生效时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>绿地国际博览城二期</td>
+              <td>红谷滩区</td>
+              <td><span style="color:#999;">南昌市</span><br><span style="font-size:11px;color:#aaa;">上100% 下50% ≥2人 3次</span></td>
+              <td><span style="color:#fa8c16;font-weight:600;">100%</span> <span class="lock-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1"/></svg>例外</span></td>
+              <td>50%</td>
+              <td>≥ 3 人 <span class="lock-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1"/></svg>例外</span></td>
+              <td>2026-07-10</td>
+              <td>
+                <span class="action-link" onclick="openModal()">修改</span>
+                <span class="action-link danger">解除例外</span>
+              </td>
+            </tr>
+            <tr>
+              <td>豫章师范学院实训大楼一期</td>
+              <td>经开区</td>
+              <td><span style="color:#999;">南昌市</span><br><span style="font-size:11px;color:#aaa;">上100% 下50% ≥2人 3次</span></td>
+              <td><span style="color:#fa8c16;font-weight:600;">100%</span> <span class="lock-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1"/></svg>例外</span></td>
+              <td><span style="color:#fa8c16;font-weight:600;">80%</span> <span class="lock-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1"/></svg>例外</span></td>
+              <td>≥ 2 人</td>
+              <td>2026-07-15</td>
+              <td>
+                <span class="action-link" onclick="openModal()">修改</span>
+                <span class="action-link danger">解除例外</span>
+              </td>
+            </tr>
+            <tr>
+              <td>南昌西站交通枢纽配套工程</td>
+              <td>红谷滩区</td>
+              <td><span style="color:#999;">南昌市</span><br><span style="font-size:11px;color:#aaa;">上100% 下50% ≥2人 3次</span></td>
+              <td>100%</td>
+              <td>50%</td>
+              <td><span style="color:#fa8c16;font-weight:600;">≥ 5 人</span> <span class="lock-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1"/></svg>例外</span></td>
+              <td>2026-07-20</td>
+              <td>
+                <span class="action-link" onclick="openModal()">修改</span>
+                <span class="action-link danger">解除例外</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="pagination">
+          <span>共 3 条</span><button>&lt;</button><button class="active">1</button><button>&gt;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 新增/修改例外弹窗 -->
+<div class="modal-overlay" id="configModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">新增项目规则例外</div>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-item">
+          <label><span class="required">*</span>选择项目</label>
+          <select><option>请选择项目</option><option>绿地国际博览城二期</option><option>豫章师范学院实训大楼一期</option><option>南昌西站交通枢纽配套工程</option></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-item">
+          <label>上级组织域当前规则</label>
+          <input type="text" value="南昌市：上班卡100% / 下班卡50% / 阈值≥2人 / 可换3次" disabled style="background:#fafafa;color:#999;">
+          <div class="hint">此项目的默认规则，源自所属组织域的全局配置</div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-item">
+          <label><span class="required">*</span>上班卡抽取率</label>
+          <input type="number" value="100" min="0" max="100">
+          <div class="hint">留空则跟随上级组织域规则</div>
+        </div>
+        <div class="form-item">
+          <label><span class="required">*</span>下班卡抽取率</label>
+          <input type="number" value="80" min="0" max="100">
+          <div class="hint">留空则跟随上级组织域规则</div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-item">
+          <label>候选人池阈值</label>
+          <input type="number" value="3" min="1">
+          <div class="hint">留空则跟随上级组织域规则</div>
+        </div>
+        <div class="form-item">
+          <label>可更换合拍人次数</label>
+          <input type="number" value="3">
+          <div class="hint">留空则跟随上级组织域规则</div>
+        </div>
+      </div>
+      <div class="form-item" style="margin-top:4px;">
+        <label>例外说明</label>
+        <input type="text" placeholder="选填：记录设置例外的原因">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-default" onclick="closeModal()">取消</button>
+      <button class="btn-primary" onclick="closeModal()">保存例外</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openModal() { document.getElementById('configModal').classList.add('show'); }
+  function closeModal() { document.getElementById('configModal').classList.remove('show'); }
+</script>
+</body>
+</html>

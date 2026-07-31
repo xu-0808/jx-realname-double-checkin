@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>考勤人脸照片上传 - 赣建宝</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: #e8ecf1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .phone {
+      width: 380px;
+      background: #4a4a4a;
+      height: 100%;
+      position: relative;
+      overflow-y: auto;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .status-bar {
+      height: 44px;
+      background: #2563ff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      z-index: 10;
+    }
+    .status-bar .time { font-size: 15px; }
+    .status-bar .icons { display: flex; align-items: center; gap: 5px; }
+    .status-bar .icons svg { width: 16px; height: 16px; fill: currentColor; }
+    .status-bar .battery { display: flex; align-items: center; gap: 2px; font-size: 13px; }
+
+    .header {
+      background: #2563ff;
+      padding: 6px 16px 14px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 10;
+    }
+    .back-btn { width: 36px; display: flex; align-items: center; }
+    .back-btn svg { width: 22px; height: 22px; }
+    .header-title { font-size: 17px; font-weight: 500; flex: 1; text-align: center; }
+    .header-actions { display: flex; align-items: center; gap: 14px; }
+    .header-actions svg { width: 22px; height: 22px; }
+
+    .camera-area {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+    }
+    .camera-preview {
+      width: 260px;
+      height: 340px;
+      background: linear-gradient(135deg, #6a6a6a 0%, #888 50%, #6a6a6a 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .camera-preview::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='35' r='14' fill='%23555'/%3E%3Cellipse cx='50' cy='82' rx='28' ry='22' fill='%23555'/%3E%3C/svg%3E") center/contain no-repeat;
+      opacity: 0.4;
+    }
+    .face-frame-corner {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border-color: #38bdf8;
+      border-style: solid;
+      border-width: 0;
+    }
+    .face-frame-corner.top-left {
+      top: 20px; left: 20px;
+      border-top-width: 3px; border-left-width: 3px;
+    }
+    .face-frame-corner.top-right {
+      top: 20px; right: 20px;
+      border-top-width: 3px; border-right-width: 3px;
+    }
+    .face-frame-corner.bottom-left {
+      bottom: 20px; left: 20px;
+      border-bottom-width: 3px; border-left-width: 3px;
+    }
+    .face-frame-corner.bottom-right {
+      bottom: 20px; right: 20px;
+      border-bottom-width: 3px; border-right-width: 3px;
+    }
+
+    .bottom-actions {
+      padding: 20px 16px 40px;
+      display: flex;
+      gap: 12px;
+    }
+    .btn {
+      flex: 1;
+      padding: 14px;
+      border-radius: 24px;
+      font-size: 16px;
+      text-align: center;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .btn-cancel {
+      background: transparent;
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.6);
+    }
+    .btn-primary {
+      background: #38bdf8;
+      color: #fff;
+      border: none;
+    }
+    /* === iPhone 17 Pro Frame === */
+    .phone-frame {
+      background: #1a1c1e;
+      border-radius: 22px;
+      padding: 10px;
+      box-shadow:
+        0 0 0 2px #2d2f31,
+        0 0 0 5px #1a1c1e,
+        0 10px 45px rgba(0,0,0,0.45);
+      position: relative;
+      display: inline-block;
+    }
+    .phone-screen {
+      width: 380px;
+      height: 844px;
+      border-radius: 14px;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid #333;
+    }
+    .punch-hole {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 10px;
+      height: 10px;
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 50%;
+      z-index: 100;
+    }
+    .home-bar {
+      position: absolute;
+      bottom: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 110px;
+      height: 4px;
+      background: rgba(255,255,255,0.22);
+      border-radius: 2px;
+      z-index: 100;
+    }
+    .side-btn {
+      position: absolute;
+      background: #2d2f31;
+      border-radius: 2px;
+      opacity: 0.7;
+    }
+    .btn-power {
+      right: -3px; top: 190px;
+      width: 2px; height: 55px;
+    }
+    .btn-vol-up {
+      left: -3px; top: 180px;
+      width: 2px; height: 38px;
+    }
+    .btn-vol-down {
+      left: -3px; top: 225px;
+      width: 2px; height: 38px;
+    }
+    /* ========================= */
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+  <div class="phone-screen">
+    <div class="punch-hole"></div>
+    <div class="phone">
+    <div class="status-bar">
+      <span class="time">10:23</span>
+      <div class="icons">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M17 4h-3V2h-4v2H7v18h10V4zm-4 16h-2v-2h2v2zm0-4h-2V8h2v8z"/></svg>
+        <span class="battery">
+          <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+          78
+        </span>
+      </div>
+    </div>
+
+    <div class="header">
+      <a href="mp-checkin-2.html" class="back-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+      </a>
+      <div class="header-title">考勤人脸照片上传</div>
+      <div class="header-actions">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      </div>
+    </div>
+
+    <div class="camera-area">
+      <div class="camera-preview">
+        <div class="face-frame-corner top-left"></div>
+        <div class="face-frame-corner top-right"></div>
+        <div class="face-frame-corner bottom-left"></div>
+        <div class="face-frame-corner bottom-right"></div>
+      </div>
+    </div>
+
+    <div class="bottom-actions">
+      <a href="mp-checkin-2.html" class="btn btn-cancel">取消</a>
+      <a href="mp-checkin-2.html" class="btn btn-primary">上传</a>
+    </div>
+  </div>
+    <div class="home-bar"></div>
+  </div>
+  <div class="side-btn btn-power"></div>
+  <div class="side-btn btn-vol-up"></div>
+  <div class="side-btn btn-vol-down"></div>
+</div>
+</body>
+</html>

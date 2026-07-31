@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>双人打卡需求规则明细 v1.1 — 修正版</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: #f5f6f8; color: #333; line-height: 1.75;
+    }
+    .topbar { height: 56px; background: linear-gradient(135deg,#1a3a5c,#2a5a8c); display:flex; align-items:center; padding:0 32px; color:#fff; }
+    .topbar .brand { font-size:16px; font-weight:600; }
+    .topbar .sub { font-size:12px; color:rgba(255,255,255,0.7); margin-left:16px; }
+    .wrapper { max-width:960px; margin:0 auto; padding:32px 24px 60px; }
+    .title-block { background:#fff; border-radius:8px; padding:32px 36px; margin-bottom:24px; border-left:4px solid #1677ff; }
+    .title-block h1 { font-size:24px; font-weight:700; color:#1a1a1a; margin-bottom:8px; }
+    .title-block .meta { font-size:13px; color:#999; display:flex; gap:20px; }
+    .section { background:#fff; border-radius:8px; padding:28px 36px; margin-bottom:16px; }
+    .section h2 { font-size:18px; font-weight:600; color:#1a1a1a; margin-bottom:16px; padding-bottom:10px; border-bottom:2px solid #f0f0f0; display:flex; align-items:center; gap:10px; }
+    .section h2 .dot { width:8px; height:8px; border-radius:50%; background:#1677ff; flex-shrink:0; }
+    .section h3 { font-size:15px; font-weight:600; color:#333; margin:20px 0 10px; }
+    .section h4 { font-size:14px; font-weight:600; color:#555; margin:14px 0 8px; }
+    .section p { font-size:14px; color:#555; margin-bottom:12px; }
+    .section ul, .section ol { margin:8px 0 12px 20px; font-size:14px; color:#555; }
+    .section li { margin-bottom:6px; }
+    .callout { background:#fffbe6; border:1px solid #ffe58f; border-radius:4px; padding:12px 16px; margin:16px 0; font-size:13px; color:#ad6800; }
+    .callout.info { background:#e6f7ff; border-color:#91d5ff; color:#0050b3; }
+    .callout.success { background:#f6ffed; border-color:#b7eb8f; color:#389e0d; }
+    table { width:100%; border-collapse:collapse; margin:12px 0; font-size:13px; }
+    table th, table td { border:1px solid #e8e8e8; padding:8px 12px; text-align:left; }
+    table th { background:#fafafa; font-weight:600; color:#333; white-space:nowrap; }
+    table td { color:#555; }
+    table td code { background:#f5f5f5; padding:1px 5px; border-radius:3px; font-size:12px; color:#d4380d; }
+    .fix-badge { display:inline-block;background:#fff1f0;color:#cf1322;border:1px solid #ffa39e;padding:1px 7px;border-radius:3px;font-size:11px;font-weight:600;margin-right:6px; }
+    .footer { text-align:center; color:#bbb; font-size:12px; padding:20px 0; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand">江西省建筑工人实名制管理服务信息平台</div>
+    <div class="sub">需求规则明细 · 修正版 v1.1</div>
+  </div>
+  <div class="wrapper">
+    <div class="title-block">
+      <h1>双人打卡（双人合照）方案需求 — 规则明细（修正版）</h1>
+      <div class="meta">
+        <span>版本：v1.1</span>
+        <span>日期：2026-07-28</span>
+        <span>基于同事初稿修正</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2><span class="dot"></span>1. 岗位人员考勤打卡流程</h2>
+      <h3>1.1 打卡流程总述</h3>
+      <p>（1）首位岗位人员考勤打卡时默认进行单人打卡（按现考勤打卡操作方式一致）；</p>
+      <p>（2）自第二个考勤人员开始，对后续考勤打卡人员根据设定的概率、时间等配置指标抽取是否需要双人合拍：</p>
+      <ul>
+        <li>① 被抽中需双人合拍的，考勤打卡人需从<strong>合拍候选人池</strong>中指定岗位人员配合其双人打卡（双人合照），考勤人员操作考勤打卡时与指定人员合拍（打卡记录中显示合拍人员信息）；</li>
+        <li>② 未被抽中需双人合拍的，可直接操作考勤打卡，无需合拍确认；</li>
+        <li>③ 考勤打卡人员被指定人拒绝后，可再次更换指定人员配合合拍；</li>
+        <li>④ 当天多次上下班打卡的，每一次打上下班卡时重新抽取是否需要双人合拍。</li>
+      </ul>
+
+      <h3><span class="fix-badge">修正</span>1.2 合拍候选人池定义</h3>
+      <p><strong>上班卡候选人池：</strong>当日该项目下已成功打卡上班、且当前未被其他合拍请求锁定的岗位人员。</p>
+      <p><strong>下班卡候选人池：</strong>当日该项目下已打卡上班但尚未打卡下班、且当前未被其他合拍请求锁定的岗位人员。</p>
+      <div class="callout">修正说明：原规则"下班卡选未打卡下班的人员"与"从已考勤人员中指定"存在矛盾。现明确下班卡候选人池为"已打上班卡但未打下班卡的人员"。</div>
+
+      <h3><span class="fix-badge">修正</span>1.3 候选人池枯竭兜底</h3>
+      <p>当候选人池为空时（如项目仅剩一名人员未打下班卡、或所有候选人均已被其他合拍请求锁定），系统自动降级为单人打卡，并记录降级原因为"候选人池枯竭"。</p>
+      <div class="callout">修正说明：原规则未考虑最后一人打下班卡时无人可合拍的场景，新增此兜底逻辑。</div>
+
+      <h3><span class="fix-badge">修正</span>1.4 合拍人锁定机制</h3>
+      <p>当打卡人指定合拍人后，该合拍人进入"<strong>合拍中</strong>"锁定状态，在此期间不接受其他打卡人的合拍请求，避免并发冲突。</p>
+      <p>锁定在以下情况下释放：合拍人接受并完成合拍；合拍人拒绝（或超时）；打卡人主动更换合拍人。</p>
+      <div class="callout">修正说明：原规则未考虑A和C同时指定B为合拍人的并发场景，新增锁定机制。</div>
+    </div>
+
+    <div class="section">
+      <h2><span class="dot"></span>2. 合拍操作规则 <span class="fix-badge">修正</span></h2>
+      <h3>2.1 合拍方式</h3>
+      <p>合拍<strong>必须调用手机摄像头实时拍摄</strong>，禁止从相册选取图片，禁止使用预录视频。拍摄时系统自动记录拍摄时间戳与GPS定位信息。</p>
+      <h3>2.2 合拍周期</h3>
+      <p>合拍周期自<strong>合拍人签收（收到通知并查看请求）时</strong>开始计时，而非打卡人发出指定时。单位配置为"分钟"。</p>
+      <div class="callout">修正说明：原规则未明确计时起点。若从打卡人发起开始计时，通知延迟会吞掉合拍人可用时间。</div>
+      <h3>2.3 赣建宝小程序合拍记录</h3>
+      <p>赣建宝小程序-我的-新增"<strong>考勤打卡合拍记录</strong>"功能，三个页签：</p>
+      <table>
+        <tr><th>页签</th><th>展示内容</th></tr>
+        <tr><td>待合拍</td><td>需我配合合拍的请求列表。展示考勤打卡人（姓名、岗位、手机号），操作栏提供【接受】【拒绝】按钮。点击【接受】进入合拍确认页，确认接受后进入实时合拍拍摄。</td></tr>
+        <tr><td>已合拍</td><td>我已完成配合的合拍记录</td></tr>
+        <tr><td>他人协助合拍</td><td>我发起、他人配合的合拍记录</td></tr>
+      </table>
+      <h3>2.4 合拍超时及拒绝</h3>
+      <p>① 合拍人收到合拍提醒后，可在合拍确认页操作【拒绝】并填写拒绝原因；② 合拍人未在合拍周期内配合且未操作【拒绝】，系统默认拒绝，拒绝原因标记为"超时未合拍"；③ 考勤打卡人在合拍周期内被拒绝或超时后，可重新指定下一个合拍人。</p>
+      <div class="callout">修正说明：原规则"最后一个合拍不得拒绝"但未说明拒绝后怎么办，新增降级兜底：候选人池仅剩最后一人时提示"您已无法更换，请配合完成合拍"。若仍拒绝/超时，系统降级为单人打卡并记录降级原因。</div>
+    </div>
+
+    <div class="section">
+      <h2><span class="dot"></span>3. 被指定提醒</h2>
+      <p>赣建宝小程序内消息提醒（小程序订阅消息 / 站内信）。</p>
+    </div>
+
+    <div class="section">
+      <h2><span class="dot"></span>4. 双人打卡规则配置</h2>
+      <h3>4.1 全局配置</h3>
+      <p>展示自江西省级组织域开始下属所有地市区县的组织域，组织域后方新增"状态""操作"两栏：</p>
+      <table>
+        <tr><th>字段</th><th>说明</th></tr>
+        <tr><td>状态</td><td>是否启用双人打卡合拍</td></tr>
+        <tr><td>操作</td><td>【合拍规则配置】按钮，点击弹出配置窗口</td></tr>
+      </table>
+      <p>配置内容：</p>
+      <table>
+        <tr><th>配置项</th><th>说明</th><th>默认值</th></tr>
+        <tr><td>双人打卡合拍启用</td><td>按地市、区县配置是否启用</td><td>关闭</td></tr>
+        <tr><td>上班卡抽取率</td><td>0-100%区间</td><td>100%</td></tr>
+        <tr><td>下班卡抽取率</td><td>0-100%区间</td><td><span class="fix-badge">修正</span>50%（建议值）</td></tr>
+        <tr><td>更换次数</td><td>打卡人可更换合拍人选的最大次数</td><td>待定</td></tr>
+        <tr><td>合拍周期</td><td>合拍人签收后完成合拍的时限</td><td>待定（分钟）</td></tr>
+        <tr><td>是否要求同一公司</td><td>合拍人是否必须与打卡人同属一家参建单位</td><td>否</td></tr>
+        <tr><td>是否可指定已下班人员</td><td>合拍候选人是否包含已打下班卡的人员</td><td>否</td></tr>
+      </table>
+      <p>组织域配置下发规则：配置窗口中新增下一级组织域多选项，选择后默认下级组织域按此合拍规则生效。</p>
+      <h3>4.2 高级配置（项目级）</h3>
+      <p>可单独为项目配置规则，项目级配置优先级高于全局配置。筛选项：监管项目名称、项目类型、项目状态、管理区域、单位名称。</p>
+    </div>
+
+    <div class="section">
+      <h2><span class="dot"></span>5. 双人打卡考勤预警 <span class="fix-badge">修正</span></h2>
+      <p>以<strong>人员</strong>为维度统计，每月初固定存储上月数据，当月数据按天更新。</p>
+      <table>
+        <tr><th>预警类型</th><th>判定规则</th></tr>
+        <tr><td>高频拒绝</td><td>7日内拒绝次数 ≥ 3次</td></tr>
+        <tr><td>首人到岗</td><td>项目下有其他岗位人员的情况下，连续7天首位打卡。除外：门卫/保安等岗位白名单；项目仅此一人在册</td></tr>
+        <tr><td>打卡人位置异常</td><td>打卡人位置与合拍人位置相差 ≥ 2公里</td></tr>
+        <tr><td>位置高度重合</td><td>连续30天内，打卡人与合拍人GPS位置高度重合（误差≤50米）累计≥10次</td></tr>
+        <tr><td>高频超时未响应</td><td>7日内超时未响应 ≥ 3次</td></tr>
+        <tr><td>合拍时间过短</td><td>从合拍拍摄界面打开到快门触发 &lt; 3秒，判定疑似预录图片/快速摆拍</td></tr>
+      </table>
+    </div>
+
+    <div class="section">
+      <h2><span class="dot"></span>6. 打卡协同管理</h2>
+      <p>以<strong>项目</strong>为维度统计，每月初固定存储上月数据，当月按天更新。</p>
+      <table>
+        <tr><th>指标</th><th>计算方式</th></tr>
+        <tr><td>上班卡触发率</td><td>当月上班卡双人打卡合拍人次 / 当月上班卡总打卡人次</td></tr>
+        <tr><td>下班卡触发率</td><td>当月下班卡双人打卡合拍人次 / 当月下班卡总打卡人次</td></tr>
+        <tr><td>预警次数</td><td>当月该项目"双人打卡考勤预警"中预警的人数</td></tr>
+      </table>
+    </div>
+
+    <div class="section">
+      <h2><span class="dot"></span>7. 人员考勤设备 <span class="fix-badge">修正</span></h2>
+      <p>赣建宝小程序打卡时自动记录当前登录微信号及手机型号，形成账号-微信号-手机对应关系。更换频次阈值默认当月最多更换2次，超出后无法打卡。新增<strong>设备异常申报</strong>通道供设备损坏/丢失场景。</p>
+      <div class="callout">修正说明：原规则更换2次限制过刚性，手机损坏/丢失场景无法处理，增加申报通道。</div>
+    </div>
+
+    <div class="section">
+      <h2><span class="dot"></span>8. 跨天与重置规则</h2>
+      <p>双人打卡配置要求当天未完成打卡的，双人考勤配置要求保留；<strong>跨天重置</strong>，次日按新的抽取规则重新抽取。</p>
+    </div>
+
+    <div class="section">
+      <h2><span class="dot"></span>修订记录</h2>
+      <table>
+        <tr><th>版本</th><th>日期</th><th>修订内容</th></tr>
+        <tr><td>v1.0</td><td>—</td><td>初稿（同事编写）</td></tr>
+        <tr><td>v1.1</td><td>2026-07-28</td><td>补全候选人池定义及枯竭兜底、新增合拍人锁定机制、强制实时拍摄、修正合拍周期起点、修正预警规则、增加设备异常申报通道</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="footer">江西省建筑工人实名制管理服务信息平台</div>
+</body>
+</html>

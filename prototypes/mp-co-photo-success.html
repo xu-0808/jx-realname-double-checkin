@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>打卡结果 - 赣建宝</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+      background:#e8ecf1; display:flex; justify-content:center; align-items:center;
+      min-height:100vh; padding:20px; gap:30px;
+    }
+
+    .phone { width:380px; background:#f5f6fa; height:100%; position:relative; overflow-y:auto; overflow-x:hidden; }
+
+    /* ====== State: Loading ====== */
+    .loading-top {
+      background:linear-gradient(180deg,#1e3a5f 0%,#2d5a87 50%,#f5f6fa 100%);
+      padding:80px 16px 60px; text-align:center;
+    }
+    .loading-spinner {
+      width:72px; height:72px; margin:0 auto 24px;
+      border:5px solid rgba(255,255,255,0.2);
+      border-top-color:#fff; border-radius:50%;
+      animation:spin 0.9s linear infinite;
+    }
+    @keyframes spin { to{transform:rotate(360deg)} }
+    .loading-title { font-size:18px; font-weight:700; color:#fff; margin-bottom:20px; }
+
+    .progress-wrap {
+      width:220px; margin:0 auto 10px;
+      height:6px; background:rgba(255,255,255,0.25); border-radius:3px;
+      overflow:hidden;
+    }
+    .progress-bar {
+      height:100%; background:#fff; border-radius:3px;
+      animation:fill 2.5s ease-in-out forwards;
+    }
+    @keyframes fill {
+      0%{width:0%} 30%{width:45%} 60%{width:70%} 85%{width:92%} 100%{width:100%}
+    }
+    .progress-text {
+      font-size:11px; color:rgba(255,255,255,0.7);
+      text-align:center;
+    }
+
+    .loading-steps {
+      margin-top:24px; text-align:left; display:inline-block;
+    }
+    .loading-step {
+      font-size:12px; color:rgba(255,255,255,0.75); padding:4px 0;
+      display:flex; align-items:center; gap:8px;
+    }
+    .loading-step .step-dot {
+      width:6px; height:6px; background:rgba(255,255,255,0.45); border-radius:50%;
+    }
+    .loading-step.done .step-dot {
+      background:#4caf50; box-shadow:0 0 4px rgba(76,175,80,0.5);
+    }
+    .loading-step.done { color:rgba(255,255,255,0.9); }
+
+    /* ====== State: Result (pass / fail shared) ====== */
+    .result-top {
+      padding:50px 16px 36px; text-align:center;
+    }
+    .result-top.success { background:linear-gradient(180deg,#16a34a 0%,#22c55e 40%,#f5f6fa 100%); }
+    .result-top.fail { background:linear-gradient(180deg,#dc2626 0%,#ef4444 40%,#f5f6fa 100%); }
+
+    .result-icon {
+      width:88px; height:88px; border-radius:50%;
+      background:#fff; margin:0 auto 20px;
+      display:flex; align-items:center; justify-content:center;
+      box-shadow:0 4px 24px rgba(0,0,0,0.12);
+      animation:popIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275);
+    }
+    @keyframes popIn { 0%{transform:scale(0)} 100%{transform:scale(1)} }
+
+    .result-title { font-size:20px; font-weight:700; color:#fff; margin-bottom:6px; }
+    .result-sub { font-size:13px; color:rgba(255,255,255,0.8); margin-bottom:4px; }
+
+    .result-detail {
+      margin:0 16px 16px; background:#fff; border-radius:16px; padding:16px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.06);
+    }
+    .result-detail-row {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:8px 0; border-bottom:1px solid #f5f5f5; font-size:13px;
+    }
+    .result-detail-row:last-child { border-bottom:none; }
+    .result-detail-label { color:#888; }
+    .result-detail-value { color:#333; font-weight:500; text-align:right; }
+
+    /* Fail reason box */
+    .fail-reason {
+      margin:0 16px 16px; background:#fef2f2; border:1px solid #fecaca;
+      border-radius:12px; padding:14px;
+      display:flex; align-items:flex-start; gap:10px;
+    }
+    .fail-reason-icon {
+      width:34px; height:34px; border-radius:50%;
+      background:#ef4444; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .fail-reason-text { font-size:12px; color:#b91c1c; line-height:1.6; }
+    .fail-reason-text strong { display:block; margin-bottom:4px; }
+
+    /* Photo preview */
+    .photo-card {
+      margin:0 16px 16px; background:#fff; border-radius:16px; padding:14px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.06); text-align:center;
+    }
+    .photo-preview {
+      width:100%; height:150px; border-radius:10px;
+      background:linear-gradient(135deg,#e8f0fe,#d4e4fc);
+      display:flex; align-items:center; justify-content:center;
+      position:relative; overflow:hidden; margin-bottom:10px;
+    }
+    .photo-watermark {
+      position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) rotate(-20deg);
+      font-size:18px; font-weight:700; color:rgba(37,99,255,0.12); white-space:nowrap;
+    }
+    .photo-preview .p-avatars { position:relative; z-index:1; display:flex; }
+    .photo-preview .p-avatar {
+      width:56px; height:56px; border-radius:50%;
+      background:rgba(255,255,255,0.9); border:3px solid #2563ff;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .photo-preview .p-avatar svg { width:30px; height:30px; fill:#2563ff; }
+    .photo-timestamp {
+      font-size:11px; color:#666; display:flex; align-items:center;
+      justify-content:center; gap:4px;
+    }
+
+    /* Buttons */
+    .btn-primary {
+      width:100%; background:linear-gradient(135deg,#2563ff,#1e90ff);
+      color:#fff; border:none; border-radius:12px; padding:14px;
+      font-size:16px; font-weight:600; cursor:pointer;
+      text-decoration:none; display:block; text-align:center;
+      margin-bottom:8px;
+    }
+    .btn-retry {
+      width:100%; background:linear-gradient(135deg,#f97316,#ef4444);
+      color:#fff; border:none; border-radius:12px; padding:14px;
+      font-size:16px; font-weight:600; cursor:pointer;
+      text-decoration:none; display:block; text-align:center;
+      margin-bottom:8px;
+    }
+    .btn-secondary {
+      width:100%; background:#fff; color:#2563ff; border:1px solid #2563ff;
+      border-radius:12px; padding:14px; font-size:16px; cursor:pointer;
+      text-decoration:none; display:block; text-align:center;
+    }
+    .content { padding:0 16px 24px; margin-top:-12px; }
+    .btn-row { display:flex; gap:8px; }
+    .btn-row a { flex:1; }
+
+    /* ====== Demo Panel ====== */
+    .demo-panel {
+      align-self:flex-start; background:#fff; border-radius:16px;
+      padding:16px; box-shadow:0 2px 12px rgba(0,0,0,0.08);
+      min-width:180px;
+    }
+    .demo-panel-title {
+      font-size:14px; font-weight:700; color:#333; margin-bottom:12px;
+    }
+    .demo-panel-btn {
+      display:block; padding:8px 14px; margin-bottom:8px;
+      border-radius:8px; font-size:12px; cursor:pointer; border:none;
+      text-align:left; font-weight:500; text-decoration:none;
+      transition:all 0.15s;
+    }
+    .demo-panel-btn:hover { transform:translateX(3px); }
+    .demo-panel-btn.active { border:2px solid #2563ff; }
+    .demo-btn-pass { background:#f0fdf4; color:#16a34a; border:1px solid #bbf7d0; }
+    .demo-btn-fail { background:#fef2f2; color:#dc2626; border:1px solid #fecaca; }
+    .demo-btn-loading { background:#eff6ff; color:#2563ff; border:1px solid #bfdbfe; }
+    .demo-hint { font-size:11px; color:#999; margin-top:8px; line-height:1.5; }
+
+    /* ====== Phone Frame ====== */
+    .phone-frame { background:#1a1c1e; border-radius:22px; padding:10px; box-shadow:0 0 0 2px #2d2f31,0 0 0 5px #1a1c1e,0 10px 45px rgba(0,0,0,0.45); position:relative; display:inline-block; }
+    .phone-screen { width:380px; height:844px; border-radius:14px; overflow:hidden; position:relative; border:1px solid #333; }
+    .punch-hole { position:absolute; top:14px; left:50%; transform:translateX(-50%); width:10px; height:10px; background:#111; border:1px solid #333; border-radius:50%; z-index:100; }
+    .home-bar { position:absolute; bottom:6px; left:50%; transform:translateX(-50%); width:110px; height:4px; background:rgba(255,255,255,0.22); border-radius:2px; z-index:100; }
+    .side-btn { position:absolute; background:#2d2f31; border-radius:2px; opacity:0.7; }
+    .btn-power { right:-3px; top:190px; width:2px; height:55px; }
+    .btn-vol-up { left:-3px; top:180px; width:2px; height:38px; }
+    .btn-vol-down { left:-3px; top:225px; width:2px; height:38px; }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+  <div class="phone-screen">
+    <div class="punch-hole"></div>
+    <div class="phone">
+
+    <!-- ================ STATE 1: LOADING ================ -->
+    <div id="state-loading">
+      <div class="loading-top">
+        <div class="loading-spinner"></div>
+        <div class="loading-title">正在核验人脸…</div>
+        <div class="progress-wrap"><div class="progress-bar"></div></div>
+        <div class="progress-text">正在等待核验结果…</div>
+        <div class="loading-steps">
+          <div class="loading-step done"><span class="step-dot"></span>照片已拍摄</div>
+          <div class="loading-step"><span class="step-dot"></span>正在核验人脸信息…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================ STATE 2: PASS ================ -->
+    <div id="state-pass" style="display:none;">
+      <div class="result-top success">
+        <div class="result-icon">
+          <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="#16a34a" stroke-width="3"><polyline points="4,12 10,18 20,6"/></svg>
+        </div>
+        <div class="result-title">核验通过</div>
+        <div class="result-sub">考勤打卡成功</div>
+      </div>
+
+      <div class="content">
+        <div class="photo-card">
+          <div class="photo-preview">
+            <div class="photo-watermark">赣建宝·实时拍摄</div>
+            <div class="p-avatars">
+              <div class="p-avatar" style="margin-right:-12px;">
+                <svg viewBox="0 0 64 64"><circle cx="32" cy="24" r="12"/><ellipse cx="32" cy="58" rx="22" ry="18"/></svg>
+              </div>
+              <div class="p-avatar">
+                <svg viewBox="0 0 64 64"><circle cx="32" cy="24" r="12"/><ellipse cx="32" cy="58" rx="22" ry="18"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="photo-timestamp">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#999" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+            2026-07-28 11:05:35
+          </div>
+        </div>
+
+        <div class="result-detail">
+          <div class="result-detail-row"><span class="result-detail-label">打卡类型</span><span class="result-detail-value">上班卡</span></div>
+          <div class="result-detail-row"><span class="result-detail-label">打卡人</span><span class="result-detail-value">德小拓（项目经理）</span></div>
+          <div class="result-detail-row"><span class="result-detail-label">合拍人</span><span class="result-detail-value">刘建国（施工员）</span></div>
+          <div class="result-detail-row"><span class="result-detail-label">项目名称</span><span class="result-detail-value">绿地国际博览城二期</span></div>
+        </div>
+
+        <a href="mp-my.html" class="btn-primary">返回首页</a>
+        <a href="mp-co-photo-records.html" class="btn-secondary">查看合拍记录</a>
+      </div>
+    </div>
+
+    <!-- ================ STATE 3: FAIL ================ -->
+    <div id="state-fail" style="display:none;">
+      <div class="result-top fail">
+        <div class="result-icon">
+          <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="#dc2626" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </div>
+        <div class="result-title">核验未通过</div>
+        <div class="result-sub">人脸核验结果不匹配</div>
+      </div>
+
+      <div class="content">
+        <div class="fail-reason">
+          <div class="fail-reason-icon">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#fff" stroke-width="2.5"><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="17" r="1"/></svg>
+          </div>
+          <div class="fail-reason-text">
+            <strong>核验失败原因</strong>
+            您与合拍人的合照未通过人脸核验验证，可能原因包括：两人面部未同时出现在画面中、光线过暗导致识别不清、或照片中出现非本人情况。请重新进行合拍。
+          </div>
+        </div>
+
+        <div class="result-detail">
+          <div class="result-detail-row"><span class="result-detail-label">打卡类型</span><span class="result-detail-value">上班卡</span></div>
+          <div class="result-detail-row"><span class="result-detail-label">打卡人</span><span class="result-detail-value">德小拓（项目经理）</span></div>
+          <div class="result-detail-row"><span class="result-detail-label">合拍人</span><span class="result-detail-value">刘建国（施工员）</span></div>
+          <div class="result-detail-row"><span class="result-detail-label">核验时间</span><span class="result-detail-value">2026-07-28 11:05:35</span></div>
+        </div>
+
+        <div class="btn-row">
+          <a href="mp-co-photo-camera.html" class="btn-retry">📷 重新拍照</a>
+        </div>
+        <a href="mp-my.html" class="btn-secondary" style="margin-top:8px;">确认放弃，降级为单人打卡</a>
+      </div>
+    </div>
+
+    </div>
+    <div class="home-bar"></div>
+  </div>
+  <div class="side-btn btn-power"></div><div class="side-btn btn-vol-up"></div><div class="side-btn btn-vol-down"></div>
+</div>
+
+<!-- Demo Panel -->
+<div class="demo-panel">
+  <div class="demo-panel-title">🔄 结果状态切换</div>
+  <a href="javascript:void(0)" class="demo-panel-btn demo-btn-loading active" onclick="showState('loading')">⏳ 状态一：加载核验中</a>
+  <a href="javascript:void(0)" class="demo-panel-btn demo-btn-pass" onclick="showState('pass')">✅ 状态二：核验通过</a>
+  <a href="javascript:void(0)" class="demo-panel-btn demo-btn-fail" onclick="showState('fail')">❌ 状态三：核验未通过</a>
+  <div class="demo-hint">💡 默认演示加载→通过流程。<br>模拟拍照后系统自动核验人脸的真实过程。</div>
+</div>
+
+<script>
+  // Default: auto transition loading → pass after 3s
+  setTimeout(function() {
+    var passBtn = document.querySelector('.demo-btn-pass');
+    if (document.getElementById('state-loading').style.display !== 'none') return; // user already switched
+    showState('pass');
+  }, 3200);
+
+  function showState(state) {
+    document.getElementById('state-loading').style.display = (state === 'loading') ? 'block' : 'none';
+    document.getElementById('state-pass').style.display = (state === 'pass') ? 'block' : 'none';
+    document.getElementById('state-fail').style.display = (state === 'fail') ? 'block' : 'none';
+
+    document.querySelectorAll('.demo-panel-btn').forEach(function(b) { b.classList.remove('active'); });
+    document.querySelector('.demo-btn-' + state).classList.add('active');
+  }
+</script>
+</body>
+</html>

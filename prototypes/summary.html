@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>抽验汇总 - 江西省建筑工人实名制管理服务信息平台</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif; background:#f0f2f5; color:#333; }
+    a { text-decoration:none; color:inherit; }
+
+    .header { height:56px; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,0.08); display:flex; align-items:center; justify-content:space-between; padding:0 24px; position:fixed; top:0; left:0; right:0; z-index:100; }
+    .header-left { display:flex; align-items:center; gap:12px; }
+    .logo { width:32px; height:32px; background:linear-gradient(135deg,#1890ff,#096dd9); border-radius:4px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; font-size:14px; }
+    .header-title { font-size:15px; font-weight:500; }
+    .header-right { display:flex; align-items:center; gap:12px; color:#666; font-size:13px; }
+    .user-info { display:flex; align-items:center; gap:6px; cursor:pointer; }
+    .avatar { width:28px; height:28px; border-radius:50%; background:#1890ff; color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; }
+
+    .layout { display:flex; min-height:100vh; padding-top:56px; }
+    .sidebar { width:200px; background:#001529; color:rgba(255,255,255,0.65); position:fixed; top:56px; bottom:0; left:0; overflow-y:auto; padding:8px 0; font-size:13px; }
+    .menu-item { padding:0 16px; height:40px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; }
+    .menu-item:hover { color:#fff; }
+    .menu-item.active { background:#1890ff; color:#fff; }
+    .menu-item .left { display:flex; align-items:center; gap:8px; }
+    .menu-icon { width:14px; height:14px; flex-shrink:0; }
+    .submenu { background:#000c17; display:none; }
+    .submenu.show { display:block; }
+    .submenu-item { padding:0 24px 0 40px; height:36px; display:flex; align-items:center; cursor:pointer; }
+    .submenu-item:hover { color:#fff; }
+    .submenu-item.active { color:#fff; background:rgba(24,144,255,0.2); border-right:3px solid #1890ff; }
+
+    .main { margin-left:200px; flex:1; padding:20px; }
+    .page-header { background:#fff; padding:14px 20px; border-radius:4px; margin-bottom:16px; }
+    .page-header h2 { font-size:16px; font-weight:500; }
+    .breadcrumb { font-size:12px; color:#999; margin-top:4px; }
+
+    .card { background:#fff; border-radius:4px; box-shadow:0 1px 4px rgba(0,0,0,0.04); }
+    .card-body { padding:20px; }
+
+    .tabs { display:flex; border-bottom:2px solid #f0f0f0; }
+    .tab { padding:10px 20px; cursor:pointer; font-size:14px; color:#666; border-bottom:2px solid transparent; margin-bottom:-2px; transition:all 0.2s; }
+    .tab:hover { color:#1890ff; }
+    .tab.active { color:#1890ff; border-bottom-color:#1890ff; font-weight:500; }
+    .tab-content { display:none; }
+    .tab-content.active { display:block; }
+
+    .filter-bar { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:16px; }
+    .filter-item { display:flex; align-items:center; gap:6px; font-size:13px; }
+    .filter-item label { color:#666; white-space:nowrap; }
+    .filter-item select,.filter-item input { padding:5px 10px; border:1px solid #d9d9d9; border-radius:4px; font-size:13px; outline:none; }
+    .btn { padding:5px 14px; border-radius:4px; font-size:13px; cursor:pointer; border:1px solid; }
+    .btn-primary { background:#1890ff; color:#fff; border-color:#1890ff; }
+    .btn-default { background:#fff; border-color:#d9d9d9; color:#666; }
+
+    .table { width:100%; border-collapse:collapse; font-size:13px; }
+    .table th { background:#fafafa; color:#666; font-weight:500; text-align:left; padding:10px 12px; border-bottom:1px solid #f0f0f0; white-space:nowrap; }
+    .table td { padding:10px 12px; border-bottom:1px solid #f0f0f0; }
+    .table tr:hover td { background:#fafafa; }
+    .tag { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:500; }
+    .tag-green { background:#f6ffed; color:#52c41a; border:1px solid #b7eb8f; }
+    .tag-red { background:#fff1f0; color:#ff4d4f; border:1px solid #ffa39e; }
+    .tag-orange { background:#fff7e6; color:#fa8c16; border:1px solid #ffd591; }
+    .action-link { color:#1890ff; cursor:pointer; font-size:12px; }
+
+    .pagination { display:flex; justify-content:flex-end; align-items:center; gap:6px; margin-top:14px; font-size:13px; color:#666; }
+    .pagination button { padding:4px 10px; border:1px solid #d9d9d9; background:#fff; border-radius:4px; cursor:pointer; font-size:12px; }
+    .pagination button.active { background:#1890ff; color:#fff; border-color:#1890ff; }
+  </style>
+</head>
+<body>
+<div class="header">
+  <div class="header-left"><div class="logo">赣</div><span class="header-title">江西省建筑工人实名制管理服务信息平台</span></div>
+  <div class="header-right"><div class="user-info"><div class="avatar">管</div><span>南昌市管理员</span></div></div>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> 工程一张图</span></div>
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="13" width="4" height="8"/><rect x="10" y="9" width="4" height="12"/><rect x="17" y="5" width="4" height="16"/></svg> BI数据看板</span></div>
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg> 实名制管理</span></div>
+    <div class="menu-item active open">
+      <span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M17 9h.01"/></svg> 双人打卡管理</span>
+    </div>
+    <div class="submenu show">
+      <div class="submenu-item"><a href="index.html">数据看板</a></div>
+      <div class="submenu-item"><a href="rule-global.html">规则配置</a></div>
+      <div class="submenu-item"><a href="records.html">抽验记录</a></div>
+      <div class="submenu-item active"><a href="summary.html">抽验汇总</a></div>
+      <div class="submenu-item"><a href="risk-warning.html">风险预警</a></div>
+    </div>
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><circle cx="8" cy="17" r="1"/></svg> 工程发检监管</span></div>
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="9" y1="10" x2="15" y2="10"/></svg> 劳务用工监管</span></div>
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="9" stroke-dasharray="4 3"/></svg> 系统管理</span></div>
+  </div>
+
+  <div class="main">
+    <div class="page-header">
+      <h2>双人打卡 · 抽验汇总</h2>
+      <div class="breadcrumb">首页 / 双人打卡管理 / 抽验汇总 · 统计周期：上线至今</div>
+    </div>
+
+    <div class="card">
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('person')">人员汇总</div>
+        <div class="tab" onclick="switchTab('project')">项目汇总</div>
+      </div>
+
+      <!-- Tab 1: 人员汇总 -->
+      <div class="tab-content active" id="tabPerson">
+        <div class="card-body">
+          <div class="filter-bar">
+            <div class="filter-item"><label>项目区划：</label><select><option>全部</option><option>南昌市-经开区</option><option>南昌市-红谷滩区</option><option>赣州市-龙南市</option></select></div>
+            <div class="filter-item"><label>岗位：</label><select><option>全部</option><option>项目经理</option><option>安全员</option><option>施工员</option></select></div>
+            <div class="filter-item"><label>姓名：</label><input type="text" placeholder="请输入"></div>
+            <button class="btn-primary">查询</button>
+          </div>
+          <table class="table">
+            <thead>
+              <tr><th>姓名</th><th>岗位</th><th>项目区划</th><th>当前所在项目</th><th>抽验次数</th><th>通过率</th><th>打卡人次数</th><th>合拍人次数</th><th>常见合拍人</th><th>操作</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>德小拓<div style="font-size:11px;color:#999;">3622********1234</div></td>
+                <td>项目经理</td><td>南昌市-经开区</td><td>豫章师范学院实训大楼</td>
+                <td>8次</td>
+                <td><span style="color:#ff4d4f;font-weight:600;">50%</span></td>
+                <td>5次</td><td>3次</td>
+                <td>刘建国（4次）</td>
+                <td><a href="summary-person-detail.html" class="action-link">详情 →</a></td>
+              </tr>
+              <tr>
+                <td>刘建国<div style="font-size:11px;color:#999;">3601********5678</div></td>
+                <td>施工员</td><td>南昌市-经开区</td><td>豫章师范学院实训大楼</td>
+                <td>12次</td>
+                <td><span style="color:#52c41a;font-weight:600;">91.7%</span></td>
+                <td>2次</td><td>10次</td>
+                <td>德小拓（4次）</td>
+                <td><a href="summary-person-detail.html" class="action-link">详情 →</a></td>
+              </tr>
+              <tr>
+                <td>王经理<div style="font-size:11px;color:#999;">3601********9012</div></td>
+                <td>项目经理</td><td>南昌市-红谷滩区</td><td>南昌西站配套工程</td>
+                <td>6次</td>
+                <td><span style="color:#fa8c16;font-weight:600;">66.7%</span></td>
+                <td>4次</td><td>2次</td>
+                <td>马工（3次）</td>
+                <td><a href="summary-person-detail.html" class="action-link">详情 →</a></td>
+              </tr>
+              <tr>
+                <td>张工<div style="font-size:11px;color:#999;">3601********3456</div></td>
+                <td>技术负责人</td><td>南昌市-经开区</td><td>豫章师范学院实训大楼</td>
+                <td>4次</td>
+                <td><span style="color:#52c41a;font-weight:600;">100%</span></td>
+                <td>3次</td><td>1次</td>
+                <td>刘建国（2次）</td>
+                <td><a href="summary-person-detail.html" class="action-link">详情 →</a></td>
+              </tr>
+              <tr>
+                <td>赵监理<div style="font-size:11px;color:#999;">3601********7890</div></td>
+                <td>监理工程师</td><td>南昌市-红谷滩区</td><td>绿地国际博览城二期</td>
+                <td>5次</td>
+                <td><span style="color:#52c41a;font-weight:600;">80%</span></td>
+                <td>2次</td><td>3次</td>
+                <td>李技术（2次）</td>
+                <td><a href="summary-person-detail.html" class="action-link">详情 →</a></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="pagination"><span>共 156 人</span><button>&lt;</button><button class="active">1</button><button>2</button><button>3</button><button>&gt;</button></div>
+        </div>
+      </div>
+
+      <!-- Tab 2: 项目汇总 -->
+      <div class="tab-content" id="tabProject">
+        <div class="card-body">
+          <div class="filter-bar">
+            <div class="filter-item"><label>项目区划：</label><select><option>全部</option><option>南昌市-经开区</option><option>南昌市-红谷滩区</option></select></div>
+            <div class="filter-item"><label>项目名称：</label><input type="text" placeholder="请输入"></div>
+            <button class="btn-primary">查询</button>
+          </div>
+          <table class="table">
+            <thead>
+              <tr><th>项目名称</th><th>项目区划</th><th>在册人数</th><th>抽验总人次</th><th>通过率</th><th>涉及人员数</th><th>高频合拍人</th><th>操作</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>豫章师范学院实训大楼一期<div style="font-size:11px;color:#999;">360100202406270101</div></td>
+                <td>南昌市-经开区</td><td>156人</td>
+                <td>87次</td>
+                <td><span style="color:#ff4d4f;font-weight:600;">65.0%</span></td>
+                <td>28人</td>
+                <td>刘建国（12次）</td>
+                <td><a href="summary-project-detail.html" class="action-link">详情 →</a></td>
+              </tr>
+              <tr>
+                <td>绿地国际博览城二期<div style="font-size:11px;color:#999;">360100202406270205</div></td>
+                <td>南昌市-红谷滩区</td><td>89人</td>
+                <td>42次</td>
+                <td><span style="color:#52c41a;font-weight:600;">89.2%</span></td>
+                <td>15人</td>
+                <td>赵监理（8次）</td>
+                <td><a href="summary-project-detail.html" class="action-link">详情 →</a></td>
+              </tr>
+              <tr>
+                <td>南昌西站交通枢纽配套工程<div style="font-size:11px;color:#999;">360100202406270310</div></td>
+                <td>南昌市-红谷滩区</td><td>72人</td>
+                <td>35次</td>
+                <td><span style="color:#fa8c16;font-weight:600;">72.3%</span></td>
+                <td>12人</td>
+                <td>马工（9次）</td>
+                <td><a href="summary-project-detail.html" class="action-link">详情 →</a></td>
+              </tr>
+              <tr>
+                <td>龙南市安基山景区建设项目<div style="font-size:11px;color:#999;">360700202406270102</div></td>
+                <td>赣州市-龙南市</td><td>45人</td>
+                <td>18次</td>
+                <td><span style="color:#52c41a;font-weight:600;">82.8%</span></td>
+                <td>8人</td>
+                <td>谢监理（6次）</td>
+                <td><a href="summary-project-detail.html" class="action-link">详情 →</a></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="pagination"><span>共 17 个项目</span><button>&lt;</button><button class="active">1</button><button>2</button><button>&gt;</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(function(t,i){ t.classList.toggle('active',(tab==='person'&&i===0)||(tab==='project'&&i===1)); });
+  document.getElementById('tabPerson').classList.toggle('active',tab==='person');
+  document.getElementById('tabProject').classList.toggle('active',tab==='project');
+}
+</script>
+</body>
+</html>

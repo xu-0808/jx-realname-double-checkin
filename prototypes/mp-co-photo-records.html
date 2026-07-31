@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>合拍验证 - 赣建宝</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+      background:#e8ecf1; display:flex; justify-content:center; align-items:center;
+      min-height:100vh; padding:20px; gap:26px;
+    }
+    .phone { width:380px; background:#f5f6fa; height:100%; position:relative; overflow-y:auto; overflow-x:hidden; }
+
+    .status-bar {
+      height:44px; background:linear-gradient(135deg,#2563ff,#1e90ff);
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0 16px; color:#fff; font-size:14px; font-weight:600;
+    }
+
+    .header {
+      background:linear-gradient(135deg,#2563ff,#1e90ff);
+      padding:4px 16px 14px; color:#fff;
+    }
+    .header-top { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+    .back-btn {
+      background:rgba(255,255,255,0.18); border:none; color:#fff;
+      width:30px; height:30px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer; text-decoration:none; flex-shrink:0;
+    }
+    .back-btn svg { width:16px; height:16px; }
+    .header-title { font-size:17px; font-weight:500; }
+
+    .tabs {
+      display:flex; background:#fff; border-bottom:1px solid #eef0f5;
+      position:sticky; top:0; z-index:10;
+    }
+    .tab-btn {
+      flex:1; padding:13px 0; text-align:center; font-size:14px;
+      color:#888; background:none; border:none;
+      border-bottom:2px solid transparent; cursor:pointer;
+      transition:all 0.2s;
+    }
+    .tab-btn.active {
+      color:#2563ff; border-bottom-color:#2563ff; font-weight:600;
+    }
+
+    .list { padding:12px 14px; padding-bottom:30px; }
+    .tab-content { display:none; }
+    .tab-content.active { display:block; }
+
+    /* Record card */
+    .record-card {
+      background:#fff; border-radius:12px; padding:16px;
+      margin-bottom:10px; box-shadow:0 1px 4px rgba(0,0,0,0.04);
+    }
+    .record-top {
+      display:flex; align-items:flex-start; justify-content:space-between;
+      margin-bottom:12px;
+    }
+    .record-person {
+      display:flex; align-items:center; gap:10px;
+    }
+    .record-avatar {
+      width:40px; height:40px; border-radius:50%;
+      background:#e8f0fe; display:flex; align-items:center; justify-content:center;
+      flex-shrink:0;
+    }
+    .record-avatar svg { width:22px; height:22px; fill:#2563ff; }
+    .record-avatar.orange { background:#fff3e0; }
+    .record-avatar.orange svg { fill:#f97316; }
+    .record-name { font-size:14px; font-weight:600; color:#222; }
+    .record-role { font-size:11px; color:#999; margin-top:2px; }
+
+    .status-badge {
+      padding:3px 10px; border-radius:10px; font-size:11px; font-weight:600;
+      flex-shrink:0;
+    }
+    .status-pass { background:#e8f5e9; color:#2e7d32; }
+    .status-fail { background:#ffebee; color:#c62828; }
+    .status-timeout { background:#f3e5f5; color:#7b1fa2; }
+    .status-refused { background:#fff3e0; color:#e65100; }
+    .status-pending { background:#e3f2fd; color:#1565c0; }
+
+    .record-info {
+      display:flex; flex-wrap:wrap; gap:6px 16px; margin-bottom:10px;
+      padding-bottom:10px; border-bottom:1px dashed #f0f0f0;
+    }
+    .info-item { font-size:12px; color:#888; }
+    .info-item strong { color:#555; font-weight:500; }
+
+    .record-footer {
+      display:flex; justify-content:space-between; align-items:center;
+    }
+    .record-time { font-size:11px; color:#bbb; }
+    .record-action {
+      font-size:12px; color:#2563ff; text-decoration:none; font-weight:500;
+    }
+
+    /* Summary bar */
+    .summary-bar {
+      display:flex; margin:0 14px 8px; background:#fff; border-radius:10px;
+      padding:10px 14px; box-shadow:0 1px 4px rgba(0,0,0,0.04);
+    }
+    .summary-item {
+      flex:1; text-align:center; border-right:1px solid #f0f0f0;
+    }
+    .summary-item:last-child { border-right:none; }
+    .summary-num { font-size:20px; font-weight:700; color:#333; }
+    .summary-num.green { color:#2e7d32; }
+    .summary-num.red { color:#c62828; }
+    .summary-label { font-size:11px; color:#999; margin-top:2px; }
+
+    .empty { text-align:center; padding:60px 20px; color:#bbb; }
+    .empty-icon { font-size:48px; margin-bottom:12px; }
+    .empty-text { font-size:14px; }
+
+    /* Message card (验证请求) */
+    .date-tag {
+      text-align:center; margin-bottom:10px;
+    }
+    .date-tag span {
+      display:inline-block; background:#e6e8eb; color:#888;
+      font-size:12px; padding:4px 12px; border-radius:10px;
+    }
+    .msg-card {
+      background:#fff; border-radius:10px; padding:14px;
+      margin-bottom:10px; box-shadow:0 2px 8px rgba(0,0,0,0.04);
+    }
+    .msg-main {
+      display:flex; gap:12px; margin-bottom:10px;
+    }
+    .msg-icon {
+      width:42px; height:42px; border-radius:8px; color:#fff;
+      display:flex; align-items:center; justify-content:center;
+      flex-shrink:0;
+    }
+    .msg-icon svg { width:22px; height:22px; fill:currentColor; }
+    .msg-body { flex:1; }
+    .msg-title {
+      font-size:15px; font-weight:600; color:#333;
+      line-height:1.4; margin-bottom:6px;
+    }
+    .msg-category {
+      font-size:13px; color:#999;
+    }
+    .msg-action {
+      text-align:center; padding-top:10px;
+      border-top:1px solid #f0f0f0;
+    }
+    .msg-action a {
+      color:#2563ff; font-size:14px; text-decoration:none;
+    }
+    .msg-card-footer {
+      margin-top:8px; font-size:11px; color:#bbb;
+    }
+
+    /* Demo panel */
+    .demo-panel {
+      align-self:flex-start; background:#fff; border-radius:14px;
+      padding:16px; box-shadow:0 2px 12px rgba(0,0,0,0.08);
+      width:200px; margin-top:30px;
+    }
+    .demo-panel-title { font-size:14px; font-weight:700; color:#333; margin-bottom:4px; }
+    .demo-panel-sub { font-size:11px; color:#999; margin-bottom:12px; }
+    .demo-btn {
+      display:block; width:100%; padding:8px 12px; margin-bottom:8px;
+      border-radius:8px; font-size:12px; cursor:pointer; border:none;
+      text-align:left; font-weight:500; text-decoration:none;
+      transition:all 0.15s;
+    }
+    .demo-btn:hover { transform:translateX(3px); }
+    .demo-btn.active { border:2px solid #2563ff; }
+    .demo-btn-ck { background:#eff6ff; color:#2563ff; border:1px solid #bfdbfe; }
+    .demo-btn-pt { background:#fff7ed; color:#ea580c; border:1px solid #fed7aa; }
+
+    /* Frame */
+    .phone-frame { background:#1a1c1e; border-radius:22px; padding:10px; box-shadow:0 0 0 2px #2d2f31,0 0 0 5px #1a1c1e,0 10px 45px rgba(0,0,0,0.45); position:relative; display:inline-block; }
+    .phone-screen { width:380px; height:844px; border-radius:14px; overflow:hidden; position:relative; border:1px solid #333; }
+    .punch-hole { position:absolute; top:14px; left:50%; transform:translateX(-50%); width:10px; height:10px; background:#111; border:1px solid #333; border-radius:50%; z-index:100; }
+    .home-bar { position:absolute; bottom:6px; left:50%; transform:translateX(-50%); width:110px; height:4px; background:rgba(255,255,255,0.22); border-radius:2px; z-index:100; }
+    .side-btn { position:absolute; background:#2d2f31; border-radius:2px; opacity:0.7; }
+    .btn-power { right:-3px; top:190px; width:2px; height:55px; }
+    .btn-vol-up { left:-3px; top:180px; width:2px; height:38px; }
+    .btn-vol-down { left:-3px; top:225px; width:2px; height:38px; }
+  </style>
+</head>
+<body>
+
+  <div class="phone-frame">
+  <div class="phone-screen">
+    <div class="punch-hole"></div>
+    <div class="phone">
+
+    <div class="status-bar">
+      <span>10:28</span>
+      <div style="display:flex;align-items:center;gap:5px;">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M17 4h-3V2h-4v2H7v18h10V4z"/></svg>
+      </div>
+    </div>
+
+    <div class="header">
+      <div class="header-top">
+        <a href="mp-my.html" class="back-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6"/></svg>
+        </a>
+        <span class="header-title">合拍验证</span>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" id="tabRequest" onclick="switchTab('request')">验证请求</button>
+      <button class="tab-btn" id="tabCheckin" onclick="switchTab('checkin')">抽验记录</button>
+      <button class="tab-btn" id="tabAssist" onclick="switchTab('assist')">协助记录</button>
+    </div>
+
+    <!-- Tab 1: 验证请求 -->
+    <div class="tab-content active" id="contentRequest">
+      <div class="list">
+        <div class="date-tag"><span>2026-07-29 08:15:33</span></div>
+        <div class="msg-card">
+          <div class="msg-main">
+            <div class="msg-icon" style="background:linear-gradient(135deg,#f97316,#fb923c);">
+              <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+            </div>
+            <div class="msg-body">
+              <div class="msg-title">德小拓请求您配合完成双人合拍打卡</div>
+              <div class="msg-category">打卡人：德小拓（项目经理）</div>
+            </div>
+          </div>
+          <div class="msg-action">
+            <a href="mp-partner-invitation.html">去处理</a>
+          </div>
+          <div class="msg-card-footer">项目：测试豫章师范学院新建教育实验实训大楼一期 · 上班卡</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 2: 抽验记录 -->
+    <div class="tab-content" id="contentCheckin">
+      <div class="summary-bar">
+        <div class="summary-item">
+          <div class="summary-num green" id="ckPass">4</div>
+          <div class="summary-label">验证通过</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-num red" id="ckFail">2</div>
+          <div class="summary-label">验证未通过</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-num" id="ckTotal">6</div>
+          <div class="summary-label">累计抽验</div>
+        </div>
+      </div>
+
+      <div class="list">
+        <!-- Pass -->
+        <div class="record-card">
+          <div class="record-top">
+            <div class="record-person">
+              <div class="record-avatar">
+                <svg viewBox="0 0 64 64"><circle cx="32" cy="24" r="12"/><ellipse cx="32" cy="58" rx="22" ry="18"/></svg>
+              </div>
+              <div>
+                <div class="record-name">合拍人：刘建国</div>
+                <div class="record-role">施工员</div>
+              </div>
+            </div>
+            <span class="status-badge status-pass">验证通过</span>
+          </div>
+          <div class="record-info">
+            <span class="info-item"><strong>项目：</strong>测试豫章师范学院新建教育实验实训大楼一期</span>
+            <span class="info-item"><strong>类型：</strong>上班卡</span>
+          </div>
+          <div class="record-footer">
+            <span class="record-time">2026-07-28 11:05</span>
+          </div>
+        </div>
+
+        <div class="record-card">
+          <div class="record-top">
+            <div class="record-person">
+              <div class="record-avatar">
+                <svg viewBox="0 0 64 64"><circle cx="32" cy="24" r="12"/><ellipse cx="32" cy="58" rx="22" ry="18"/></svg>
+              </div>
+              <div>
+                <div class="record-name">合拍人：张工</div>
+                <div class="record-role">技术负责人</div>
+              </div>
+            </div>
+            <span class="status-badge status-pass">验证通过</span>
+          </div>
+          <div class="record-info">
+            <span class="info-item"><strong>项目：</strong>测试豫章师范学院新建教育实验实训大楼一期</span>
+            <span class="info-item"><strong>类型：</strong>下班卡</span>
+          </div>
+          <div class="record-footer">
+            <span class="record-time">2026-07-27 18:22</span>
+          </div>
+        </div>
+
+        <div class="record-card">
+          <div class="record-top">
+            <div class="record-person">
+              <div class="record-avatar">
+                <svg viewBox="0 0 64 64"><circle cx="32" cy="24" r="12"/><ellipse cx="32" cy="58" rx="22" ry="18"/></svg>
+              </div>
+              <div>
+                <div class="record-name">合拍人：王师傅</div>
+                <div class="record-role">安全员</div>
+              </div>
+            </div>
+            <span class="status-badge status-pass">验证通过</span>
+          </div>
+          <div class="record-info">
+            <span class="info-item"><strong>项目：</strong>测试豫章师范学院新建教育实验实训大楼一期</span>
+            <span class="info-item"><strong>类型：</strong>上班卡</span>
+          </div>
+          <div class="record-footer">
+            <span class="record-time">2026-07-26 08:15</span>
+          </div>
+        </div>
+
+        <div class="record-card">
+          <div class="record-top">
+            <div class="record-person">
+              <div class="record-avatar">
+                <svg viewBox="0 0 64 64"><circle cx="32" cy="24" r="12"/><ellipse cx="32" cy="58" rx="22" ry="18"/></svg>
+              </div>
+              <div>
+                <div class="record-name">合拍人：李工</div>
+                <div class="record-role">施工员</div>
+              </div>
+            </div>
+            <span class="status-badge status-pass">验证通过</span>
+          </div>
+          <div class="record-info">
+            <span class="info-item"><strong>项目：</strong>测试豫章师范学院新建教育实验实训大楼一期</span>
+            <span class="info-item"><strong>类型：</strong>下班卡</span>
+          </div>
+          <div class="record-footer">
+            <span class="record-time">2026-07-22 18:10</span>
+          </div>
+        </div>
+
+        <!-- Fail: 人脸核验不通过 -->
+        <div class="record-card">
+          <div class="record-top">
+            <div class="record-person">
+              <div class="record-avatar">
+                <svg viewBox="0 0 64 64"><circle cx="32" cy="24" r="12"/><ellipse cx="32" cy="58" rx="22" ry="18"/></svg>
+              </div>
+              <div>
+                <div class="record-name">合拍人：赵监理</div>
+                <div class="record-role">监理工程师</div>
+              </div>
+            </div>
+            <span class="status-badge status-fail">验证未通过</span>
+          </div>
+          <div class="record-info">
+            <span class="info-item"><strong>项目：</strong>测试豫章师范学院新建教育实验实训大楼一期</span>
+            <span class="info-item"><strong>类型：</strong>上班卡</span>
+            <span class="info-item"><strong>未通过原因：</strong>人脸核验不通过</span>
+          </div>
+          <div class="record-footer">
+            <span class="record-time">2026-07-25 08:42</span>
+          </div>
+        </div>
+
+        <!-- Fail: 候选人枯竭降级 -->
+        <div class="record-card">
+          <div class="record-top">
+            <div class="record-person">
+              <div class="record-avatar">
+                <svg viewBox="0 0 64 64"><circle cx="32" cy="24" r="12"/><ellipse cx="32" cy="58" rx="22" ry="18"/></svg>
+              </div>
+              <div>
+                <div class="record-name">合拍人：无</div>
+                <div class="record-role">—</div>
+              </div>
+            </div>
+            <span class="status-badge status-fail">验证未通过</span>
+          </div>
+          <div class="record-info">
+            <span class="info-item"><strong>项目：</strong>测试豫章师范学院新建教育实验实训大楼一期</span>
+            <span class="info-item"><strong>类型：</strong>上班卡</span>
+            <span class="info-item"><strong>未通过原因：</strong>候选人池枯竭，降级为单人打卡</span>
+          </div>
+          <div class="record-footer">
+            <span class="record-time">2026-07-23 08:58</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 3: 协助记录 -->
+    <div class="tab-content" id="contentAssist">
+      <div class="summary-bar">
+        <div class="summary-item">
+          <div class="summary-num green" id="asPass">3</div>
+          <div class="summary-label">同意协助</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-num red" id="asRefuse">1</div>
+          <div class="summary-label">拒绝请求</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-num" id="asTotal">4</div>
+          <div class="summary-label">累计协助</div>
+        </div>
+      </div>
+
+      <div class="list">
+        <div class="record-card">
+          <div class="record-top">
+            <div class="record-person">
+              <div class="record-avatar orange">
+                <svg viewBox="0 0 64 64"><circle cx="32" cy="24" r="12"/><ellipse cx="32" cy="58" rx="22" ry="18"/></svg>
+              </div>
+              <div>
+                <div class="record-name">打卡人：德小拓</div>
+                <div class="record-role">项目经理</div>
+              </div>
+            </div>
+            <span class="status-badge status-pass">同意协助</span>
+          </div>
+          <div class="record-info">
+            <span class="info-item"><strong>项目：</strong>测试豫章师范学院新建教育实验实训大楼一期</span>
+            <span class="info-item"><strong>类型：</strong>上班卡</span>
+          </div>
+          <div class="record-footer">
+            <span class="record-time">2026-07-28 11:05</span>
+          </div>
+        </div>
+
+        <div class="record-card">
+          <div class="record-top">
+            <div class="record-person">
+              <div class="record-avatar orange">
+                <svg viewBox="0 0 64 64"><circle cx="32" cy="24" r="12"/><ellipse cx="32" cy="58" rx="22" ry="18"/></svg>
+              </div>
+              <div>
+                <div class="record-name">打卡人：李技术</div>
+                <div class="record-role">技术负责人</div>
+              </div>
+            </div>
+            <span class="status-badge status-pass">同意协助</span>
+          </div>
+          <div class="record-info">
+            <span class="info-item"><strong>项目：</strong>南昌绿地国际博览城二期</span>
+            <span class="info-item"><strong>类型：</strong>上班卡</span>
+          </div>
+          <div class="record-footer">
+            <span class="record-time">2026-07-27 08:30</span>
+          </div>
+        </div>
+
+        <div class="record-card">
+          <div class="record-top">
+            <div class="record-person">
+              <div class="record-avatar orange">
+                <svg viewBox="0 0 64 64"><circle cx="32" cy="24" r="12"/><ellipse cx="32" cy="58" rx="22" ry="18"/></svg>
+              </div>
+              <div>
+                <div class="record-name">打卡人：王工</div>
+                <div class="record-role">质量员</div>
+              </div>
+            </div>
+            <span class="status-badge status-pass">同意协助</span>
+          </div>
+          <div class="record-info">
+            <span class="info-item"><strong>项目：</strong>测试豫章师范学院新建教育实验实训大楼一期</span>
+            <span class="info-item"><strong>类型：</strong>下班卡</span>
+          </div>
+          <div class="record-footer">
+            <span class="record-time">2026-07-26 18:45</span>
+          </div>
+        </div>
+
+        <div class="record-card">
+          <div class="record-top">
+            <div class="record-person">
+              <div class="record-avatar orange">
+                <svg viewBox="0 0 64 64"><circle cx="32" cy="24" r="12"/><ellipse cx="32" cy="58" rx="22" ry="18"/></svg>
+              </div>
+              <div>
+                <div class="record-name">打卡人：赵监理</div>
+                <div class="record-role">监理工程师</div>
+              </div>
+            </div>
+            <span class="status-badge status-refused">拒绝请求</span>
+          </div>
+          <div class="record-info">
+            <span class="info-item"><strong>项目：</strong>南昌绿地国际博览城二期</span>
+            <span class="info-item"><strong>类型：</strong>上班卡</span>
+            <span class="info-item"><strong>拒绝原因：</strong>当前不在项目工地</span>
+          </div>
+          <div class="record-footer">
+            <span class="record-time">2026-07-25 09:12</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    </div><!-- .phone -->
+    <div class="home-bar"></div>
+  </div>
+  <div class="side-btn btn-power"></div>
+  <div class="side-btn btn-vol-up"></div>
+  <div class="side-btn btn-vol-down"></div>
+</div>
+
+<!-- Demo Panel -->
+<div class="demo-panel">
+  <div class="demo-panel-title">📋 合拍验证</div>
+  <div class="demo-panel-sub">三个页签查看不同维度记录</div>
+  <button class="demo-btn demo-btn-pt active" id="demoRQ" onclick="switchTab('request')">📨 验证请求<br><small>收到的合拍打卡请求，待处理</small></button>
+  <button class="demo-btn demo-btn-ck" id="demoCK" onclick="switchTab('checkin')">🗂 抽验记录<br><small>我作为打卡人的合拍核验记录</small></button>
+  <button class="demo-btn demo-btn-pt" id="demoPT" onclick="switchTab('assist')">🤝 协助记录<br><small>我作为合拍人协助他人的记录</small></button>
+  <div style="font-size:11px;color:#999;margin-top:10px;line-height:1.5;">
+    当前演示账号：刘建国<br>
+    收到来自德小拓的合拍请求。
+  </div>
+</div>
+
+<script>
+function switchTab(tab) {
+  document.getElementById('tabCheckin').classList.toggle('active', tab === 'checkin');
+  document.getElementById('tabAssist').classList.toggle('active', tab === 'assist');
+  document.getElementById('tabRequest').classList.toggle('active', tab === 'request');
+  document.getElementById('contentCheckin').classList.toggle('active', tab === 'checkin');
+  document.getElementById('contentAssist').classList.toggle('active', tab === 'assist');
+  document.getElementById('contentRequest').classList.toggle('active', tab === 'request');
+
+  document.getElementById('demoCK').classList.toggle('active', tab === 'checkin');
+  document.getElementById('demoPT').classList.toggle('active', tab === 'assist');
+  document.getElementById('demoRQ').classList.toggle('active', tab === 'request');
+}
+</script>
+
+</body>
+</html>

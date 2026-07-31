@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>已接受合拍 - 赣建宝</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+      background:#e8ecf1; display:flex; justify-content:center; align-items:center;
+      min-height:100vh; padding:20px; gap:26px;
+    }
+    .phone { width:380px; background:#f5f6fa; height:100%; position:relative; overflow-y:auto; overflow-x:hidden; }
+
+    .status-bar {
+      height:44px; background:linear-gradient(135deg,#2563ff,#1e90ff);
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0 16px; color:#fff; font-size:14px; font-weight:600;
+    }
+
+    .header {
+      background:linear-gradient(135deg,#16a34a,#22c55e);
+      padding:4px 16px 20px; color:#fff;
+    }
+    .header-top { display:flex; align-items:center; gap:12px; }
+    .back-btn {
+      background:rgba(255,255,255,0.18); border:none; color:#fff;
+      width:30px; height:30px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center; cursor:pointer;
+      text-decoration:none;
+    }
+    .back-btn svg { width:16px; height:16px; }
+    .header-title { font-size:17px; font-weight:500; }
+
+    .content { padding:16px 16px 24px; }
+
+    .success-banner {
+      text-align:center; padding:24px 0 16px;
+    }
+    .success-icon {
+      width:72px; height:72px; border-radius:50%;
+      background:#fff; margin:0 auto 16px;
+      display:flex; align-items:center; justify-content:center;
+      box-shadow:0 4px 24px rgba(0,0,0,0.1);
+      animation:popIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275);
+    }
+    @keyframes popIn { 0%{transform:scale(0)} 100%{transform:scale(1)} }
+    .success-icon svg { width:40px; height:40px; stroke:#16a34a; }
+    .success-title { font-size:20px; font-weight:700; color:#333; margin-bottom:6px; }
+    .success-sub { font-size:13px; color:#666; }
+
+    .guide-card {
+      background:#fff; border-radius:16px; padding:20px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.06); margin-bottom:16px;
+    }
+    .guide-step {
+      display:flex; align-items:flex-start; gap:14px; margin-bottom:18px;
+    }
+    .guide-step:last-child { margin-bottom:0; }
+    .step-num {
+      width:28px; height:28px; border-radius:50%;
+      background:#e8f0fe; color:#2563ff;
+      display:flex; align-items:center; justify-content:center;
+      font-size:14px; font-weight:700; flex-shrink:0;
+    }
+    .step-body { flex:1; }
+    .step-title { font-size:14px; font-weight:600; color:#333; margin-bottom:4px; }
+    .step-desc { font-size:12px; color:#888; line-height:1.6; }
+
+    .checkin-info {
+      background:#f8fafc; border-radius:12px; padding:14px;
+      margin-top:14px; border:1px dashed #d0d7de;
+    }
+    .info-row {
+      display:flex; justify-content:space-between; font-size:13px;
+      padding:6px 0; border-bottom:1px solid #f0f0f0;
+    }
+    .info-row:last-child { border-bottom:none; }
+    .info-label { color:#888; }
+    .info-value { color:#333; font-weight:500; }
+
+    .notice-card {
+      background:#fffbe6; border:1px solid #ffe58f; border-radius:12px;
+      padding:14px; margin-bottom:16px; display:flex; gap:10px;
+    }
+    .notice-icon { width:20px; height:20px; flex-shrink:0; margin-top:1px; }
+    .notice-text { font-size:12px; color:#8c6d00; line-height:1.6; }
+
+    .btn-primary {
+      width:100%; background:linear-gradient(135deg,#2563ff,#1e90ff);
+      color:#fff; border:none; border-radius:12px; padding:14px;
+      font-size:16px; font-weight:600; cursor:pointer;
+      text-decoration:none; display:block; text-align:center;
+      margin-bottom:10px;
+    }
+    .btn-secondary {
+      width:100%; background:#fff; color:#2563ff; border:1px solid #2563ff;
+      border-radius:12px; padding:14px; font-size:15px; cursor:pointer;
+      text-decoration:none; display:block; text-align:center;
+    }
+
+    /* Frame */
+    .phone-frame { background:#1a1c1e; border-radius:22px; padding:10px; box-shadow:0 0 0 2px #2d2f31,0 0 0 5px #1a1c1e,0 10px 45px rgba(0,0,0,0.45); position:relative; display:inline-block; }
+    .phone-screen { width:380px; height:844px; border-radius:14px; overflow:hidden; position:relative; border:1px solid #333; }
+    .punch-hole { position:absolute; top:14px; left:50%; transform:translateX(-50%); width:10px; height:10px; background:#111; border:1px solid #333; border-radius:50%; z-index:100; }
+    .home-bar { position:absolute; bottom:6px; left:50%; transform:translateX(-50%); width:110px; height:4px; background:rgba(255,255,255,0.22); border-radius:2px; z-index:100; }
+    .side-btn { position:absolute; background:#2d2f31; border-radius:2px; opacity:0.7; }
+    .btn-power { right:-3px; top:190px; width:2px; height:55px; }
+    .btn-vol-up { left:-3px; top:180px; width:2px; height:38px; }
+    .btn-vol-down { left:-3px; top:225px; width:2px; height:38px; }
+  </style>
+</head>
+<body>
+
+  <div class="phone-frame">
+  <div class="phone-screen">
+    <div class="punch-hole"></div>
+    <div class="phone">
+
+    <div class="status-bar">
+      <span>10:30</span>
+      <div style="display:flex;align-items:center;gap:5px;">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M17 4h-3V2h-4v2H7v18h10V4z"/></svg>
+      </div>
+    </div>
+
+    <div class="header">
+      <div class="header-top">
+        <a href="mp-message.html?role=partner" class="back-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6"/></svg>
+        </a>
+        <span class="header-title">合拍确认结果</span>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="success-banner">
+        <div class="success-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="4,12 10,18 20,6"/></svg>
+        </div>
+        <div class="success-title">已接受合拍请求</div>
+        <div class="success-sub">请尽快前往与打卡人汇合</div>
+      </div>
+
+      <div class="guide-card">
+        <div class="guide-step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">前往打卡人所在位置</div>
+            <div class="step-desc">打卡人正在工地现场等待您的配合，请尽快前往汇合。拍照操作由打卡人的手机完成，您只需到场入镜即可。</div>
+          </div>
+        </div>
+        <div class="guide-step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">配合打卡人完成合拍</div>
+            <div class="step-desc">两人同时出现在打卡人手机取景画面中，打卡人点击快门完成实时拍摄。</div>
+          </div>
+        </div>
+        <div class="guide-step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">等待核验结果</div>
+            <div class="step-desc">拍照完成后系统自动进行人脸核验，核验通过即完成双人打卡。</div>
+          </div>
+        </div>
+
+        <div class="checkin-info">
+          <div class="info-row"><span class="info-label">打卡人</span><span class="info-value">德小拓（项目经理）</span></div>
+          <div class="info-row"><span class="info-label">联系电话</span><span class="info-value">139****6789</span></div>
+          <div class="info-row"><span class="info-label">项目名称</span><span class="info-value">测试豫章师范学院新建教育实验实训大楼一期</span></div>
+          <div class="info-row"><span class="info-label">打卡类型</span><span class="info-value">上班卡</span></div>
+        </div>
+      </div>
+
+      <div class="notice-card">
+        <svg class="notice-icon" viewBox="0 0 24 24" fill="none" stroke="#d48806" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <div class="notice-text">合拍验证执行时间总计为15分钟，已开始计时。请在规定时间内前往汇合并拍照，超时未完成则验证失败。</div>
+      </div>
+
+      <a href="mp-my.html" class="btn-primary">已知晓，返回首页</a>
+      <a href="mp-message.html?role=partner" class="btn-secondary">返回消息</a>
+    </div>
+
+    </div><!-- .phone -->
+    <div class="home-bar"></div>
+  </div>
+  <div class="side-btn btn-power"></div><div class="side-btn btn-vol-up"></div><div class="side-btn btn-vol-down"></div>
+</div>
+
+</body>
+</html>

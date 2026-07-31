@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>江西实名制双人打卡 — 方案说明书</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:#f0f2f5;color:#333;line-height:1.75}
+.topbar{height:56px;background:linear-gradient(135deg,#1a3a5c,#2a5a8c);display:flex;align-items:center;padding:0 32px;color:#fff}
+.topbar .brand{font-size:16px;font-weight:600}
+.topbar .sub{font-size:12px;color:rgba(255,255,255,.7);margin-left:16px}
+.wrapper{max-width:960px;margin:0 auto;padding:32px 24px 60px}
+
+.title-block{background:#fff;border-radius:8px;padding:32px 36px;margin-bottom:20px;border-left:4px solid #1677ff}
+.title-block h1{font-size:24px;font-weight:700;color:#1a1a1a;margin-bottom:8px}
+.title-block .meta{font-size:13px;color:#999;display:flex;gap:20px;flex-wrap:wrap}
+
+.section{background:#fff;border-radius:8px;padding:28px 36px;margin-bottom:16px}
+.section h2{font-size:18px;font-weight:600;color:#1a1a1a;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid #f0f0f0;display:flex;align-items:center;gap:10px}
+.section h2 .dot{width:8px;height:8px;border-radius:50%;background:#1677ff;flex-shrink:0}
+.section h3{font-size:15px;font-weight:600;color:#333;margin:22px 0 10px}
+.section h4{font-size:14px;font-weight:600;color:#555;margin:14px 0 8px}
+.section p{font-size:14px;color:#555;margin-bottom:12px}
+.section ul,.section ol{margin:8px 0 12px 20px;font-size:14px;color:#555}
+.section li{margin-bottom:6px}
+
+.callout{background:#e6f7ff;border:1px solid #91d5ff;border-radius:4px;padding:12px 16px;margin:16px 0;font-size:13px;color:#0050b3}
+.callout.warn{background:#fff7e6;border-color:#ffd591;color:#ad6800}
+.callout.success{background:#f6ffed;border-color:#b7eb8f;color:#389e0d}
+.callout.danger{background:#fff1f0;border-color:#ffa39e;color:#cf1322}
+
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}
+table th,table td{border:1px solid #e8e8e8;padding:9px 14px;text-align:left}
+table th{background:#fafafa;font-weight:600;color:#333;white-space:nowrap}
+table td{color:#555}
+
+.tag{display:inline-block;padding:2px 8px;border-radius:3px;font-size:11px;font-weight:600}
+.tag.red{background:#fff1f0;color:#cf1322}
+.tag.orange{background:#fff7e6;color:#d46b08}
+.tag.green{background:#f6ffed;color:#389e0d}
+.tag.blue{background:#e6f7ff;color:#096dd9}
+
+.flow-row{display:flex;align-items:center;gap:0;margin:16px 0;overflow-x:auto;padding:8px 0}
+.flow-box{background:#f0f5ff;border:2px solid #1677ff;border-radius:8px;padding:12px 16px;text-align:center;min-width:130px;flex-shrink:0}
+.flow-box h4{font-size:13px;color:#1677ff;margin-bottom:4px}
+.flow-box p{font-size:11px;color:#666;margin:0}
+.flow-arrow{font-size:20px;color:#1677ff;padding:0 8px;flex-shrink:0}
+
+.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
+.card-grid .card{border:1px solid #e8e8e8;border-radius:6px;padding:18px}
+.card-grid .card h4{font-size:14px;font-weight:600;color:#1677ff;margin-bottom:8px}
+.card-grid .card p{font-size:13px;color:#555;margin-bottom:0}
+
+.score-bar{display:flex;align-items:center;gap:10px;margin:6px 0}
+.score-bar .bar{flex:1;height:8px;background:#f0f0f0;border-radius:4px;overflow:hidden}
+.score-bar .fill{height:100%;border-radius:4px}
+.score-bar .val{font-size:13px;font-weight:700;width:36px;text-align:right}
+.footer{text-align:center;color:#bbb;font-size:12px;padding:20px 0}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="brand">江西省建筑工人实名制管理服务信息平台</div><div class="sub">面向客户 · 方案说明书 v1.0</div></div>
+<div class="wrapper">
+
+<div class="title-block">
+<h1>实名制双人打卡 — 方案说明书</h1>
+<div class="meta"><span>版本 v1.0</span><span>2026-07-30</span><span>适用范围：江西省住建厅 / 各地市住建局 / 各区县主管部门</span></div>
+</div>
+
+<!-- 1. 背景 -->
+<div class="section">
+<h2><span class="dot"></span>一、项目背景与建设目标</h2>
+<h3>1.1 现状与问题</h3>
+<p>江西省建筑工人实名制管理平台已建立较完善的考勤体系，岗位人员通过<strong>刷脸活体检测 + GPS定位 + 工地WiFi校验</strong>完成每日上下班打卡。但在实际运行中，主管部门发现部分挂职人员（尤其是项目经理等关键岗位）通过以下手段绕过监管：</p>
+<ul>
+<li>使用<strong>虚拟定位软件</strong>伪造GPS位置</li>
+<li>通过<strong>VPN盒子</strong>模拟工地WiFi环境</li>
+<li>人不在工地，但系统显示正常打卡</li>
+</ul>
+<h3>1.2 解决思路</h3>
+<p>在现有打卡体系之上增加一层<strong>"双人合拍验证"</strong>机制 —— 随机要求打卡人与工地上另一名已打卡人员用同一手机拍摄双人合影，由系统进行人脸核验确认两人真实性。</p>
+<div class="callout"><strong>核心逻辑：</strong>挂职人员若不在工地现场，则无法与任何在工地的人员完成实时合拍。当系统将其抽为合拍人时，其频繁拒绝/超时未响应将成为挂职的直接证据。</div>
+<h3>1.3 建设目标</h3>
+<ol>
+<li>有效遏制关键岗位人员挂职、虚假考勤行为</li>
+<li>不显著增加正常在岗人员的打卡负担</li>
+<li>为各级主管部门提供数据化监管手段</li>
+<li>建立人员/项目维度的风险评分与预警体系</li>
+</ol>
+</div>
+
+<!-- 2. 功能清单 -->
+<div class="section">
+<h2><span class="dot"></span>二、功能模块总览</h2>
+<p>本方案涉及<strong>两大端</strong>共计 <strong>9 个功能模块</strong>：</p>
+
+<h3>2.1 赣建宝小程序端（建筑工人使用）</h3>
+<table>
+<tr><th style="width:20px">#</th><th style="width:120px">功能模块</th><th>定位</th><th>主要功能内容</th></tr>
+<tr><td>1</td><td><strong>单人打卡</strong></td><td>日常考勤基础功能，保持不变</td><td>WiFi校验→人脸采集→活体检测→打卡成功。在此基础上增加：打卡完成后系统随机判定是否触发双人合拍</td></tr>
+<tr><td>2</td><td><strong>合拍触发通知</strong></td><td>告知打卡人被抽中需完成双人合拍</td><td>展示合拍人信息、确认状态、拒绝历史、倒计时。不可拒绝/换人，需联系合拍人配合完成</td></tr>
+<tr><td>3</td><td><strong>合拍拍照</strong></td><td>完成双人实时合影拍摄</td><td>横版取景框+双人人脸引导框，强制实时拍摄禁止相册，自动叠加GPS+项目+人员+时间水印</td></tr>
+<tr><td>4</td><td><strong>核验结果</strong></td><td>展示合拍照片的人脸核验结果</td><td>加载→核验通过（考勤成功）/ 核验不通过（可重拍，15分钟内不限次数）</td></tr>
+<tr><td>5</td><td><strong>合拍邀请处理</strong></td><td>合拍人响应合拍请求</td><td>5分钟内接受或拒绝，接受后获得打卡人信息与汇合指引（拍照由打卡人手机完成）</td></tr>
+<tr><td>6</td><td><strong>消息通知</strong></td><td>接收合拍请求通知</td><td>在现有消息列表中增加"合拍请求"类型消息，"去处理"按钮跳转至处理页面</td></tr>
+<tr><td>7</td><td><strong>合拍验证记录</strong></td><td>查看个人的合拍历史</td><td>两个页签：抽验记录（我作为打卡人）/ 协助记录（我作为合拍人）</td></tr>
+</table>
+
+<h3>2.2 监管端Web（主管部门使用）</h3>
+<table>
+<tr><th style="width:20px">#</th><th style="width:120px">功能模块</th><th>定位</th><th>主要功能内容</th></tr>
+<tr><td>1</td><td><strong>数据看板</strong></td><td>全局数据概览，一屏掌握整体态势</td><td>统计卡片（触发人次/通过率/预警/高风险）、项目排名、预警分布、通过率趋势图、辖区动态</td></tr>
+<tr><td>2</td><td><strong>规则配置</strong></td><td>按组织层级配置合拍参数</td><td>全局配置：上班卡/下班卡抽取率、候选人池阈值、下发至下级组织域。项目规则例外：特定项目独立规则且不被下发覆盖</td></tr>
+<tr><td>3</td><td><strong>抽验记录</strong></td><td>按时间线查看每条抽验详情</td><td>支持按项目/人员/区划/类型/结果/时间多维筛选。详情页含完整核验轨迹（换人记录+多次拍照+每次分数）</td></tr>
+<tr><td>4</td><td><strong>抽验汇总</strong></td><td>以人员/项目维度聚合查看全量累计数据</td><td>人员汇总：每人总抽验次数、通过率、角色分布、常见合拍人。项目汇总：项目抽验总人次、通过率、关键岗位表现</td></tr>
+<tr><td>5</td><td><strong>风险预警</strong></td><td>自动化风险评分与排序</td><td>人员风险排名（5指标加权评分）、项目风险排名（5指标加权评分），近30天滚动计算</td></tr>
+</table>
+</div>
+
+<!-- 3. 业务流程 -->
+<div class="section">
+<h2><span class="dot"></span>三、业务流程图</h2>
+
+<h3>3.1 核心流程：打卡人视角</h3>
+<div class="flow-row">
+<div class="flow-box"><h4>① 正常打卡</h4><p>刷脸+GPS+WiFi</p></div>
+<div class="flow-arrow">→</div>
+<div class="flow-box"><h4>② 系统判定</h4><p>按抽取率随机</p></div>
+<div class="flow-arrow">→</div>
+<div class="flow-box" style="border-color:#fa8c16"><h4>③ 被抽中</h4><p>6模块触发通知</p></div>
+<div class="flow-arrow">→</div>
+<div class="flow-box"><h4>④ 联系合拍人</h4><p>等待确认/直接拍照</p></div>
+<div class="flow-arrow">→</div>
+<div class="flow-box"><h4>⑤ 双人合拍</h4><p>横版取景+水印</p></div>
+<div class="flow-arrow">→</div>
+<div class="flow-box" style="border-color:#52c41a"><h4>⑥ 人脸核验</h4><p>通过/重拍/降级</p></div>
+</div>
+
+<h3>3.2 合拍人响应流程</h3>
+<div class="flow-row">
+<div class="flow-box"><h4>收到通知</h4><p>消息中"去处理"</p></div>
+<div class="flow-arrow">→</div>
+<div class="flow-box" style="border-color:#fa8c16"><h4>查看邀请</h4><p>5分钟倒计时</p></div>
+<div class="flow-arrow">→</div>
+<div class="flow-box" style="border-color:#52c41a"><h4>接受</h4><p>获知打卡人信息</p></div>
+<div class="flow-arrow">→</div>
+<div class="flow-box"><h4>前往汇合</h4><p>与打卡人碰面</p></div>
+<div class="flow-arrow">→</div>
+<div class="flow-box"><h4>配合拍照</h4><p>打卡人手机拍摄</p></div>
+<div class="flow-arrow">→</div>
+<div class="flow-box" style="border-color:#ff4d4f"><h4>拒绝</h4><p>选原因→系统换人</p></div>
+</div>
+
+<h3>3.3 换人场景流程</h3>
+<div class="flow-row">
+<div class="flow-box" style="border-color:#ff4d4f"><h4>第1人拒绝</h4><p>记录原因</p></div>
+<div class="flow-arrow">→</div>
+<div class="flow-box"><h4>系统自动换人</h4><p>抽取第2候选人</p></div>
+<div class="flow-arrow">→</div>
+<div class="flow-box" style="border-color:#ff4d4f"><h4>第2人拒绝</h4><p>"最后一个合拍机会"</p></div>
+<div class="flow-arrow">→</div>
+<div class="flow-box"><h4>第3人</h4><p>不可再拒绝</p></div>
+<div class="flow-arrow">→</div>
+<div class="flow-box" style="border-color:#ff4d4f"><h4>仍拒绝/超时</h4><p>降级单人打卡</p></div>
+</div>
+
+<h3>3.4 候选人池枯竭流程</h3>
+<div class="flow-row">
+<div class="flow-box" style="border-color:#fa8c16"><h4>触发抽验</h4><p>查询候选人池</p></div>
+<div class="flow-arrow">→</div>
+<div class="flow-box" style="border-color:#ff4d4f"><h4>池中无人</h4><p>或全部锁定中</p></div>
+<div class="flow-arrow">→</div>
+<div class="flow-box" style="border-color:#ff4d4f"><h4>标记枯竭</h4><p>记录原因</p></div>
+<div class="flow-arrow">→</div>
+<div class="flow-box"><h4>降级单人打卡</h4><p>系统记录异常</p></div>
+</div>
+</div>
+
+<!-- 4. 关键规则 -->
+<div class="section">
+<h2><span class="dot"></span>四、核心业务规则</h2>
+
+<h3>4.1 候选人池规则</h3>
+<table>
+<tr><th>打卡类型</th><th>候选人池范围</th><th>排除条件</th></tr>
+<tr><td>上班卡</td><td>当日该项目下已成功打卡上班的在册人员</td><td>打卡人本人、已被其他请求锁定的人员</td></tr>
+<tr><td>下班卡</td><td>当日已打上班卡、尚未打下班卡的在册人员</td><td>打卡人本人、已被其他请求锁定的人员</td></tr>
+</table>
+
+<h3>4.2 时间窗口规则</h3>
+<table>
+<tr><th>计时器</th><th>时长</th><th>起点</th><th>超时后果</th></tr>
+<tr><td>确认倒计时</td><td><strong>5分钟</strong></td><td>系统推送通知给合拍人</td><td>自动视为拒绝，系统换下一个候选人</td></tr>
+<tr><td>合拍执行窗口</td><td><strong>15分钟</strong></td><td>打卡人被抽中时</td><td>验证失败，系统标记后降级为单人打卡</td></tr>
+</table>
+
+<h3>4.3 抽取规则</h3>
+<ul>
+<li>上班卡抽取率：建议 100%（重点管理岗位的上班打卡均需合拍验证）</li>
+<li>下班卡抽取率：建议 50%（降低下班时段负担，但保留随机威慑）</li>
+<li>候选人池阈值：池中人数低于此值不触发抽验（避免频繁枯竭，默认≥2人）</li>
+<li>每天每次打卡独立抽取，跨天重置</li>
+</ul>
+
+<h3>4.4 合拍拍照规则</h3>
+<ul>
+<li><strong>强制实时拍摄：</strong>调用手机摄像头实时取景，禁止从相册选择</li>
+<li><strong>横版取景框：</strong>包含两个虚线头肩轮廓引导框，辅助站位</li>
+<li><strong>自动水印叠加：</strong>GPS定位坐标 + 项目名称 + 打卡人姓名 + 拍摄时间戳</li>
+<li><strong>拍照人：</strong>始终由打卡人手机完成，合拍人只需到场配合</li>
+</ul>
+
+<h3>4.5 换人与降级规则</h3>
+<ul>
+<li>候选人更换上限 2 次（即最多 3 个候选人）</li>
+<li>第 3 人为最后机会，界面提示"最后一个合拍机会"</li>
+<li>候选人池枯竭或全部拒绝/超时后，降级为单人打卡并记录异常</li>
+<li>降级记录在监管端可查，作为风险评分输入数据</li>
+</ul>
+</div>
+
+<!-- 5. 风险预警 -->
+<div class="section">
+<h2><span class="dot"></span>五、风险预警体系</h2>
+<p>基于<strong>近30天滚动数据</strong>，对人员和项目分别进行自动化风险评分。评分每日凌晨更新。</p>
+
+<h3>5.1 人员风险评分算法</h3>
+<table>
+<tr><th style="width:30px">#</th><th>指标</th><th style="width:60px">权重</th><th>计算方式</th><th>说明</th></tr>
+<tr><td>1</td><td>拒绝配合率</td><td><strong>30%</strong></td><td>作为合拍人被抽中后拒绝次数 ÷ 被抽中总次数</td><td>核心反挂职指标。项目经理常被抽中又常拒绝，说明不在工地</td></tr>
+<tr><td>2</td><td>抽验未通过率</td><td><strong>25%</strong></td><td>作为打卡人抽验未通过次数 ÷ 抽验总次数</td><td>核查不通过可能意味着非本人或两人未真实同框</td></tr>
+<tr><td>3</td><td>超时/降级率</td><td><strong>20%</strong></td><td>超时或候选人枯竭降级次数 ÷ 抽验总次数</td><td>操作异常信号：找人不积极、合拍人不到场</td></tr>
+<tr><td>4</td><td>GPS偏离次数</td><td><strong>15%</strong></td><td>GPS与工地中心点距离 &gt;500m 的累计次数</td><td>虚拟定位嫌疑</td></tr>
+<tr><td>5</td><td>核验重试率</td><td><strong>10%</strong></td><td>单次合拍需拍摄 ≥2次的次数 ÷ 总合拍次数</td><td>反复尝试蒙混过关</td></tr>
+</table>
+
+<h3>5.2 项目风险评分算法</h3>
+<table>
+<tr><th style="width:30px">#</th><th>指标</th><th style="width:60px">权重</th><th>计算方式</th><th>说明</th></tr>
+<tr><td>1</td><td>关键岗位拒绝率</td><td><strong>30%</strong></td><td>项目经理/安全员等关键岗位被抽为合拍人后拒绝次数 ÷ 被抽总次数</td><td>关键岗位人员频繁拒绝说明项目管理松散</td></tr>
+<tr><td>2</td><td>抽验未通过率</td><td><strong>25%</strong></td><td>项目内所有人员抽验未通过次数 ÷ 总抽验次数</td><td>整体核验质量</td></tr>
+<tr><td>3</td><td>超时/降级率</td><td><strong>20%</strong></td><td>项目内超时降级次数 ÷ 总抽验次数</td><td>项目配合度</td></tr>
+<tr><td>4</td><td>合拍人集中度</td><td><strong>15%</strong></td><td>同一合拍人被≥3个不同打卡人使用的集中程度</td><td>疑似"职业配合者"长期蹲守代拍</td></tr>
+<tr><td>5</td><td>异常打卡人次比</td><td><strong>10%</strong></td><td>(GPS偏离+人脸核验不通过人次) ÷ 总打卡人次</td><td>项目级异常打卡严重程度</td></tr>
+</table>
+
+<h3>5.3 风险等级与处理建议</h3>
+<table>
+<tr><th>得分区间</th><th>等级</th><th>处理建议</th></tr>
+<tr><td>≥ 80</td><td><span class="tag red">高风险</span></td><td>重点核查，下发督办，必要时现场检查</td></tr>
+<tr><td>50 — 79</td><td><span class="tag orange">中风险</span></td><td>持续关注，定期复查数据分析</td></tr>
+<tr><td>&lt; 50</td><td><span class="tag green">低风险</span></td><td>正常管理，日常巡检</td></tr>
+</table>
+
+<div class="callout success"><strong>风险评分的价值：</strong>不同于单条预警规则的"是/否"判断，风险评分综合多维数据给出量化得分，帮助主管部门从海量人员/项目中精准识别应重点关注的对象。</div>
+</div>
+
+<!-- 6. 权限 -->
+<div class="section">
+<h2><span class="dot"></span>六、权限体系</h2>
+<table>
+<tr><th>账号级别</th><th>可查看范围</th><th>可操作权限</th></tr>
+<tr><td><strong>省级</strong>（省住建厅）</td><td>全省所有地市、区县数据</td><td>全省看板、配置省级默认规则、下发至地市、风险预警全局视图</td></tr>
+<tr><td><strong>市级</strong>（市住建局）</td><td>本市及下辖区县数据</td><td>本市看板、在省级框架内微调规则、本市风险预警、下发督办</td></tr>
+<tr><td><strong>区县级</strong>（区住建局）</td><td>本区县数据</td><td>本区县看板、查看风险详情、处理人员标记</td></tr>
+</table>
+</div>
+
+<!-- 7. 价值 -->
+<div class="section">
+<h2><span class="dot"></span>七、方案核心价值</h2>
+<div class="card-grid">
+<div class="card"><h4>🔍 精准识别挂职</h4><p>合拍人确认制+拒绝/超时记录，让不在工地的人员无处遁形。数据异常直接成为管理证据。</p></div>
+<div class="card"><h4>📊 量化风险评估</h4><p>5维加权评分取代简单规则判断，主管部门可直观看到需要重点关注的人员和项目。</p></div>
+<div class="card"><h4>⏱ 轻量不扰民</h4><p>只在打卡时随机触发，正常在岗人员配合拍照仅需十几秒。下班卡50%抽取率降低负担。</p></div>
+<div class="card"><h4>📋 全过程可追溯</h4><p>每次抽验完整记录：谁触发、谁被选、谁拒绝、几次拍照、每次核验分数。全程留痕。</p></div>
+</div>
+</div>
+
+</div>
+<div class="footer">江西省建筑工人实名制管理服务信息平台</div>
+</body>
+</html>

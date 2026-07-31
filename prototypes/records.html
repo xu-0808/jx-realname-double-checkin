@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>抽验记录 - 江西省建筑工人实名制管理服务信息平台</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif; background:#f0f2f5; color:#333; }
+    a { text-decoration:none; color:inherit; }
+
+    .header { height:56px; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,0.08); display:flex; align-items:center; justify-content:space-between; padding:0 24px; position:fixed; top:0; left:0; right:0; z-index:100; }
+    .header-left { display:flex; align-items:center; gap:12px; }
+    .logo { width:32px; height:32px; background:linear-gradient(135deg,#1890ff,#096dd9); border-radius:4px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; font-size:14px; }
+    .header-title { font-size:15px; font-weight:500; color:#333; }
+    .header-sub { font-size:12px; color:#999; margin-left:8px; }
+    .header-right { display:flex; align-items:center; gap:20px; color:#666; font-size:13px; }
+    .user-info { display:flex; align-items:center; gap:6px; cursor:pointer; }
+    .avatar { width:28px; height:28px; border-radius:50%; background:#1890ff; color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; }
+
+    .layout { display:flex; min-height:100vh; padding-top:56px; }
+    .sidebar { width:200px; background:#001529; color:rgba(255,255,255,0.65); position:fixed; top:56px; bottom:0; left:0; overflow-y:auto; padding:8px 0; font-size:13px; }
+    .menu-item { padding:0 16px; height:40px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; transition:all 0.2s; }
+    .menu-item:hover { color:#fff; }
+    .menu-item.active { background:#1890ff; color:#fff; }
+    .menu-item .left { display:flex; align-items:center; gap:8px; }
+    .menu-icon { width:14px; height:14px; flex-shrink:0; }
+    .menu-item .arrow { font-size:10px; transition:transform 0.2s; }
+    .submenu { background:#000c17; display:none; }
+    .submenu.show { display:block; }
+    .submenu-item { padding:0 24px 0 40px; height:36px; display:flex; align-items:center; cursor:pointer; transition:all 0.2s; }
+    .submenu-item:hover { color:#fff; }
+    .submenu-item.active { color:#fff; background:rgba(24,144,255,0.2); border-right:3px solid #1890ff; }
+
+    .main { margin-left:200px; flex:1; padding:20px; }
+    .page-header { background:#fff; padding:14px 20px; border-radius:4px; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; }
+    .page-header h2 { font-size:16px; font-weight:500; }
+
+    .card { background:#fff; border-radius:4px; box-shadow:0 1px 4px rgba(0,0,0,0.04); }
+    .card-header { padding:14px 20px; border-bottom:1px solid #f0f0f0; display:flex; justify-content:space-between; align-items:center; }
+    .card-title { font-size:15px; font-weight:500; }
+    .card-body { padding:20px; }
+
+    .filter-bar { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:16px; }
+    .filter-item { display:flex; align-items:center; gap:6px; font-size:13px; }
+    .filter-item label { color:#666; white-space:nowrap; }
+    .filter-item select,.filter-item input { padding:5px 10px; border:1px solid #d9d9d9; border-radius:4px; font-size:13px; outline:none; }
+    .filter-item select:focus,.filter-item input:focus { border-color:#1890ff; }
+    .btn { padding:5px 14px; border-radius:4px; font-size:13px; cursor:pointer; border:1px solid; }
+    .btn-primary { background:#1890ff; color:#fff; border-color:#1890ff; }
+    .btn-default { background:#fff; border-color:#d9d9d9; color:#666; }
+
+    .table { width:100%; border-collapse:collapse; font-size:13px; }
+    .table th { background:#fafafa; color:#666; font-weight:500; text-align:left; padding:10px 12px; border-bottom:1px solid #f0f0f0; white-space:nowrap; }
+    .table td { padding:10px 12px; border-bottom:1px solid #f0f0f0; }
+    .table tr:hover td { background:#fafafa; }
+    .tag { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:500; }
+    .tag-green { background:#f6ffed; color:#52c41a; border:1px solid #b7eb8f; }
+    .tag-red { background:#fff1f0; color:#ff4d4f; border:1px solid #ffa39e; }
+    .action-link { color:#1890ff; cursor:pointer; font-size:12px; }
+    .pagination { display:flex; justify-content:flex-end; align-items:center; gap:6px; margin-top:14px; font-size:13px; color:#666; }
+    .pagination button { padding:4px 10px; border:1px solid #d9d9d9; background:#fff; border-radius:4px; cursor:pointer; font-size:12px; }
+    .pagination button:hover { border-color:#1890ff; color:#1890ff; }
+    .pagination button.active { background:#1890ff; color:#fff; border-color:#1890ff; }
+    .page-total { margin-left:8px; }
+
+    /* Highlight filtered rows */
+    .row-hidden { display:none; }
+  </style>
+</head>
+<body>
+<div class="header">
+  <div class="header-left">
+    <div class="logo">赣</div>
+    <div>
+      <span class="header-title">江西省建筑工人实名制管理服务信息平台</span>
+      <span class="header-sub">双人打卡管理</span>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="icon"><svg style="width:18px;height:18px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+    <div class="user-info"><div class="avatar" id="demoAvatar">赣</div><span id="demoUser">江西省管理员</span></div>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> 工程一张图</span></div>
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="13" width="4" height="8"/><rect x="10" y="9" width="4" height="12"/><rect x="17" y="5" width="4" height="16"/></svg> BI数据看板</span></div>
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg> 实名制管理</span></div>
+    <div class="menu-item active open">
+      <span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M17 9h.01"/></svg> 双人打卡管理</span>
+    </div>
+    <div class="submenu show">
+      <div class="submenu-item"><a href="index.html">数据看板</a></div>
+      <div class="submenu-item"><a href="rule-global.html">规则配置</a></div>
+      <div class="submenu-item active"><a href="records.html">抽验记录</a></div>
+      <div class="submenu-item"><a href="summary.html">抽验汇总</a></div>
+      <div class="submenu-item"><a href="risk-warning.html">风险预警</a></div>
+    </div>
+    <div class="menu-item">
+      <span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><circle cx="8" cy="17" r="1"/></svg> 工程发检监管</span></div>
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="9" y1="10" x2="15" y2="10"/></svg> 劳务用工监管</span></div>
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="9" stroke-dasharray="4 3"/></svg> 系统管理</span></div>
+  </div>
+
+  <div class="main">
+    <div class="page-header">
+      <div>
+        <h2>双人打卡 · 抽验记录</h2>
+        <div style="font-size:12px;color:#999;margin-top:4px;">管辖范围：<strong id="scopeLabel">江西省（全省）</strong> | 共 <span id="totalCount">10</span> 条记录</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <span style="font-size:12px;color:#999;">当前账号：</span>
+        <select id="accountLevel" onchange="switchLevel()" style="padding:5px 10px;border:1px solid #d9d9d9;border-radius:4px;font-size:13px;">
+          <option value="province">省级账号 · 江西省</option>
+          <option value="nanchang">市级账号 · 南昌市</option>
+          <option value="ganzhou">市级账号 · 赣州市</option>
+          <option value="jingkai">区县账号 · 南昌经开区</option>
+        </select>
+        <button class="btn-default">导出</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+
+        <div class="filter-bar">
+          <div class="filter-item"><label>项目区划：</label><select id="filterRegion"><option>全部</option></select></div>
+          <div class="filter-item"><label>项目：</label><input type="text" placeholder="项目名称"></div>
+          <div class="filter-item"><label>打卡人：</label><input type="text" placeholder="姓名/身份证号"></div>
+          <div class="filter-item"><label>合拍人：</label><input type="text" placeholder="姓名"></div>
+          <div class="filter-item"><label>类型：</label><select><option>全部</option><option>上班卡</option><option>下班卡</option></select></div>
+          <div class="filter-item"><label>结果：</label><select><option>全部</option><option>验证通过</option><option>验证未通过</option></select></div>
+          <div class="filter-item"><label>时间：</label><input type="date" value="2026-07-01"> 至 <input type="date" value="2026-07-28"></div>
+          <button class="btn-primary">查询</button>
+          <button class="btn-default">重置</button>
+        </div>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th style="width:45px;">序号</th>
+              <th style="min-width:200px;">项目名称 | 施工许可证号</th>
+              <th>项目区划</th>
+              <th>打卡人</th>
+              <th>合拍人</th>
+              <th>类型</th>
+              <th>验证结果</th>
+              <th>未通过原因</th>
+              <th>验证时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+          </tbody>
+        </table>
+
+        <div class="pagination">
+          <span class="page-total">共 <span id="totalCount2">10</span> 条</span>
+          <button disabled>&lt;</button>
+          <button class="active">1</button>
+          <button>2</button>
+          <button>&gt;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// All records data
+var allData = [
+  {p:'豫章师范学院实训大楼一期',pn:'360100202406270101',r:'南昌市经开区',cp:'德小拓',cprole:'项目经理',pp:'刘建国',pprole:'施工员',t:'上班卡',s:'pass',f:'—',d:'07-28 11:05',l:'record-detail.html'},
+  {p:'豫章师范学院实训大楼一期',pn:'360100202406270101',r:'南昌市经开区',cp:'张工',cprole:'技术负责人',pp:'刘建国',pprole:'施工员',t:'下班卡',s:'pass',f:'—',d:'07-27 18:22',l:'record-detail.html?scenario=swap'},
+  {p:'绿地国际博览城二期',pn:'360100202406270205',r:'南昌市红谷滩区',cp:'李技术',cprole:'技术负责人',pp:'刘建国',pprole:'施工员',t:'上班卡',s:'pass',f:'—',d:'07-27 08:30',l:'record-detail.html'},
+  {p:'豫章师范学院实训大楼一期',pn:'360100202406270101',r:'南昌市经开区',cp:'德小拓',cprole:'项目经理',pp:'赵监理',pprole:'监理工程师',t:'上班卡',s:'fail',f:'人脸核验不通过',d:'07-25 08:42',l:'record-detail.html'},
+  {p:'豫章师范学院实训大楼一期',pn:'360100202406270101',r:'南昌市经开区',cp:'德小拓',cprole:'项目经理',pp:'—',pprole:'候选人枯竭',t:'上班卡',s:'fail',f:'候选人池枯竭，降级为单人打卡',d:'07-23 08:58',l:'record-detail.html'},
+  {p:'绿地国际博览城二期',pn:'360100202406270205',r:'南昌市红谷滩区',cp:'王工',cprole:'质量员',pp:'刘建国',pprole:'施工员',t:'下班卡',s:'pass',f:'—',d:'07-22 18:10',l:'record-detail.html'},
+  {p:'龙南市安基山景区建设项目',pn:'360700202406270102',r:'赣州市龙南市',cp:'钟工',cprole:'项目经理',pp:'谢监理',pprole:'监理工程师',t:'上班卡',s:'pass',f:'—',d:'07-28 09:15',l:'record-detail.html'},
+  {p:'九江市同文中学学生公寓',pn:'360400202406270199',r:'九江市浔阳区',cp:'周工',cprole:'安全员',pp:'吴队长',pprole:'门卫',t:'上班卡',s:'pass',f:'—',d:'07-27 07:40',l:'record-detail.html'},
+  {p:'龙南市安基山景区建设项目',pn:'360700202406270102',r:'赣州市龙南市',cp:'黄工',cprole:'施工员',pp:'谢监理',pprole:'监理工程师',t:'下班卡',s:'fail',f:'人脸核验不通过',d:'07-26 18:30',l:'record-detail.html'},
+  {p:'南昌西站交通枢纽配套工程',pn:'360100202406270310',r:'南昌市红谷滩区',cp:'马工',cprole:'技术负责人',pp:'刘建国',pprole:'施工员',t:'上班卡',s:'pass',f:'—',d:'07-25 08:10',l:'record-detail.html'},
+];
+
+// Scope definitions
+var scopes = {
+  province: {label:'江西省（全省）', user:'江西省管理员', filter:function(d){return true;}},
+  nanchang: {label:'南昌市', user:'南昌市管理员', filter:function(d){return d.r.indexOf('南昌市')>=0;}},
+  ganzhou:  {label:'赣州市', user:'赣州市管理员', filter:function(d){return d.r.indexOf('赣州市')>=0;}},
+  jingkai:  {label:'南昌经济技术开发区', user:'经开区管理员', filter:function(d){return d.r.indexOf('经开区')>=0;}}
+};
+
+function renderTable(scopeKey) {
+  var scope = scopes[scopeKey];
+  var filtered = allData.filter(scope.filter);
+  document.getElementById('scopeLabel').textContent = scope.label;
+  document.getElementById('demoUser').textContent = scope.user;
+  var count = filtered.length;
+  document.getElementById('totalCount').textContent = count;
+  document.getElementById('totalCount2').textContent = count;
+
+  var html = '';
+  filtered.forEach(function(d,i){
+    var stag = d.s==='pass' ? '<span class="tag tag-green">验证通过</span>' : '<span class="tag tag-red">验证未通过</span>';
+    html += '<tr>'+
+      '<td>'+(i+1)+'</td>'+
+      '<td>'+d.p+'<div style="font-size:11px;color:#aaa;">'+d.pn+'</div></td>'+
+      '<td>'+d.r+'</td>'+
+      '<td>'+d.cp+'<div style="font-size:11px;color:#999;">'+d.cprole+'</div></td>'+
+      '<td>'+d.pp+'<div style="font-size:11px;color:#999;">'+d.pprole+'</div></td>'+
+      '<td>'+d.t+'</td>'+
+      '<td>'+stag+'</td>'+
+      '<td>'+d.f+'</td>'+
+      '<td>'+d.d+'</td>'+
+      '<td><a href="'+d.l+'" class="action-link">详情</a></td>'+
+    '</tr>';
+  });
+  document.getElementById('tableBody').innerHTML = html;
+}
+
+function switchLevel() {
+  renderTable(document.getElementById('accountLevel').value);
+}
+
+// Init
+renderTable('province');
+</script>
+</body>
+</html>

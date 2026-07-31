@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>双人合拍验证 — 赣建宝</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: #e8ecf1;
+      display: flex; justify-content: center; align-items: center;
+      min-height: 100vh; padding: 20px;
+    }
+    .demo-wrapper { display: flex; align-items: flex-start; gap: 28px; }
+
+    /* ==== Demo Panel ==== */
+    .demo-panel {
+      background: #fff; border-radius: 14px;
+      padding: 20px 18px; box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+      width: 240px; flex-shrink: 0;
+    }
+    .demo-panel-title { font-size: 14px; font-weight: 700; color: #333; margin-bottom: 4px; }
+    .demo-panel-sub { font-size: 11px; color: #999; margin-bottom: 14px; }
+    .demo-scenario {
+      display: block; width: 100%;
+      padding: 10px 12px; border: 1.5px solid #e5e7eb; border-radius: 10px;
+      background: #fafbfc; font-size: 13px; color: #555; cursor: pointer;
+      text-align: left; margin-bottom: 8px; transition: all 0.18s; line-height: 1.5;
+    }
+    .demo-scenario:hover { border-color: #93c5fd; background: #eff6ff; color: #2563ff; }
+    .demo-scenario.active {
+      border-color: #2563ff; background: #eef4ff; color: #1d4ed8;
+      font-weight: 600; box-shadow: 0 0 0 2px rgba(37,99,255,0.12);
+    }
+    .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 7px; vertical-align: middle; position: relative; top: -1px; }
+    .dot-green{background:#22c55e} .dot-yellow{background:#f59e0b} .dot-red{background:#ef4444}
+    .dot-orange{background:#f97316} .dot-blue{background:#3b82f6} .dot-purple{background:#a855f7} .dot-gray{background:#94a3b8}
+    .demo-hint { font-size: 11px; color: #aaa; margin-top: 12px; padding-top: 10px; border-top: 1px solid #f0f0f0; line-height: 1.6; }
+
+    /* ==== Phone Frame ==== */
+    .phone-frame {
+      background: #1a1c1e; border-radius: 22px; padding: 10px;
+      box-shadow: 0 0 0 2px #2d2f31, 0 0 0 5px #1a1c1e, 0 10px 45px rgba(0,0,0,0.45);
+      position: relative; display: inline-block;
+    }
+    .phone-screen { width: 380px; height: 844px; border-radius: 14px; overflow: hidden; position: relative; border: 1px solid #333; }
+    .punch-hole { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); width: 10px; height: 10px; background: #111; border: 1px solid #333; border-radius: 50%; z-index: 100; }
+    .home-bar { position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); width: 110px; height: 4px; background: rgba(255,255,255,0.22); border-radius: 2px; z-index: 100; }
+    .side-btn { position: absolute; background: #2d2f31; border-radius: 2px; opacity: 0.7; }
+    .btn-power { right: -3px; top: 190px; width: 2px; height: 55px; }
+    .btn-vol-up { left: -3px; top: 180px; width: 2px; height: 38px; }
+    .btn-vol-down { left: -3px; top: 225px; width: 2px; height: 38px; }
+
+    .phone { width: 380px; height: 100%; background: #f5f6fa; position: relative; overflow-y: auto; overflow-x: hidden; }
+    .status-bar { height: 44px; background: linear-gradient(135deg, #2563ff 0%, #1e90ff 100%); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; color: #fff; font-size: 14px; font-weight: 600; }
+    .header { background: linear-gradient(135deg, #2563ff 0%, #1e90ff 100%); padding: 4px 16px 20px; color: #fff; }
+    .header-top { display: flex; align-items: center; gap: 12px; }
+    .back-btn { background: rgba(255,255,255,0.18); border: none; color: #fff; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; text-decoration: none; }
+    .back-btn svg { width: 16px; height: 16px; }
+    .header-title { font-size: 17px; font-weight: 500; }
+    .content { padding: 14px 14px 24px; }
+
+    /* ====== ① 顶部横幅通知条（统一颜色） ====== */
+    .section-banner { margin-bottom: 14px; }
+    .banner-strip {
+      position: relative; border-radius: 10px; overflow: hidden;
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px; font-size: 14px; font-weight: 700;
+      background: #fff8f0; border: 1px solid #ffe0c0;
+    }
+    .banner-strip::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+      width: 4px; background: #f97316;
+    }
+    .banner-icon { width: 20px; height: 20px; flex-shrink: 0; color: #f97316; }
+    .banner-text { flex: 1; font-size: 14px; line-height: 1.45; color: #9a3412; }
+
+    /* ====== ② 事件时间线（拒绝历史） ====== */
+    .reject-history {
+      padding: 10px 14px; border-radius: 10px; font-size: 12px; line-height: 1.6;
+      display: flex; align-items: flex-start; gap: 8px; margin-bottom: 14px;
+    }
+    .reject-history svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; }
+    .reject-history.yellow { background: #fffbe6; border: 1px dashed #facc15; color: #92400e; }
+    .reject-history.red    { background: #fff5f5; border: 1px dashed #fca5a5; color: #991b1b; }
+
+    /* ====== ③ 合拍人员信息卡片（固定统一样式 + 右上角图章） ====== */
+    .section-partner { margin-bottom: 14px; }
+    .partner-card {
+      background: #fff; border-radius: 14px; padding: 18px;
+      display: flex; align-items: center; gap: 14px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+      border: 1px solid #e0e4ea;
+      position: relative; overflow: visible;
+    }
+    /* 图章 — 右上角旋转，统一红色 */
+    .partner-stamp {
+      position: absolute; top: -6px; right: 10px;
+      width: 56px; height: 56px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 900; letter-spacing: 1px;
+      border: 2.5px solid #dc2626; border-radius: 50%;
+      color: #dc2626; background: rgba(255,255,255,0.88);
+      transform: rotate(18deg);
+      line-height: 1; text-align: center;
+      box-shadow: 0 2px 6px rgba(220,38,38,0.15);
+      pointer-events: none; z-index: 2;
+    }
+    .partner-avatar-wrap {
+      width: 64px; height: 64px; border-radius: 50%; flex-shrink: 0;
+      position: relative; overflow: hidden;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+    .partner-avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
+    .partner-avatar-wrap .mini-badge {
+      position: absolute; bottom: -2px; right: -4px;
+      font-size: 9px; color: #fff; padding: 2px 7px;
+      border-radius: 8px; font-weight: 700; white-space: nowrap;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .mini-badge.replaced { background: #d97706; }
+    .mini-badge.last     { background: #dc2626; }
+    .partner-info { flex: 1; min-width: 0; }
+    .partner-info .name { font-size: 17px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; }
+    .partner-info .role { font-size: 13px; color: #666; margin-bottom: 3px; }
+    .partner-info .phone { font-size: 12px; color: #999; }
+
+    /* ====== ④ 联系提醒条（统一模板） ====== */
+    .section-contact { margin-bottom: 14px; }
+    .contact-bar {
+      display: flex; align-items: center; gap: 12px; padding: 13px 15px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #fffdf5, #fff8e8);
+      border: 1px solid #fcd34d;
+    }
+    .contact-icon {
+      width: 40px; height: 40px; border-radius: 50%; background: #fff;
+      border: 2px solid #f59e0b; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .contact-icon svg { width: 20px; height: 20px; fill: #f59e0b; }
+    .contact-text { flex: 1; min-width: 0; }
+    .contact-title { font-size: 13px; font-weight: 700; color: #92400e; margin-bottom: 3px; }
+    .contact-desc { font-size: 11.5px; color: #b45309; line-height: 1.6; }
+    .contact-desc .phone-highlight {
+      display: inline-block; background: #fff; color: #ea580c;
+      padding: 2px 7px; border-radius: 5px; font-weight: 700; margin: 0 1px;
+      border: 1px solid #fdba74;
+    }
+
+    /* ====== ⑤ 合拍人确认状态 ====== */
+    .section-confirm { margin-bottom: 14px; }
+    .confirm-box {
+      background: #fff; border-radius: 14px; padding: 14px 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+      border: 1px solid #e8ecf1;
+    }
+    .confirm-box.waiting   { border-color: #bfdbfe; background: #f8fbff; }
+    .confirm-box.confirmed { border-color: #bbf7d0; background: #f7fef9; }
+    .confirm-row { display: flex; align-items: center; gap: 12px; }
+    .confirm-icon-circle {
+      width: 42px; height: 42px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .confirm-icon-circle.waiting-bg   { background: #e0efff; }
+    .confirm-icon-circle.confirmed-bg { background: #dcfce7; }
+    .spinner-ring { width: 24px; height: 24px; border: 3px solid #bfdbfe; border-top-color: #2563ff; border-radius: 50%; animation: spin 0.9s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .confirm-text { flex: 1; min-width: 0; }
+    .confirm-title { font-size: 14px; font-weight: 700; color: #1d4ed8; }
+    .confirm-title.green { color: #15803d; }
+    .confirm-title.red { color: #dc2626; }
+    .confirm-sub { font-size: 11.5px; color: #888; line-height: 1.5; margin-top: 1px; }
+
+    /* 确认倒计时 */
+    .confirm-timer-bar {
+      margin-top: 10px; padding-top: 10px;
+      border-top: 1px dashed #dbeafe;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .confirm-timer-label { font-size: 11.5px; color: #6b7280; display: flex; align-items: center; gap: 5px; }
+    .confirm-timer-label svg { width: 13px; height: 13px; }
+    .confirm-timer-value { font-size: 20px; font-weight: 800; color: #2563ff; font-variant-numeric: tabular-nums; letter-spacing: 1.5px; }
+    .confirm-timer-value.warn { color: #d97706; }
+    .confirm-timer-value.danger { color: #dc2626; animation: blink 0.6s ease-in-out infinite; }
+
+    /* 已确认状态不显示倒计时，显示确认时间 */
+    .confirm-accepted-time {
+      margin-top: 8px; font-size: 11px; color: #15803d;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .confirm-accepted-time svg { width: 12px; height: 12px; }
+
+    /* ====== ⑥ 合拍执行倒计时 ====== */
+    .section-countdown {
+      background: #fff; border-radius: 14px; padding: 16px 20px; text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03); margin-bottom: 14px; border: 1px solid #e8ecf1;
+    }
+    .countdown-label {
+      font-size: 11.5px; color: #6b7280; font-weight: 600;
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+      margin-bottom: 6px;
+    }
+    .countdown-label svg { width: 13px; height: 13px; }
+    .countdown-start-time { font-size: 11.5px; color: #aaa; margin-bottom: 8px; }
+    .countdown-start-time strong { color: #666; font-weight: 600; }
+    /* 待确认占位 */
+    .countdown-start-placeholder { font-size: 11.5px; color: #bbb; margin-bottom: 8px; font-style: italic; }
+    .countdown-remaining {
+      font-size: 42px; font-weight: 800; font-variant-numeric: tabular-nums;
+      color: #2563ff; letter-spacing: 3px; line-height: 1;
+    }
+    .countdown-remaining.static { color: #9ca3af; }
+    .countdown-remaining.expired { color: #dc2626; animation: blink 0.6s ease-in-out infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+    .countdown-sub {
+      font-size: 11.5px; color: #aaa; margin-top: 6px;
+    }
+
+    /* ====== ⑤ 合拍规范示意图 + 温馨提示 ====== */
+    .section-guide {
+      background: #fff; border-radius: 14px; padding: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03); margin-bottom: 18px; border: 1px solid #e8ecf1;
+    }
+    .guide-photo { width: 100%; border-radius: 10px; overflow: hidden; border: 1px solid #e8ecf1; position: relative; margin-bottom: 12px; }
+    .guide-photo img { width: 100%; height: auto; display: block; }
+    .guide-photo-label { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.5); color: #fff; font-size: 11px; padding: 4px 10px; border-radius: 5px; font-weight: 600; letter-spacing: 0.5px; }
+    .guide-tips { display: flex; flex-direction: column; gap: 7px; }
+    .guide-tip-item { display: flex; align-items: flex-start; gap: 8px; font-size: 11.5px; color: #777; line-height: 1.55; }
+    .guide-tip-item .blue-dot { display: inline-block; flex-shrink: 0; margin-top: 5px; width: 5px; height: 5px; border-radius: 50%; background: #2563ff; }
+
+    /* ====== ⑥ 操作区 ====== */
+    .section-actions { display: flex; flex-direction: column; gap: 10px; margin-bottom: 8px; }
+    .btn-photo {
+      width: 100%; background: linear-gradient(135deg, #2563ff, #1d4ed8);
+      color: #fff; border: none; border-radius: 12px; padding: 14px;
+      font-size: 16px; font-weight: 600; cursor: pointer;
+      text-decoration: none; display: block; text-align: center;
+      box-shadow: 0 4px 12px rgba(37,99,255,0.2);
+    }
+    .btn-photo:active { opacity: 0.9; transform: scale(0.98); }
+    .btn-downgrade { width: 100%; background: #fff; color: #888; border: 1px dashed #ccc; border-radius: 12px; padding: 14px; font-size: 16px; cursor: pointer; text-decoration: none; display: block; text-align: center; }
+    .btn-hint { font-size: 11px; color: #aaa; text-align: center; margin-top: 4px; }
+
+    .exhausted-empty { text-align: center; padding: 28px 0; color: #bbb; }
+
+    .scenario { display: none; }
+    .scenario.active { display: block; }
+  </style>
+</head>
+<body>
+<div class="demo-wrapper">
+
+  <!-- ==== Demo Panel ==== -->
+  <div class="demo-panel">
+    <div class="demo-panel-title">🎬 情景切换</div>
+    <div class="demo-panel-sub">点击切换不同演示状态</div>
+    <button class="demo-scenario active" onclick="switchScenario('normal')">
+      <span class="dot dot-blue"></span>情景一：等待合拍人确认
+    </button>
+    <button class="demo-scenario" onclick="switchScenario('confirmed')">
+      <span class="dot dot-green"></span>情景二：合拍人已确认
+    </button>
+    <button class="demo-scenario" onclick="switchScenario('swapped')">
+      <span class="dot dot-yellow"></span>情景三：合拍人拒绝已换人
+    </button>
+    <button class="demo-scenario" onclick="switchScenario('lastperson')">
+      <span class="dot dot-red"></span>情景四：最后一位候选人
+    </button>
+    <button class="demo-scenario" onclick="switchScenario('exhausted')">
+      <span class="dot dot-orange"></span>情景五：候选人池枯竭
+    </button>
+    <button class="demo-scenario" onclick="switchScenario('offduty')">
+      <span class="dot dot-purple"></span>情景六：下班卡场景
+    </button>
+    <button class="demo-scenario" onclick="location.href='mp-checkin-4.html'">
+      <span class="dot dot-gray"></span>情景七：普通单人打卡
+    </button>
+    <div class="demo-hint">💡 确认倒计时5分钟（合拍人响应），合拍执行倒计时15分钟（确认后开始计时）。两个计时独立运行，待确认期间也可直接拍照。</div>
+  </div>
+
+  <!-- ==== Phone ==== -->
+  <div class="phone-frame">
+  <div class="phone-screen">
+    <div class="punch-hole"></div>
+    <div class="phone">
+
+    <div class="status-bar">
+      <span>11:00</span>
+      <div style="display:flex;align-items:center;gap:5px;">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M17 4h-3V2h-4v2H7v18h10V4z"/></svg>
+      </div>
+    </div>
+
+    <div class="header">
+      <div class="header-top">
+        <a href="mp-checkin-2.html" class="back-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6"/></svg>
+        </a>
+        <span class="header-title" id="headerTitle">双人合拍验证</span>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ========================
+           SCENARIO 1: 正常等待确认
+           ======================== -->
+      <div class="scenario active" id="sc-normal">
+
+        <!-- ① 横幅（统一颜色） -->
+        <div class="section-banner">
+          <div class="banner-strip">
+            <svg class="banner-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="1" fill="currentColor"/>
+            </svg>
+            <span class="banner-text">您被抽中需双人合拍验证</span>
+          </div>
+        </div>
+
+        <!-- ② 合拍人员信息卡片（统一样式） -->
+        <div class="section-partner">
+          <div class="partner-card">
+            <div class="partner-stamp">合<br>拍<br>人</div>
+            <div class="partner-avatar-wrap">
+              <img src="avatar-manager-1.png" alt="张建平">
+            </div>
+            <div class="partner-info">
+              <div class="name">张建平</div>
+              <div class="role">项目经理 · 总承包单位</div>
+              <div class="phone">139****6789</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ④ 联系提醒（统一模板） -->
+        <div class="section-contact">
+          <div class="contact-bar">
+            <div class="contact-icon">
+              <svg viewBox="0 0 24 24"><path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1.003 1.003 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>
+            </div>
+            <div class="contact-text">
+              <div class="contact-title">📢 请主动联系合拍人处理</div>
+              <div class="contact-desc">
+                合拍人可能未关注微信站内消息，建议直接拨打电话 <span class="phone-highlight">139****6789</span> 或微信语音通知对方打开<strong>赣建宝小程序</strong>查看合拍请求。
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑤ 合拍人确认状态（待确认，无小字） -->
+        <div class="section-confirm">
+          <div class="confirm-box waiting">
+            <div class="confirm-row">
+              <div class="confirm-icon-circle waiting-bg">
+                <div class="spinner-ring"></div>
+              </div>
+              <div class="confirm-text">
+                <div class="confirm-title">等待 "张建平" 确认中…</div>
+              </div>
+            </div>
+            <div class="confirm-timer-bar">
+              <div class="confirm-timer-label">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+                合拍人确认时限（5分钟）
+              </div>
+              <div class="confirm-timer-value">04:58</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑥ 合拍执行倒计时（待确认：不显示具体时间，15:00静态） -->
+        <div class="section-countdown">
+          <div class="countdown-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+            合拍执行倒计时
+          </div>
+          <div class="countdown-start-placeholder">合拍人确认后开始计时</div>
+          <div class="countdown-remaining static">15:00</div>
+          <div class="countdown-sub">合拍执行时限为15分钟，超时未完成则验证失败，系统标记后降级为单人打卡</div>
+        </div>
+
+        <!-- ⑤ 合拍规范示例 -->
+        <div class="section-guide">
+          <div class="guide-photo">
+            <div class="guide-photo-label">合拍规范示例图</div>
+            <img src="co-photo-demo.jpg" alt="双人合拍示意">
+          </div>
+          <div class="guide-tips">
+            <div class="guide-tip-item"><span class="blue-dot"></span>合拍必须调用手机摄像头<strong>实时拍摄</strong>，禁止从相册选取</div>
+            <div class="guide-tip-item"><span class="blue-dot"></span>系统将自动记录拍摄时间戳与 GPS 定位信息</div>
+            <div class="guide-tip-item"><span class="blue-dot"></span>合拍照片将作为打卡凭证存档，请确保两人面部清晰可见</div>
+          </div>
+        </div>
+
+        <!-- ⑥ 操作区 -->
+        <div class="section-actions">
+          <a href="mp-co-photo-camera.html" class="btn-photo">📷 开始拍照</a>
+          <div class="btn-hint">合拍人如已就位可直接拍照，无需等待确认</div>
+        </div>
+      </div>
+
+      <!-- ========================
+           SCENARIO 2: 合拍人已确认
+           ======================== -->
+      <div class="scenario" id="sc-confirmed">
+
+        <!-- ① 横幅（统一颜色） -->
+        <div class="section-banner">
+          <div class="banner-strip">
+            <svg class="banner-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="1" fill="currentColor"/>
+            </svg>
+            <span class="banner-text">您被抽中需双人合拍验证</span>
+          </div>
+        </div>
+
+        <!-- ② 合拍人员信息卡片（统一样式） -->
+        <div class="section-partner">
+          <div class="partner-card">
+            <div class="partner-stamp">合<br>拍<br>人</div>
+            <div class="partner-avatar-wrap">
+              <img src="avatar-manager-1.png" alt="张建平">
+            </div>
+            <div class="partner-info">
+              <div class="name">张建平</div>
+              <div class="role">项目经理 · 总承包单位</div>
+              <div class="phone">139****6789</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑤ 确认状态：已确认 -->
+        <div class="section-confirm">
+          <div class="confirm-box confirmed">
+            <div class="confirm-row">
+              <div class="confirm-icon-circle confirmed-bg">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#16a34a" stroke-width="3">
+                  <polyline points="4,12 10,18 20,6"/>
+                </svg>
+              </div>
+              <div class="confirm-text">
+                <div class="confirm-title green">张建平已确认就位</div>
+                <div class="confirm-sub">合拍人已在手机上确认，可以开始合拍。</div>
+              </div>
+            </div>
+            <div class="confirm-accepted-time">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><polyline points="20,6 9,17 4,12"/></svg>
+              确认时间：2026-07-28 11:00:23（用时 23 秒）
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑥ 合拍执行倒计时（已确认：展示确认时间，倒计时开始） -->
+        <div class="section-countdown">
+          <div class="countdown-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+            合拍执行倒计时
+          </div>
+          <div class="countdown-start-time">开始计时时间：<strong>2026-07-28 11:00:23</strong></div>
+          <div class="countdown-remaining">14:35</div>
+          <div class="countdown-sub">合拍执行时限为15分钟，超时未完成则验证失败，系统标记后降级为单人打卡</div>
+        </div>
+
+        <!-- ⑤ 合拍规范示例 -->
+        <div class="section-guide">
+          <div class="guide-photo">
+            <div class="guide-photo-label">合拍规范示例图</div>
+            <img src="co-photo-demo.jpg" alt="双人合拍示意">
+          </div>
+          <div class="guide-tips">
+            <div class="guide-tip-item"><span class="blue-dot"></span>合拍必须调用手机摄像头<strong>实时拍摄</strong>，禁止从相册选取</div>
+            <div class="guide-tip-item"><span class="blue-dot"></span>系统将自动记录拍摄时间戳与 GPS 定位信息</div>
+            <div class="guide-tip-item"><span class="blue-dot"></span>合拍照片将作为打卡凭证存档，请确保两人面部清晰可见</div>
+          </div>
+        </div>
+
+        <!-- ⑥ 操作区 -->
+        <div class="section-actions">
+          <a href="mp-co-photo-camera.html" class="btn-photo">📷 开始拍照</a>
+        </div>
+      </div>
+
+      <!-- ========================
+           SCENARIO 3: 合拍人拒绝、已换人（第1次换人）
+           ======================== -->
+      <div class="scenario" id="sc-swapped">
+
+        <!-- ① 横幅（统一颜色） -->
+        <div class="section-banner">
+          <div class="banner-strip">
+            <svg class="banner-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="1" fill="currentColor"/>
+            </svg>
+            <span class="banner-text">您被抽中需双人合拍验证</span>
+          </div>
+        </div>
+
+        <!-- ② 拒绝历史（1人拒绝已换人） -->
+        <div class="reject-history yellow">
+          <svg viewBox="0 0 24 24" fill="#f59e0b"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-2h2v2h-2zm0-10v6h2V7h-2z"/></svg>
+          <span><strong>【张建平】</strong>已拒绝合拍请求（原因：正在开会），系统已自动更换合拍人。</span>
+        </div>
+
+        <!-- ② 合拍人员信息卡片（统一样式） -->
+        <div class="section-partner">
+          <div class="partner-card">
+            <div class="partner-stamp">合<br>拍<br>人</div>
+            <div class="partner-avatar-wrap">
+              <img src="avatar-supervisor-1.png" alt="陈志强">
+              <div class="mini-badge replaced">已更换</div>
+            </div>
+            <div class="partner-info">
+              <div class="name">陈志强</div>
+              <div class="role">安全员 · 监理单位</div>
+              <div class="phone">137****3456</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ④ 联系提醒（统一模板，电话随人变化） -->
+        <div class="section-contact">
+          <div class="contact-bar">
+            <div class="contact-icon">
+              <svg viewBox="0 0 24 24"><path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1.003 1.003 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>
+            </div>
+            <div class="contact-text">
+              <div class="contact-title">📢 请主动联系合拍人处理</div>
+              <div class="contact-desc">
+                合拍人可能未关注微信站内消息，建议直接拨打电话 <span class="phone-highlight">137****3456</span> 或微信语音通知对方打开<strong>赣建宝小程序</strong>查看合拍请求。
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑤ 新合拍人确认状态（待确认，无小字） -->
+        <div class="section-confirm">
+          <div class="confirm-box waiting">
+            <div class="confirm-row">
+              <div class="confirm-icon-circle waiting-bg">
+                <div class="spinner-ring"></div>
+              </div>
+              <div class="confirm-text">
+                <div class="confirm-title">等待 "陈志强" 确认中…</div>
+              </div>
+            </div>
+            <div class="confirm-timer-bar">
+              <div class="confirm-timer-label">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+                合拍人确认时限（5分钟）
+              </div>
+              <div class="confirm-timer-value warn">04:45</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑥ 合拍执行倒计时（待确认：占位，15:00静态） -->
+        <div class="section-countdown">
+          <div class="countdown-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+            合拍执行倒计时
+          </div>
+          <div class="countdown-start-placeholder">合拍人确认后开始计时</div>
+          <div class="countdown-remaining static">15:00</div>
+          <div class="countdown-sub">合拍执行时限为15分钟，超时未完成则验证失败，系统标记后降级为单人打卡</div>
+        </div>
+
+        <!-- ⑤ 合拍规范示例 -->
+        <div class="section-guide">
+          <div class="guide-photo">
+            <div class="guide-photo-label">合拍规范示例图</div>
+            <img src="co-photo-demo.jpg" alt="双人合拍示意">
+          </div>
+          <div class="guide-tips">
+            <div class="guide-tip-item"><span class="blue-dot"></span>合拍必须调用手机摄像头<strong>实时拍摄</strong>，禁止从相册选取</div>
+            <div class="guide-tip-item"><span class="blue-dot"></span>系统将自动记录拍摄时间戳与 GPS 定位信息</div>
+            <div class="guide-tip-item"><span class="blue-dot"></span>合拍照片将作为打卡凭证存档，请确保两人面部清晰可见</div>
+          </div>
+        </div>
+
+        <!-- ⑥ 操作区 -->
+        <div class="section-actions">
+          <a href="mp-co-photo-camera.html" class="btn-photo">📷 开始拍照</a>
+          <div class="btn-hint">合拍人如已就位可直接拍照，无需等待确认</div>
+        </div>
+      </div>
+
+      <!-- ========================
+           SCENARIO 4: 最后一位候选人（第2次换人，最后一个合拍机会）
+           ======================== -->
+      <div class="scenario" id="sc-lastperson">
+
+        <!-- ① 横幅（统一颜色） -->
+        <div class="section-banner">
+          <div class="banner-strip">
+            <svg class="banner-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="1" fill="currentColor"/>
+            </svg>
+            <span class="banner-text">您被抽中需双人合拍验证</span>
+          </div>
+        </div>
+
+        <!-- ② 拒绝历史（2人拒绝，最后一个合拍机会） -->
+        <div class="reject-history red">
+          <svg viewBox="0 0 24 24" fill="#ef4444"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-2h2v2h-2zm0-10v6h2V7h-2z"/></svg>
+          <span><strong>【张建平】</strong>拒绝（原因：正在开会）→ <strong>【陈志强】</strong>拒绝（原因：已下班离开工地）→ 系统已更换合拍人（<strong>最后一个合拍机会</strong>）</span>
+        </div>
+
+        <!-- ② 合拍人员信息卡片（统一样式） -->
+        <div class="section-partner">
+          <div class="partner-card">
+            <div class="partner-stamp">合<br>拍<br>人</div>
+            <div class="partner-avatar-wrap">
+              <img src="avatar-worker-1.png" alt="王建国">
+              <div class="mini-badge last">最后一人</div>
+            </div>
+            <div class="partner-info">
+              <div class="name">王建国</div>
+              <div class="role">总监理工程师 · 监理单位</div>
+              <div class="phone">136****7890</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ④ 联系提醒（统一模板，电话随人变化） -->
+        <div class="section-contact">
+          <div class="contact-bar">
+            <div class="contact-icon">
+              <svg viewBox="0 0 24 24"><path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1.003 1.003 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>
+            </div>
+            <div class="contact-text">
+              <div class="contact-title">📢 请主动联系合拍人处理</div>
+              <div class="contact-desc">
+                合拍人可能未关注微信站内消息，建议直接拨打电话 <span class="phone-highlight">136****7890</span> 或微信语音通知对方打开<strong>赣建宝小程序</strong>查看合拍请求。
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑤ 确认状态（最后一人，待确认，无小字） -->
+        <div class="section-confirm">
+          <div class="confirm-box waiting" style="border-color:#fecaca;background:#fff5f5;">
+            <div class="confirm-row">
+              <div class="confirm-icon-circle waiting-bg" style="background:#fee2e2;">
+                <div class="spinner-ring" style="border-color:#fecaca; border-top-color:#ef4444;"></div>
+              </div>
+              <div class="confirm-text">
+                <div class="confirm-title red">等待 "王建国" 确认中…</div>
+              </div>
+            </div>
+            <div class="confirm-timer-bar" style="border-top-color:#fecaca;">
+              <div class="confirm-timer-label" style="color:#991b1b;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+                合拍人确认时限（5分钟）
+              </div>
+              <div class="confirm-timer-value danger">01:12</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑥ 合拍执行倒计时（待确认：占位，15:00静态） -->
+        <div class="section-countdown">
+          <div class="countdown-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+            合拍执行倒计时
+          </div>
+          <div class="countdown-start-placeholder">合拍人确认后开始计时</div>
+          <div class="countdown-remaining static">15:00</div>
+          <div class="countdown-sub">合拍执行时限为15分钟，超时未完成则验证失败，系统标记后降级为单人打卡</div>
+        </div>
+
+        <!-- ⑤ 合拍规范示例 -->
+        <div class="section-guide">
+          <div class="guide-photo">
+            <div class="guide-photo-label">合拍规范示例图</div>
+            <img src="co-photo-demo.jpg" alt="双人合拍示意">
+          </div>
+          <div class="guide-tips">
+            <div class="guide-tip-item"><span class="blue-dot"></span>合拍必须调用手机摄像头<strong>实时拍摄</strong>，禁止从相册选取</div>
+            <div class="guide-tip-item"><span class="blue-dot"></span>系统将自动记录拍摄时间戳与 GPS 定位信息</div>
+            <div class="guide-tip-item"><span class="blue-dot"></span>合拍照片将作为打卡凭证存档，请确保两人面部清晰可见</div>
+          </div>
+        </div>
+
+        <!-- ⑥ 操作区 -->
+        <div class="section-actions">
+          <a href="mp-co-photo-camera.html" class="btn-photo">📷 开始拍照</a>
+          <div class="btn-hint">合拍人如已就位可直接拍照，无需等待确认</div>
+        </div>
+      </div>
+
+      <!-- ========================
+           SCENARIO 5: 候选人池枯竭（保持原样）
+           ======================== -->
+      <div class="scenario" id="sc-exhausted">
+
+        <!-- ① 横幅（统一颜色） -->
+        <div class="section-banner">
+          <div class="banner-strip">
+            <svg class="banner-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="1" fill="currentColor"/>
+            </svg>
+            <span class="banner-text">您被抽中需双人合拍验证</span>
+          </div>
+        </div>
+
+        <div class="section-partner">
+          <div class="exhausted-empty">
+            <svg viewBox="0 0 64 64" width="56" height="56" style="fill:#e0e0e0;">
+              <circle cx="32" cy="32" r="30" fill="none" stroke="#ddd" stroke-width="2"/>
+              <path d="M44 32H20" stroke="#ccc" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+            <div style="font-size:14px;color:#999;font-weight:600;margin-bottom:2px;">当前无可选合拍人</div>
+            <div style="font-size:12px;color:#bbb;">系统将为您降级为单人打卡</div>
+          </div>
+        </div>
+
+        <div style="background:#fff3e0;border:1px solid #ffcc80;border-radius:12px;padding:12px 14px;display:flex;align-items:flex-start;gap:10px;margin-bottom:18px;">
+          <div style="width:34px;height:34px;border-radius:50%;background:#f97316;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="#fff"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#e65100;margin-bottom:2px;">情况说明</div>
+            <div style="font-size:12px;color:#bf360c;line-height:1.5;">现在项目上已经无符合条件的合拍打卡人员，双人合拍验证未完成，系统已进行记录。系统将降级为单人打卡，请继续完成打卡考勤。</div>
+          </div>
+        </div>
+
+        <div class="section-actions">
+          <a href="mp-checkin-4.html" class="btn-photo">确认，开始单人打卡</a>
+        </div>
+      </div>
+
+      <!-- ========================
+           SCENARIO 6: 下班卡场景
+           ======================== -->
+      <div class="scenario" id="sc-offduty">
+
+        <!-- ① 横幅（统一颜色） -->
+        <div class="section-banner">
+          <div class="banner-strip">
+            <svg class="banner-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="1" fill="currentColor"/>
+            </svg>
+            <span class="banner-text">您被抽中需双人合拍验证</span>
+          </div>
+        </div>
+
+        <!-- ② 合拍人员信息卡片（统一样式） -->
+        <div class="section-partner">
+          <div class="partner-card">
+            <div class="partner-stamp">合<br>拍<br>人</div>
+            <div class="partner-avatar-wrap">
+              <img src="avatar-worker-2.png" alt="刘建国">
+            </div>
+            <div class="partner-info">
+              <div class="name">刘建国</div>
+              <div class="role">施工员 · 总承包单位</div>
+              <div class="phone">185****4567</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ④ 联系提醒（统一模板，电话随人变化） -->
+        <div class="section-contact">
+          <div class="contact-bar">
+            <div class="contact-icon">
+              <svg viewBox="0 0 24 24"><path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1.003 1.003 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>
+            </div>
+            <div class="contact-text">
+              <div class="contact-title">📢 请主动联系合拍人处理</div>
+              <div class="contact-desc">
+                合拍人可能未关注微信站内消息，建议直接拨打电话 <span class="phone-highlight">185****4567</span> 或微信语音通知对方打开<strong>赣建宝小程序</strong>查看合拍请求。
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑤ 确认状态（待确认，无小字） -->
+        <div class="section-confirm">
+          <div class="confirm-box waiting">
+            <div class="confirm-row">
+              <div class="confirm-icon-circle waiting-bg">
+                <div class="spinner-ring"></div>
+              </div>
+              <div class="confirm-text">
+                <div class="confirm-title">等待 "刘建国" 确认中…</div>
+              </div>
+            </div>
+            <div class="confirm-timer-bar">
+              <div class="confirm-timer-label">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+                合拍人确认时限（5分钟）
+              </div>
+              <div class="confirm-timer-value">04:52</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑥ 合拍执行倒计时（待确认：占位，15:00静态） -->
+        <div class="section-countdown">
+          <div class="countdown-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+            合拍执行倒计时
+          </div>
+          <div class="countdown-start-placeholder">合拍人确认后开始计时</div>
+          <div class="countdown-remaining static">15:00</div>
+          <div class="countdown-sub">合拍执行时限为15分钟，超时未完成则验证失败，系统标记后降级为单人打卡</div>
+        </div>
+
+        <!-- ⑤ 合拍规范示例 -->
+        <div class="section-guide">
+          <div class="guide-photo">
+            <div class="guide-photo-label">合拍规范示例图</div>
+            <img src="co-photo-demo.jpg" alt="双人合拍示意">
+          </div>
+          <div class="guide-tips">
+            <div class="guide-tip-item"><span class="blue-dot"></span>合拍必须调用手机摄像头<strong>实时拍摄</strong>，禁止从相册选取</div>
+            <div class="guide-tip-item"><span class="blue-dot"></span>系统将自动记录拍摄时间戳与 GPS 定位信息</div>
+            <div class="guide-tip-item"><span class="blue-dot"></span>合拍照片将作为打卡凭证存档，请确保两人面部清晰可见</div>
+          </div>
+        </div>
+
+        <!-- ⑥ 操作区 -->
+        <div class="section-actions">
+          <a href="mp-co-photo-camera.html" class="btn-photo">📷 开始拍照</a>
+          <div class="btn-hint">合拍人如已就位可直接拍照，无需等待确认</div>
+        </div>
+      </div>
+
+    </div><!-- .content -->
+
+    </div><!-- .phone -->
+    <div class="home-bar"></div>
+  </div>
+  <div class="side-btn btn-power"></div>
+  <div class="side-btn btn-vol-up"></div>
+  <div class="side-btn btn-vol-down"></div>
+</div>
+</div><!-- .demo-wrapper -->
+
+<script>
+function switchScenario(name) {
+  document.querySelectorAll('.scenario').forEach(el => el.classList.remove('active'));
+  document.getElementById('sc-' + name).classList.add('active');
+  document.querySelectorAll('.demo-scenario').forEach(btn => btn.classList.remove('active'));
+  var map = {
+    normal:'情景一', confirmed:'情景二', swapped:'情景三',
+    lastperson:'情景四', exhausted:'情景五', offduty:'情景六'
+  };
+  var match = map[name] || '';
+  document.querySelectorAll('.demo-scenario').forEach(function(btn) {
+    if (btn.textContent.indexOf(match) >= 0) btn.classList.add('active');
+  });
+  var titles = {
+    normal:'双人合拍验证', confirmed:'双人合拍验证',
+    swapped:'双人合拍验证', lastperson:'双人合拍验证',
+    exhausted:'双人合拍验证', offduty:'下班打卡 · 合拍验证'
+  };
+  document.getElementById('headerTitle').textContent = titles[name] || '双人合拍验证';
+  window.location.hash = name;
+}
+
+(function(){
+  var h = window.location.hash.replace('#','');
+  var valid = ['normal','confirmed','swapped','lastperson','exhausted','offduty'];
+  if (valid.indexOf(h) >= 0) switchScenario(h);
+})();
+</script>
+
+</body>
+</html>

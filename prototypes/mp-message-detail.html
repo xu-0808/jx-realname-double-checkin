@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>公告详情 - 赣建宝</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: #e8ecf1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .phone {
+      width: 380px;
+      background: #f5f7fa;
+      height: 100%;
+      position: relative;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    .status-bar {
+      height: 44px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      color: #333;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .status-bar .time { font-size: 15px; }
+    .status-bar .icons { display: flex; align-items: center; gap: 5px; }
+    .status-bar .icons svg { width: 16px; height: 16px; fill: currentColor; }
+    .status-bar .battery { display: flex; align-items: center; gap: 2px; font-size: 13px; }
+
+    .header {
+      background: #fff;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .header-left { display: flex; align-items: center; gap: 10px; }
+    .back-btn {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #333;
+    }
+    .back-btn svg { width: 22px; height: 22px; }
+    .header-title { font-size: 17px; font-weight: 500; color: #333; }
+    .header-actions { display: flex; align-items: center; gap: 12px; }
+    .header-actions svg { width: 22px; height: 22px; color: #333; }
+
+    .content {
+      padding: 16px;
+      padding-bottom: 24px;
+    }
+    .detail-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #333;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+    .detail-meta {
+      font-size: 13px;
+      color: #999;
+      margin-bottom: 16px;
+    }
+    .detail-body {
+      background: #fff;
+      border-radius: 10px;
+      padding: 16px;
+      font-size: 15px;
+      color: #333;
+      line-height: 1.8;
+      text-align: justify;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    /* === Xiaomi 15 Pro Frame === */
+    .phone-frame {
+      background: #1a1c1e;
+      border-radius: 22px;
+      padding: 10px;
+      box-shadow:
+        0 0 0 2px #2d2f31,
+        0 0 0 5px #1a1c1e,
+        0 10px 45px rgba(0,0,0,0.45);
+      position: relative;
+      display: inline-block;
+    }
+    .phone-screen {
+      width: 380px;
+      height: 844px;
+      border-radius: 14px;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid #333;
+    }
+    .punch-hole {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 10px;
+      height: 10px;
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 50%;
+      z-index: 100;
+    }
+    .home-bar {
+      position: absolute;
+      bottom: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 110px;
+      height: 4px;
+      background: rgba(255,255,255,0.22);
+      border-radius: 2px;
+      z-index: 100;
+    }
+    .side-btn {
+      position: absolute;
+      background: #2d2f31;
+      border-radius: 2px;
+      opacity: 0.7;
+    }
+    .btn-power {
+      right: -3px; top: 190px;
+      width: 2px; height: 55px;
+    }
+    .btn-vol-up {
+      left: -3px; top: 180px;
+      width: 2px; height: 38px;
+    }
+    .btn-vol-down {
+      left: -3px; top: 225px;
+      width: 2px; height: 38px;
+    }
+    /* ========================= */
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+  <div class="phone-screen">
+    <div class="punch-hole"></div>
+    <div class="phone">
+    <div class="status-bar">
+      <span class="time">10:29</span>
+      <div class="icons">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M17 4h-3V2h-4v2H7v18h10V4zm-4 16h-2v-2h2v2zm0-4h-2V8h2v8z"/></svg>
+        <span class="battery">
+          <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+          75
+        </span>
+      </div>
+    </div>
+
+    <div class="header">
+      <div class="header-left">
+        <a href="mp-message.html" class="back-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+        </a>
+        <div class="header-title">公告详情</div>
+      </div>
+      <div class="header-actions">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="detail-title">工程项目违法违规问题警示（一）</div>
+      <div class="detail-meta">发布时间：2026-04-07 10:17:00</div>
+      <div class="detail-body">
+        2020年9月，某建设项目施工工地发生一起坍塌事故。施工单位现场实际项目负责人无证上岗履职，相关管理人员违法违规组织施工，事故发生后伪造相关施工文件；监理公司履职不到位，委派无证人员到施工现场实施监理。实际项目负责人刘某某和总监理工程师刘某某被逮捕，施工队队长杜某某和施工管理员王某被移送司法机关追究刑事责任。
+      </div>
+    </div>
+  </div>
+    <div class="home-bar"></div>
+  </div>
+  <div class="side-btn btn-power"></div>
+  <div class="side-btn btn-vol-up"></div>
+  <div class="side-btn btn-vol-down"></div>
+</div>
+</body>
+</html>

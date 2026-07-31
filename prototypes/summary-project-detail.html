@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>项目抽验汇总详情 - 赣建宝</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif; background:#f0f2f5; color:#333; }
+    a { text-decoration:none; color:inherit; }
+    .header { height:56px; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,0.08); display:flex; align-items:center; justify-content:space-between; padding:0 24px; position:fixed; top:0; left:0; right:0; z-index:100; }
+    .header-left { display:flex; align-items:center; gap:12px; }
+    .logo { width:32px; height:32px; background:linear-gradient(135deg,#1890ff,#096dd9); border-radius:4px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; font-size:14px; }
+    .header-title { font-size:15px; font-weight:500; }
+    .header-right { display:flex; align-items:center; gap:12px; color:#666; font-size:13px; }
+    .user-info { display:flex; align-items:center; gap:6px; }
+    .avatar { width:28px; height:28px; border-radius:50%; background:#1890ff; color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; }
+
+    .layout { display:flex; min-height:100vh; padding-top:56px; }
+    .sidebar { width:200px; background:#001529; color:rgba(255,255,255,0.65); position:fixed; top:56px; bottom:0; left:0; overflow-y:auto; padding:8px 0; font-size:13px; }
+    .menu-item { padding:0 16px; height:40px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; }
+    .menu-item:hover { color:#fff; }
+    .menu-item.active { background:#1890ff; color:#fff; }
+    .menu-item .left { display:flex; align-items:center; gap:8px; }
+    .menu-icon { width:14px; height:14px; flex-shrink:0; }
+    .submenu { background:#000c17; display:none; }
+    .submenu.show { display:block; }
+    .submenu-item { padding:0 24px 0 40px; height:36px; display:flex; align-items:center; cursor:pointer; }
+    .submenu-item:hover { color:#fff; }
+    .submenu-item.active { color:#fff; background:rgba(24,144,255,0.2); border-right:3px solid #1890ff; }
+
+    .main { margin-left:200px; flex:1; padding:20px; }
+    .page-header { background:#fff; padding:14px 20px; border-radius:4px; margin-bottom:16px; display:flex; align-items:center; gap:12px; }
+    .back-btn { font-size:13px; color:#1890ff; cursor:pointer; }
+    .page-header h2 { font-size:16px; font-weight:500; }
+    .breadcrumb { font-size:12px; color:#999; }
+
+    .card { background:#fff; border-radius:4px; box-shadow:0 1px 4px rgba(0,0,0,0.04); margin-bottom:16px; }
+    .card-header { padding:14px 20px; border-bottom:1px solid #f0f0f0; }
+    .card-title { font-size:15px; font-weight:500; }
+    .card-body { padding:20px; }
+
+    .tag { display:inline-block; padding:2px 10px; border-radius:4px; font-size:12px; font-weight:500; }
+    .tag-red { background:#fff1f0; color:#ff4d4f; border:1px solid #ffa39e; }
+    .tag-orange { background:#fff7e6; color:#fa8c16; border:1px solid #ffd591; }
+    .tag-green { background:#f6ffed; color:#52c41a; border:1px solid #b7eb8f; }
+
+    .info-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
+    .info-row { display:flex; padding:8px 0; border-bottom:1px solid #f5f5f5; font-size:13px; }
+    .info-row:last-child { border-bottom:none; }
+    .info-label { width:80px; color:#999; flex-shrink:0; }
+    .info-value { color:#333; font-weight:500; }
+
+    .stat-mini { display:flex; gap:12px; margin-bottom:16px; }
+    .stat-item { flex:1; text-align:center; padding:12px; background:#fafafa; border-radius:4px; }
+    .stat-num { font-size:22px; font-weight:700; }
+    .stat-lbl { font-size:11px; color:#999; margin-top:2px; }
+
+    .table { width:100%; border-collapse:collapse; font-size:13px; }
+    .table th { background:#fafafa; color:#666; font-weight:500; text-align:left; padding:10px 12px; border-bottom:1px solid #f0f0f0; }
+    .table td { padding:10px 12px; border-bottom:1px solid #f0f0f0; }
+    .table tr:hover td { background:#fafafa; }
+    .pagination { display:flex; justify-content:flex-end; gap:6px; margin-top:14px; font-size:13px; color:#666; }
+    .pagination button { padding:4px 10px; border:1px solid #d9d9d9; background:#fff; border-radius:4px; cursor:pointer; font-size:12px; }
+    .pagination button.active { background:#1890ff; color:#fff; border-color:#1890ff; }
+  </style>
+</head>
+<body>
+<div class="header">
+  <div class="header-left"><div class="logo">赣</div><span class="header-title">江西省建筑工人实名制管理服务信息平台</span></div>
+  <div class="header-right"><div class="user-info"><div class="avatar">管</div><span>南昌市管理员</span></div></div>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> 工程一张图</span></div>
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="13" width="4" height="8"/><rect x="10" y="9" width="4" height="12"/><rect x="17" y="5" width="4" height="16"/></svg> BI数据看板</span></div>
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg> 实名制管理</span></div>
+    <div class="menu-item active open">
+      <span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M17 9h.01"/></svg> 双人打卡管理</span>
+    </div>
+    <div class="submenu show">
+      <div class="submenu-item"><a href="index.html">数据看板</a></div>
+      <div class="submenu-item"><a href="rule-global.html">规则配置</a></div>
+      <div class="submenu-item"><a href="records.html">抽验记录</a></div>
+      <div class="submenu-item active"><a href="summary.html">抽验汇总</a></div>
+      <div class="submenu-item"><a href="risk-warning.html">风险预警</a></div>
+    </div>
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><circle cx="8" cy="17" r="1"/></svg> 工程发检监管</span></div>
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="9" y1="10" x2="15" y2="10"/></svg> 劳务用工监管</span></div>
+    <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="9" stroke-dasharray="4 3"/></svg> 系统管理</span></div>
+  </div>
+
+  <div class="main">
+    <div class="page-header">
+      <a href="summary.html" class="back-btn">← 返回</a>
+      <h2>项目抽验汇总详情 · 豫章师范学院实训大楼一期</h2>
+      <span class="breadcrumb">首页 / 双人打卡管理 / 抽验汇总 / 项目详情</span>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <div class="stat-mini">
+          <div class="stat-item"><div class="stat-num" style="color:#1890ff;">87</div><div class="stat-lbl">抽验总人次</div></div>
+          <div class="stat-item"><div class="stat-num" style="color:#ff4d4f;">65%</div><div class="stat-lbl">通过率</div></div>
+          <div class="stat-item"><div class="stat-num">28</div><div class="stat-lbl">涉及人员数</div></div>
+          <div class="stat-item"><div class="stat-num">156</div><div class="stat-lbl">在册人数</div></div>
+          <div class="stat-item"><div class="stat-num" style="color:#fa8c16;">88</div><div class="stat-lbl">项目风险分</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-grid">
+      <div class="card">
+        <div class="card-header"><div class="card-title">项目基本信息</div></div>
+        <div class="card-body">
+          <div class="info-row"><span class="info-label">项目名称</span><span class="info-value">豫章师范学院实训大楼一期</span></div>
+          <div class="info-row"><span class="info-label">施工许可编号</span><span class="info-value">360100202406270101</span></div>
+          <div class="info-row"><span class="info-label">项目区划</span><span class="info-value">南昌市-经开区</span></div>
+          <div class="info-row"><span class="info-label">项目类型</span><span class="info-value">房屋建筑</span></div>
+          <div class="info-row"><span class="info-label">项目状态</span><span class="info-value"><span class="tag tag-green">在建</span></span></div>
+          <div class="info-row"><span class="info-label">建设单位</span><span class="info-value">江西省教育厅</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">抽验概况</div></div>
+        <div class="card-body">
+          <div class="info-row"><span class="info-label">高频打卡人</span><span class="info-value">德小拓（5次）</span></div>
+          <div class="info-row"><span class="info-label">高频合拍人</span><span class="info-value">刘建国（12次）</span></div>
+          <div class="info-row"><span class="info-label">被拒总次数</span><span class="info-value" style="color:#ff4d4f;">8次</span></div>
+          <div class="info-row"><span class="info-label">超时降级</span><span class="info-value">4次</span></div>
+          <div class="info-row"><span class="info-label">人日均抽验</span><span class="info-value">2.9次/天</span></div>
+          <div class="info-row"><span class="info-label">异常人次比</span><span class="info-value" style="color:#ff4d4f;">18%</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">关键岗位抽验</div></div>
+        <div class="card-body">
+          <div class="info-row"><span class="info-label">项目经理</span><span class="info-value">德小拓 — 通过率50% <span class="tag tag-red">异常</span></span></div>
+          <div class="info-row"><span class="info-label">技术负责人</span><span class="info-value">张工 — 通过率100% <span class="tag tag-green">正常</span></span></div>
+          <div class="info-row"><span class="info-label">安全员</span><span class="info-value">李明华 — 通过率75%</span></div>
+          <div class="info-row"><span class="info-label">监理工程师</span><span class="info-value">赵监理 — 通过率80%</span></div>
+          <div class="info-row"><span class="info-label">施工员</span><span class="info-value">刘建国 — 通过率91.7%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 人员抽验明细 -->
+    <div class="card">
+      <div class="card-header"><div class="card-title">项目内人员抽验汇总</div></div>
+      <div class="card-body">
+        <table class="table">
+          <thead>
+            <tr><th>姓名</th><th>岗位</th><th>抽验次数</th><th>通过率</th><th>角色分布</th><th>常见合拍人</th><th>操作</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>德小拓</td><td>项目经理</td><td>8次</td>
+              <td><span style="color:#ff4d4f;font-weight:600;">50%</span></td>
+              <td>打卡5 / 合拍3</td>
+              <td>刘建国（4次）</td>
+              <td><a href="summary-person-detail.html" class="action-link" style="color:#1890ff;font-size:12px;">详情 →</a></td>
+            </tr>
+            <tr>
+              <td>刘建国</td><td>施工员</td><td>12次</td>
+              <td><span style="color:#52c41a;font-weight:600;">91.7%</span></td>
+              <td>打卡2 / 合拍10</td>
+              <td>德小拓（4次）</td>
+              <td><a href="summary-person-detail.html" class="action-link" style="color:#1890ff;font-size:12px;">详情 →</a></td>
+            </tr>
+            <tr>
+              <td>张工</td><td>技术负责人</td><td>4次</td>
+              <td><span style="color:#52c41a;font-weight:600;">100%</span></td>
+              <td>打卡3 / 合拍1</td>
+              <td>刘建国（2次）</td>
+              <td><a href="summary-person-detail.html" class="action-link" style="color:#1890ff;font-size:12px;">详情 →</a></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="pagination"><span>共 28 人</span><button>&lt;</button><button class="active">1</button><button>2</button><button>&gt;</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
