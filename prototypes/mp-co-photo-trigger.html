@@ -239,6 +239,10 @@
       box-shadow: 0 4px 12px rgba(37,99,255,0.2);
     }
     .btn-photo:active { opacity: 0.9; transform: scale(0.98); }
+    .btn-photo.disabled {
+      background: #e5e7eb; color: #9ca3af; cursor: not-allowed; pointer-events: none;
+      box-shadow: none;
+    }
     .btn-downgrade { width: 100%; background: #fff; color: #888; border: 1px dashed #ccc; border-radius: 12px; padding: 14px; font-size: 16px; cursor: pointer; text-decoration: none; display: block; text-align: center; }
     .btn-hint { font-size: 11px; color: #aaa; text-align: center; margin-top: 4px; }
 
@@ -276,7 +280,7 @@
     <button class="demo-scenario" onclick="location.href='mp-checkin-4.html'">
       <span class="dot dot-gray"></span>情景七：普通单人打卡
     </button>
-    <div class="demo-hint">💡 确认倒计时5分钟（合拍人响应），合拍执行倒计时15分钟（确认后开始计时）。两个计时独立运行，待确认期间也可直接拍照。</div>
+    <div class="demo-hint">💡 合拍人未确认时拍照按钮禁用，确认后方可开始合拍。确认倒计时5分钟，合拍窗口15分钟。</div>
   </div>
 
   <!-- ==== Phone ==== -->
@@ -396,8 +400,8 @@
 
         <!-- ⑥ 操作区 -->
         <div class="section-actions">
-          <a href="mp-co-photo-camera.html" class="btn-photo">📷 开始拍照</a>
-          <div class="btn-hint">合拍人如已就位可直接拍照，无需等待确认</div>
+          <a class="btn-photo disabled">📷 请等待合拍人确认</a>
+          <div class="btn-hint">合拍人确认就位后方可开始拍照</div>
         </div>
       </div>
 
@@ -581,8 +585,8 @@
 
         <!-- ⑥ 操作区 -->
         <div class="section-actions">
-          <a href="mp-co-photo-camera.html" class="btn-photo">📷 开始拍照</a>
-          <div class="btn-hint">合拍人如已就位可直接拍照，无需等待确认</div>
+          <a class="btn-photo disabled">📷 请等待新合拍人确认</a>
+          <div class="btn-hint">新合拍人确认就位后方可开始拍照</div>
         </div>
       </div>
 
@@ -685,8 +689,8 @@
 
         <!-- ⑥ 操作区 -->
         <div class="section-actions">
-          <a href="mp-co-photo-camera.html" class="btn-photo">📷 开始拍照</a>
-          <div class="btn-hint">合拍人如已就位可直接拍照，无需等待确认</div>
+          <a class="btn-photo disabled">📷 请等待合拍人确认（最后机会）</a>
+          <div class="btn-hint">这是最后一个合拍机会，请尽快联系合拍人确认</div>
         </div>
       </div>
 
@@ -823,8 +827,8 @@
 
         <!-- ⑥ 操作区 -->
         <div class="section-actions">
-          <a href="mp-co-photo-camera.html" class="btn-photo">📷 开始拍照</a>
-          <div class="btn-hint">合拍人如已就位可直接拍照，无需等待确认</div>
+          <a class="btn-photo disabled">📷 请等待合拍人确认</a>
+          <div class="btn-hint">合拍人确认就位后方可开始拍照</div>
         </div>
       </div>
 

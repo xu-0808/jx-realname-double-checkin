@@ -264,7 +264,7 @@ table td code{background:#f5f5f5;padding:1px 6px;border-radius:3px;font-size:12p
 <tr><td>判定触发抽验</td><td>后端</td><td>—</td><td>—</td><td>按组织域规则+项目例外规则判定</td></tr>
 <tr><td>抽取合拍人</td><td>后端</td><td>—</td><td>—</td><td>候选人池查询+随机+分布式锁</td></tr>
 <tr><td>推送通知</td><td>后端</td><td>WS</td><td><code>push co-photo:notify</code></td><td>requestId, partnerUserId, expireAt</td></tr>
-<tr><td>合拍人确认</td><td>合拍人</td><td>POST</td><td><code>/api/co-photo/confirm</code></td><td>requestId, action, reason</td></tr>
+<tr><td>合拍人确认</td><td>合拍人</td><td>POST</td><td><code>/api/co-photo/confirm</code></td><td>requestId, action(accept/reject), reason, gis(lat/lng), ip</td></tr>
 <tr><td>提交合拍照片</td><td>打卡人</td><td>POST</td><td><code>/api/co-photo/submit</code></td><td>requestId, image(base64), gps, timestamp</td></tr>
 <tr><td>调用人脸核验</td><td>后端</td><td>POST</td><td><code>/api/co-photo/verify</code></td><td>内部调用第三方核验API</td></tr>
 <tr><td>返回核验结果</td><td>后端→打卡人</td><td>WS</td><td><code>push co-photo:result</code></td><td>result, score, failReason</td></tr>
@@ -273,7 +273,7 @@ table td code{background:#f5f5f5;padding:1px 6px;border-radius:3px;font-size:12p
 <h3>5.2 核心数据表</h3>
 <table>
 <tr><th>表名</th><th>核心字段</th><th>说明</th></tr>
-<tr><td><code>co_photo_request</code></td><td>id, checkin_user_id, partner_user_id, project_id, status(pending/confirmed/rejected/timeout), confirm_at, confirm_deadline, expire_at(15min), result(pass/fail/downgrade), final_score</td><td>合拍请求主表</td></tr>
+<tr><td><code>co_photo_request</code></td><td>id, checkin_user_id, partner_user_id, project_id, status(pending/confirmed/rejected/timeout), confirm_at, confirm_deadline, expire_at(15min), result(pass/fail/downgrade), final_score, <br><strong>partner_response</strong>(json: {action, reason, gis_lat, gis_lng, ip, response_at})</td><td>合拍请求主表。<br><strong>partner_response</strong>：合拍人确认/拒绝时写入，记录响应动作 + 地理位置 + IP，用于防作弊审计。</td></tr>
 <tr><td><code>co_photo_record</code></td><td>id, request_id, attempt_no, image_url, score, result, fail_reason, gps, camera_device, created_at</td><td>每次拍照记录（含失败重拍）</td></tr>
 <tr><td><code>co_photo_reject_log</code></td><td>id, request_id, user_id, candidate_order, reason, rejected_at</td><td>拒绝/超时记录</td></tr>
 <tr><td><code>co_photo_rule</code></td><td>id, org_id, org_level, shangban_rate, xiaban_rate, pool_threshold, valid_from, valid_to</td><td>组织域规则配置</td></tr>
@@ -291,6 +291,8 @@ table td code{background:#f5f5f5;padding:1px 6px;border-radius:3px;font-size:12p
 </table>
 
 <div class="callout info"><strong>并发控制：</strong>抽取合拍人时使用 Redis 分布式锁 (<code>lock:partner:{userId}</code>, TTL=15min)，防止同一人被多个打卡人同时抽中。</div>
+
+<div class="callout warn"><strong>防作弊审计：</strong>合拍人提交确认/拒绝时，后端必须记录合拍人的 GPS 坐标和客户端 IP 地址，写入 <code>co_photo_request.partner_response</code> 字段。用途：(1) 核查合拍人是否在项目工地附近——若挂职者远程操作，其 GIS 必然偏离工地坐标，直接成为挂职证据；(2) 频繁拒绝/超时的合拍人，结合 GIS 数据可判断是否"人不在现场"。</div>
 </div>
 
 <!-- 6. 硬编码常量 -->
