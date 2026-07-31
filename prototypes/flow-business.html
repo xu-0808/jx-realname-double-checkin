@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>双人打卡业务流程图</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#f8f9fb;display:flex;justify-content:center;padding:40px 20px 80px;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{max-width:1100px;width:100%}
+.wrap h1{font-size:22px;font-weight:600;color:#1e293b;margin-bottom:6px}
+.wrap .sub{font-size:13px;color:#94a3b8;margin-bottom:28px}
+svg{width:100%;height:auto;display:block}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>实名制双人打卡 &mdash; 业务流程图</h1>
+<div class="sub">赣建宝小程序 · 全流程总览</div>
+
+<svg viewBox="0 0 1060 1540" xmlns="http://www.w3.org/2000/svg">
+
+<defs>
+  <filter id="sh"><feDropShadow dx="0" dy="1" stdDeviation="2" flood-opacity="0.06"/></filter>
+  <!-- 箭头：跟随线条颜色 -->
+  <marker id="ma" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+    <path d="M1 1L8 5L1 9" fill="none" stroke="#94a3b8" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+  <marker id="mg" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+    <path d="M1 1L8 5L1 9" fill="none" stroke="#16a34a" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+  <marker id="mr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+    <path d="M1 1L8 5L1 9" fill="none" stroke="#dc2626" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+  <marker id="mo" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+    <path d="M1 1L8 5L1 9" fill="none" stroke="#d97706" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+  <marker id="mb" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+    <path d="M1 1L8 5L1 9" fill="none" stroke="#2563eb" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+</defs>
+
+<style>
+  .tt{font-size:14px;font-weight:500;font-family:sans-serif}
+  .ts{font-size:12px;font-family:sans-serif}
+  .tx{font-size:11px;font-family:sans-serif}
+</style>
+
+<!-- ============================================================
+      DESIGN SYSTEM
+      Process node: w=280 h=50 rx=8  fill="#f0f5ff" stroke="#5b8def"
+      Decision diamond: w=140 h=70     fill="#fffbeb" stroke="#e6a817"
+      Filled button:   w=240 h=44 rx=22 fill="#2563eb"
+      Success:         w=200 h=46 rx=23 fill="#ecfdf5" stroke="#16a34a"
+      Degrade:         w=200 h=46 rx=23 fill="#fef2f2" stroke="#dc2626"
+      Vertical gap between nodes: 60-92px
+      Columns:
+        x=20   loop-back竖线
+        x=160  left branch center
+        x=350  center column center
+        x=500  degrade bus (left)
+        x=580  N次 bus (right)
+        x=800  right branch center
+        x=980  right迂回竖线
+     ============================================================ -->
+
+<!-- ===== TITLE ===== -->
+<text x="530" y="36" class="tt" text-anchor="middle" fill="#1e293b" font-size="17">实名制双人打卡 &middot; 业务全流程</text>
+
+<!-- ============================================================
+     LEVEL 0: 最底层线（loop-back 回环，画在所有节点之前）
+     ============================================================ -->
+
+<!-- 否→更换 回环：N次判定左 → 左到x=20 → 上到y=521 → 右进入抽取合拍人（左侧进入） -->
+<line x1="280" y1="1412" x2="20" y2="1412" stroke="#2563eb" stroke-width="1.4"/>
+<line x1="20" y1="1412" x2="20" y2="521" stroke="#2563eb" stroke-width="1.4"/>
+<line x1="20" y1="521" x2="656" y2="521" stroke="#2563eb" stroke-width="1.4" marker-end="url(#mb)"/>
+<text x="150" y="1404" class="ts" text-anchor="middle" fill="#2563eb">否</text>
+<text x="6" y="960" class="tx" text-anchor="middle" fill="#2563eb" transform="rotate(-90,6,960)">系统自动更换候选人</text>
+
+<!-- ============================================================
+     LEVEL 1: 降级汇流竖线（画在所有分支节点之前）
+     Bus A (x=500) — 枯竭 / 限时否 / 核验不通过 / N次判定-是
+     Bus B (x=580) — 拒绝/超时 → N次判定
+     ============================================================ -->
+
+<!-- Bus B: 拒绝/超时 → N次判定入口 -->
+<line x1="580" y1="814" x2="580" y2="1390" stroke="#dc2626" stroke-width="1.4"/>
+
+<!-- Bus A: 枯竭 / 否 / 不通过 / 是 → 降级 -->
+<line x1="500" y1="590" x2="500" y2="1490" stroke="#dc2626" stroke-width="1.4"/>
+
+<!-- 枯竭汇入 Bus A -->
+<line x1="730" y1="590" x2="500" y2="590" stroke="#dc2626" stroke-width="1.4" marker-end="url(#mr)"/>
+<text x="615" y="582" class="ts" text-anchor="middle" fill="#dc2626">枯竭</text>
+
+<!-- 限时否汇入 Bus A -->
+<line x1="730" y1="1038" x2="500" y2="1038" stroke="#dc2626" stroke-width="1.4" marker-end="url(#mr)"/>
+<text x="615" y="1030" class="ts" text-anchor="middle" fill="#dc2626">否</text>
+
+<!-- 核验不通过汇入 Bus A -->
+<line x1="730" y1="1204" x2="500" y2="1204" stroke="#dc2626" stroke-width="1.4" marker-end="url(#mr)"/>
+<text x="615" y="1196" class="ts" text-anchor="middle" fill="#dc2626">不通过</text>
+
+<!-- ============================================================
+     CENTER COLUMN（中轴）x-center=350, node=210-490
+     ============================================================ -->
+
+<line x1="350" y1="56" x2="350" y2="114" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ma)"/>
+
+<rect x="210" y="114" width="280" height="50" rx="8" fill="#f0f5ff" stroke="#5b8def" stroke-width="1" filter="url(#sh)"/>
+<text x="350" y="139" class="tt" text-anchor="middle" dominant-baseline="central" fill="#1e40af">进入岗位人员打卡页面</text>
+
+<line x1="350" y1="164" x2="350" y2="216" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ma)"/>
+
+<rect x="210" y="216" width="280" height="50" rx="8" fill="#f0f5ff" stroke="#5b8def" stroke-width="1" filter="url(#sh)"/>
+<text x="350" y="238" class="tt" text-anchor="middle" dominant-baseline="central" fill="#1e40af">GPS + WiFi 校验</text>
+<text x="350" y="254" class="tx" text-anchor="middle" dominant-baseline="central" fill="#94a3b8">页面进入时自动获取</text>
+
+<line x1="350" y1="266" x2="350" y2="318" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ma)"/>
+
+<rect x="230" y="318" width="240" height="44" rx="22" fill="#2563eb" stroke="#1d4ed8" stroke-width="1" filter="url(#sh)"/>
+<text x="350" y="340" class="tt" text-anchor="middle" dominant-baseline="central" fill="#fff">点击「打卡」按钮</text>
+
+<line x1="350" y1="362" x2="350" y2="405" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ma)"/>
+
+<!-- ◇ 系统随机判定 -->
+<polygon points="350,375 420,410 350,445 280,410" fill="#fffbeb" stroke="#e6a817" stroke-width="1" filter="url(#sh)"/>
+<text x="350" y="406" class="tt" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="13">系统随机判定</text>
+<text x="350" y="426" class="tx" text-anchor="middle" dominant-baseline="central" fill="#d97706">按抽取率</text>
+
+<!-- ============================================================
+     LEFT BRANCH（未抽中）x-center=160, node=20-300
+     ============================================================ -->
+
+<line x1="280" y1="410" x2="160" y2="410" stroke="#16a34a" stroke-width="1.4"/>
+<line x1="160" y1="410" x2="160" y2="490" stroke="#16a34a" stroke-width="1.4" marker-end="url(#mg)"/>
+<text x="220" y="402" class="ts" text-anchor="middle" fill="#16a34a">未抽中</text>
+
+<rect x="20" y="490" width="280" height="50" rx="8" fill="#f0f5ff" stroke="#5b8def" stroke-width="1" filter="url(#sh)"/>
+<text x="160" y="512" class="tt" text-anchor="middle" dominant-baseline="central" fill="#1e40af">拍照记录</text>
+<text x="160" y="528" class="tx" text-anchor="middle" dominant-baseline="central" fill="#94a3b8">手机实时拍摄</text>
+
+<line x1="160" y1="540" x2="160" y2="592" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ma)"/>
+
+<rect x="20" y="592" width="280" height="50" rx="8" fill="#f0f5ff" stroke="#5b8def" stroke-width="1" filter="url(#sh)"/>
+<text x="160" y="614" class="tt" text-anchor="middle" dominant-baseline="central" fill="#1e40af">人脸核验</text>
+<text x="160" y="630" class="tx" text-anchor="middle" dominant-baseline="central" fill="#94a3b8">微信刷脸验证</text>
+
+<line x1="160" y1="642" x2="160" y2="696" stroke="#16a34a" stroke-width="1.4" marker-end="url(#mg)"/>
+
+<rect x="60" y="696" width="200" height="46" rx="23" fill="#ecfdf5" stroke="#16a34a" stroke-width="1.2" filter="url(#sh)"/>
+<text x="160" y="719" class="tt" text-anchor="middle" dominant-baseline="central" fill="#15803d">普通单人打卡成功</text>
+
+<!-- LEFT BRANCH END y=742 -->
+
+<!-- ============================================================
+     RIGHT BRANCH（被抽中）x-center=800, node=660-940
+     RIGHT迂回竖线 x=980
+     ============================================================ -->
+
+<line x1="420" y1="410" x2="800" y2="410" stroke="#d97706" stroke-width="1.4"/>
+<line x1="800" y1="410" x2="800" y2="490" stroke="#d97706" stroke-width="1.4" marker-end="url(#mo)"/>
+<text x="610" y="402" class="ts" text-anchor="middle" fill="#d97706">被抽中</text>
+
+<rect x="660" y="490" width="280" height="50" rx="8" fill="#f0f5ff" stroke="#5b8def" stroke-width="1" filter="url(#sh)"/>
+<text x="800" y="512" class="tt" text-anchor="middle" dominant-baseline="central" fill="#1e40af">抽取合拍人</text>
+<text x="800" y="528" class="tx" text-anchor="middle" dominant-baseline="central" fill="#94a3b8">从候选人池随机抽取</text>
+
+<line x1="800" y1="540" x2="800" y2="577" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ma)"/>
+
+<!-- ◇ 候选人池 -->
+<polygon points="800,550 870,590 800,630 730,590" fill="#fffbeb" stroke="#e6a817" stroke-width="1" filter="url(#sh)"/>
+<text x="800" y="586" class="tt" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="12">候选人池</text>
+<text x="800" y="604" class="tx" text-anchor="middle" dominant-baseline="central" fill="#d97706">是否有人</text>
+
+<!-- 有人 → 右侧迂回 -->
+<line x1="870" y1="590" x2="980" y2="590" stroke="#16a34a" stroke-width="1.4"/>
+<line x1="980" y1="590" x2="980" y2="684" stroke="#16a34a" stroke-width="1.4"/>
+<line x1="980" y1="684" x2="800" y2="684" stroke="#94a3b8" stroke-width="1.4"/>
+<line x1="800" y1="684" x2="800" y2="710" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ma)"/>
+<text x="940" y="582" class="ts" text-anchor="middle" fill="#16a34a">有人</text>
+
+<rect x="660" y="710" width="280" height="50" rx="8" fill="#f0f5ff" stroke="#5b8def" stroke-width="1" filter="url(#sh)"/>
+<text x="800" y="732" class="tt" text-anchor="middle" dominant-baseline="central" fill="#1e40af">推送通知给合拍人</text>
+<text x="800" y="748" class="tx" text-anchor="middle" dominant-baseline="central" fill="#94a3b8">小程序站内信 + 订阅消息</text>
+
+<line x1="800" y1="760" x2="800" y2="797" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ma)"/>
+
+<!-- ◇ 合拍人响应 -->
+<polygon points="800,770 870,814 800,858 730,814" fill="#fffbeb" stroke="#e6a817" stroke-width="1" filter="url(#sh)"/>
+<text x="800" y="810" class="tt" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="12">合拍人响应</text>
+<text x="800" y="830" class="tx" text-anchor="middle" dominant-baseline="central" fill="#d97706">5 分钟确认窗口</text>
+
+<!-- 接受 → 右侧迂回 -->
+<line x1="870" y1="814" x2="980" y2="814" stroke="#16a34a" stroke-width="1.4"/>
+<line x1="980" y1="814" x2="980" y2="918" stroke="#16a34a" stroke-width="1.4"/>
+<line x1="980" y1="918" x2="800" y2="918" stroke="#94a3b8" stroke-width="1.4"/>
+<line x1="800" y1="918" x2="800" y2="944" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ma)"/>
+<text x="940" y="806" class="ts" text-anchor="middle" fill="#16a34a">接受</text>
+
+<!-- 拒绝/超时 → Bus B -->
+<line x1="730" y1="814" x2="580" y2="814" stroke="#dc2626" stroke-width="1.4"/>
+<text x="655" y="806" class="ts" text-anchor="middle" fill="#dc2626">拒绝 / 超时</text>
+
+<rect x="660" y="944" width="280" height="50" rx="8" fill="#f0f5ff" stroke="#5b8def" stroke-width="1" filter="url(#sh)"/>
+<text x="800" y="966" class="tt" text-anchor="middle" dominant-baseline="central" fill="#1e40af">拍照按钮可点击</text>
+<text x="800" y="982" class="tx" text-anchor="middle" dominant-baseline="central" fill="#94a3b8">合拍人已确认到场</text>
+
+<line x1="800" y1="994" x2="800" y2="1031" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ma)"/>
+
+<!-- ◇ 是否限时内拍照 -->
+<polygon points="800,1004 870,1048 800,1092 730,1048" fill="#fffbeb" stroke="#e6a817" stroke-width="1" filter="url(#sh)"/>
+<text x="800" y="1044" class="tt" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="12">是否限时内拍照</text>
+<text x="800" y="1064" class="tx" text-anchor="middle" dominant-baseline="central" fill="#d97706">15 分钟执行窗口</text>
+
+<!-- 是 → 向下 -->
+<line x1="800" y1="1092" x2="800" y2="1128" stroke="#16a34a" stroke-width="1.4" marker-end="url(#mg)"/>
+<text x="816" y="1114" class="ts" text-anchor="start" fill="#16a34a">是</text>
+
+<rect x="660" y="1128" width="280" height="50" rx="8" fill="#f0f5ff" stroke="#5b8def" stroke-width="1" filter="url(#sh)"/>
+<text x="800" y="1150" class="tt" text-anchor="middle" dominant-baseline="central" fill="#1e40af">双人合拍（打卡人手机）</text>
+<text x="800" y="1166" class="tx" text-anchor="middle" dominant-baseline="central" fill="#94a3b8">实时拍摄 &middot; GPS 水印 &middot; 禁止相册</text>
+
+<line x1="800" y1="1178" x2="800" y2="1215" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ma)"/>
+
+<!-- ◇ 双人人脸核验 -->
+<polygon points="800,1188 870,1232 800,1276 730,1232" fill="#fffbeb" stroke="#e6a817" stroke-width="1" filter="url(#sh)"/>
+<text x="800" y="1228" class="tt" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="12">双人人脸核验</text>
+<text x="800" y="1248" class="tx" text-anchor="middle" dominant-baseline="central" fill="#d97706">百度多搜 V3 接口</text>
+
+<!-- 通过 → 右侧迂回 → 成功 -->
+<line x1="870" y1="1232" x2="980" y2="1232" stroke="#16a34a" stroke-width="1.4"/>
+<line x1="980" y1="1232" x2="980" y2="1310" stroke="#16a34a" stroke-width="1.4" marker-end="url(#mg)"/>
+<text x="940" y="1224" class="ts" text-anchor="middle" fill="#16a34a">通过</text>
+
+<rect x="880" y="1310" width="200" height="46" rx="23" fill="#ecfdf5" stroke="#16a34a" stroke-width="1.2" filter="url(#sh)"/>
+<text x="980" y="1333" class="tt" text-anchor="middle" dominant-baseline="central" fill="#15803d">双人合拍打卡成功</text>
+
+<!-- RIGHT BRANCH END y=1356 -->
+
+<!-- ============================================================
+     BOTTOM: N次判定 + 降级终点
+     ============================================================ -->
+
+<!-- Bus B 末端 → N次判定入口 -->
+<line x1="580" y1="1390" x2="350" y2="1390" stroke="#dc2626" stroke-width="1.4" marker-end="url(#mr)"/>
+
+<!-- ◇ 是否大于配置 N 次 -->
+<polygon points="350,1360 420,1392 350,1424 280,1392" fill="#fffbeb" stroke="#e6a817" stroke-width="1" filter="url(#sh)"/>
+<text x="350" y="1388" class="tt" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="12">是否大于配置 N 次</text>
+
+<!-- 是 → 向右汇入 Bus A → 降级 -->
+<line x1="420" y1="1392" x2="500" y2="1392" stroke="#dc2626" stroke-width="1.4"/>
+<text x="460" y="1384" class="ts" text-anchor="middle" fill="#dc2626">是</text>
+
+<!-- Bus A → 底部降级终点 -->
+<line x1="500" y1="1490" x2="500" y2="1519" stroke="#dc2626" stroke-width="1.4"/>
+<line x1="500" y1="1519" x2="450" y2="1519" stroke="#dc2626" stroke-width="1.4" marker-end="url(#mr)"/>
+
+<rect x="250" y="1496" width="200" height="46" rx="23" fill="#fef2f2" stroke="#dc2626" stroke-width="1.2" filter="url(#sh)"/>
+<text x="350" y="1519" class="tt" text-anchor="middle" dominant-baseline="central" fill="#991b1b">降级单人打卡</text>
+
+<!-- ============================================================
+     LEGEND
+     ============================================================ -->
+<g transform="translate(24,56)">
+  <rect x="0" y="0" width="210" height="78" rx="6" fill="#fff" stroke="#e2e8f0" stroke-width="0.5" filter="url(#sh)"/>
+  <text x="14" y="20" class="tx" fill="#64748b" font-weight="600">图例</text>
+
+  <rect x="14" y="32" width="18" height="14" rx="3" fill="#f0f5ff" stroke="#5b8def" stroke-width="0.8"/>
+  <text x="38" y="43" class="tx" dominant-baseline="central" fill="#64748b">流程节点</text>
+
+  <polygon points="118,32 126,39 118,46 110,39" fill="#fffbeb" stroke="#e6a817" stroke-width="0.8"/>
+  <text x="134" y="43" class="tx" dominant-baseline="central" fill="#64748b">判定</text>
+
+  <rect x="14" y="54" width="18" height="14" rx="7" fill="#ecfdf5" stroke="#16a34a" stroke-width="0.8"/>
+  <text x="38" y="65" class="tx" dominant-baseline="central" fill="#64748b">成功</text>
+
+  <rect x="118" y="54" width="18" height="14" rx="7" fill="#fef2f2" stroke="#dc2626" stroke-width="0.8"/>
+  <text x="142" y="65" class="tx" dominant-baseline="central" fill="#64748b">降级</text>
+</g>
+
+</svg>
+</div>
+</body>
+</html>

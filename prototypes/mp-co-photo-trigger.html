@@ -172,6 +172,17 @@
     .confirm-title.red { color: #dc2626; }
     .confirm-sub { font-size: 11.5px; color: #888; line-height: 1.5; margin-top: 1px; }
 
+    /* 刷新按钮 */
+    .confirm-refresh {
+      font-size: 12px; color: #2563ff; font-weight: 600;
+      cursor: pointer; text-decoration: none; flex-shrink: 0;
+      padding: 5px 10px; border-radius: 6px; white-space: nowrap;
+      background: #eff6ff; border: 1px solid #bfdbfe;
+      transition: all 0.15s; user-select: none;
+    }
+    .confirm-refresh:active { background: #dbeafe; transform: scale(0.96); }
+    .confirm-refresh.refreshing { color: #93c5fd; pointer-events: none; }
+
     /* 确认倒计时 */
     .confirm-timer-bar {
       margin-top: 10px; padding-top: 10px;
@@ -274,13 +285,10 @@
     <button class="demo-scenario" onclick="switchScenario('exhausted')">
       <span class="dot dot-orange"></span>情景五：候选人池枯竭
     </button>
-    <button class="demo-scenario" onclick="switchScenario('offduty')">
-      <span class="dot dot-purple"></span>情景六：下班卡场景
-    </button>
     <button class="demo-scenario" onclick="location.href='mp-checkin-4.html'">
-      <span class="dot dot-gray"></span>情景七：普通单人打卡
+      <span class="dot dot-gray"></span>情景六：普通单人打卡
     </button>
-    <div class="demo-hint">💡 合拍人未确认时拍照按钮禁用，确认后方可开始合拍。确认倒计时5分钟，合拍窗口15分钟。</div>
+    <div class="demo-hint">💡 合拍人未确认时拍照按钮禁用，确认后方可开始合拍。可点击"刷新"手动查询确认状态；未手动刷新时每45秒自动刷新一次。</div>
   </div>
 
   <!-- ==== Phone ==== -->
@@ -363,6 +371,7 @@
               <div class="confirm-text">
                 <div class="confirm-title">等待 "张建平" 确认中…</div>
               </div>
+              <a class="confirm-refresh" href="javascript:void(0)" onclick="refreshConfirm(this)">刷新</a>
             </div>
             <div class="confirm-timer-bar">
               <div class="confirm-timer-label">
@@ -548,6 +557,7 @@
               <div class="confirm-text">
                 <div class="confirm-title">等待 "陈志强" 确认中…</div>
               </div>
+              <a class="confirm-refresh" href="javascript:void(0)" onclick="refreshConfirm(this)">刷新</a>
             </div>
             <div class="confirm-timer-bar">
               <div class="confirm-timer-label">
@@ -652,6 +662,7 @@
               <div class="confirm-text">
                 <div class="confirm-title red">等待 "王建国" 确认中…</div>
               </div>
+              <a class="confirm-refresh" href="javascript:void(0)" onclick="refreshConfirm(this)">刷新</a>
             </div>
             <div class="confirm-timer-bar" style="border-top-color:#fecaca;">
               <div class="confirm-timer-label" style="color:#991b1b;">
@@ -735,103 +746,6 @@
         </div>
       </div>
 
-      <!-- ========================
-           SCENARIO 6: 下班卡场景
-           ======================== -->
-      <div class="scenario" id="sc-offduty">
-
-        <!-- ① 横幅（统一颜色） -->
-        <div class="section-banner">
-          <div class="banner-strip">
-            <svg class="banner-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="1" fill="currentColor"/>
-            </svg>
-            <span class="banner-text">您被抽中需双人合拍验证</span>
-          </div>
-        </div>
-
-        <!-- ② 合拍人员信息卡片（统一样式） -->
-        <div class="section-partner">
-          <div class="partner-card">
-            <div class="partner-stamp">合<br>拍<br>人</div>
-            <div class="partner-avatar-wrap">
-              <img src="avatar-worker-2.png" alt="刘建国">
-            </div>
-            <div class="partner-info">
-              <div class="name">刘建国</div>
-              <div class="role">施工员 · 总承包单位</div>
-              <div class="phone">185****4567</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ④ 联系提醒（统一模板，电话随人变化） -->
-        <div class="section-contact">
-          <div class="contact-bar">
-            <div class="contact-icon">
-              <svg viewBox="0 0 24 24"><path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1.003 1.003 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>
-            </div>
-            <div class="contact-text">
-              <div class="contact-title">📢 请主动联系合拍人处理</div>
-              <div class="contact-desc">
-                合拍人可能未关注微信站内消息，建议直接拨打电话 <span class="phone-highlight">185****4567</span> 或微信语音通知对方打开<strong>赣建宝小程序</strong>查看合拍请求。
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ⑤ 确认状态（待确认，无小字） -->
-        <div class="section-confirm">
-          <div class="confirm-box waiting">
-            <div class="confirm-row">
-              <div class="confirm-icon-circle waiting-bg">
-                <div class="spinner-ring"></div>
-              </div>
-              <div class="confirm-text">
-                <div class="confirm-title">等待 "刘建国" 确认中…</div>
-              </div>
-            </div>
-            <div class="confirm-timer-bar">
-              <div class="confirm-timer-label">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
-                合拍人确认时限（5分钟）
-              </div>
-              <div class="confirm-timer-value">04:52</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ⑥ 合拍执行倒计时（待确认：占位，15:00静态） -->
-        <div class="section-countdown">
-          <div class="countdown-label">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
-            合拍执行倒计时
-          </div>
-          <div class="countdown-start-placeholder">合拍人确认后开始计时</div>
-          <div class="countdown-remaining static">15:00</div>
-          <div class="countdown-sub">合拍执行时限为15分钟，超时未完成则验证失败，系统标记后降级为单人打卡</div>
-        </div>
-
-        <!-- ⑤ 合拍规范示例 -->
-        <div class="section-guide">
-          <div class="guide-photo">
-            <div class="guide-photo-label">合拍规范示例图</div>
-            <img src="co-photo-demo.jpg" alt="双人合拍示意">
-          </div>
-          <div class="guide-tips">
-            <div class="guide-tip-item"><span class="blue-dot"></span>合拍必须调用手机摄像头<strong>实时拍摄</strong>，禁止从相册选取</div>
-            <div class="guide-tip-item"><span class="blue-dot"></span>系统将自动记录拍摄时间戳与 GPS 定位信息</div>
-            <div class="guide-tip-item"><span class="blue-dot"></span>合拍照片将作为打卡凭证存档，请确保两人面部清晰可见</div>
-          </div>
-        </div>
-
-        <!-- ⑥ 操作区 -->
-        <div class="section-actions">
-          <a class="btn-photo disabled">📷 开始拍照</a>
-          <div class="btn-hint">待合拍人确认后方可开始拍照</div>
-        </div>
-      </div>
-
     </div><!-- .content -->
 
     </div><!-- .phone -->
@@ -850,7 +764,7 @@ function switchScenario(name) {
   document.querySelectorAll('.demo-scenario').forEach(btn => btn.classList.remove('active'));
   var map = {
     normal:'情景一', confirmed:'情景二', swapped:'情景三',
-    lastperson:'情景四', exhausted:'情景五', offduty:'情景六'
+    lastperson:'情景四', exhausted:'情景五'
   };
   var match = map[name] || '';
   document.querySelectorAll('.demo-scenario').forEach(function(btn) {
@@ -859,7 +773,7 @@ function switchScenario(name) {
   var titles = {
     normal:'双人合拍验证', confirmed:'双人合拍验证',
     swapped:'双人合拍验证', lastperson:'双人合拍验证',
-    exhausted:'双人合拍验证', offduty:'下班打卡 · 合拍验证'
+    exhausted:'双人合拍验证'
   };
   document.getElementById('headerTitle').textContent = titles[name] || '双人合拍验证';
   window.location.hash = name;
@@ -867,9 +781,19 @@ function switchScenario(name) {
 
 (function(){
   var h = window.location.hash.replace('#','');
-  var valid = ['normal','confirmed','swapped','lastperson','exhausted','offduty'];
+  var valid = ['normal','confirmed','swapped','lastperson','exhausted'];
   if (valid.indexOf(h) >= 0) switchScenario(h);
 })();
+
+function refreshConfirm(el) {
+  if (!el || el.classList.contains('refreshing')) return;
+  el.classList.add('refreshing');
+  el.textContent = '刷新中…';
+  setTimeout(function() {
+    el.classList.remove('refreshing');
+    el.textContent = '刷新';
+  }, 800);
+}
 </script>
 
 </body>

@@ -60,12 +60,12 @@ table td{color:#555}
 </style>
 </head>
 <body>
-<div class="topbar"><div class="brand">江西省建筑工人实名制管理服务信息平台</div><div class="sub">面向客户 · 方案说明书 v1.0</div></div>
+<div class="topbar"><div class="brand">江西省建筑工人实名制管理服务信息平台</div><div class="sub">面向客户 · 方案说明书 v1.1</div></div>
 <div class="wrapper">
 
 <div class="title-block">
 <h1>实名制双人打卡 — 方案说明书</h1>
-<div class="meta"><span>版本 v1.0</span><span>2026-07-30</span><span>适用范围：江西省住建厅 / 各地市住建局 / 各区县主管部门</span></div>
+<div class="meta"><span>版本 v1.1</span><span>2026-07-31</span><span>适用范围：江西省住建厅 / 各地市住建局 / 各区县主管部门</span></div>
 </div>
 
 <!-- 1. 背景 -->
@@ -124,46 +124,53 @@ table td{color:#555}
 
 <h3>3.1 核心流程：打卡人视角</h3>
 <div class="flow-row">
-<div class="flow-box"><h4>① 正常打卡</h4><p>刷脸+GPS+WiFi</p></div>
+<div class="flow-box"><h4>① 进入打卡页</h4><p>GPS+WiFi自动获取</p></div>
 <div class="flow-arrow">→</div>
-<div class="flow-box"><h4>② 系统判定</h4><p>按抽取率随机</p></div>
+<div class="flow-box" style="background:#2563eb;border-color:#1d4ed8"><h4 style="color:#fff">② 点击打卡</h4><p style="color:rgba(255,255,255,.8)">触发随机判定</p></div>
 <div class="flow-arrow">→</div>
-<div class="flow-box" style="border-color:#fa8c16"><h4>③ 被抽中</h4><p>6模块触发通知</p></div>
-<div class="flow-arrow">→</div>
-<div class="flow-box"><h4>④ 等待确认</h4><p>合拍人确认后拍照</p></div>
-<div class="flow-arrow">→</div>
-<div class="flow-box"><h4>⑤ 双人合拍</h4><p>横版取景+水印</p></div>
-<div class="flow-arrow">→</div>
-<div class="flow-box" style="border-color:#52c41a"><h4>⑥ 人脸核验</h4><p>通过/重拍/降级</p></div>
+<div class="flow-box" style="border-color:#fa8c16"><h4>③ 系统判定</h4><p>按抽取率随机</p></div>
 </div>
+<div class="flow-row" style="margin-top:8px">
+<div class="flow-box" style="border-color:#52c41a"><h4>├ 未抽中</h4><p>拍照→人脸核验→成功</p></div>
+<div style="width:60px;flex-shrink:0"></div>
+<div class="flow-box" style="border-color:#fa8c16"><h4>└ 被抽中</h4><p>抽取合拍人→合拍人响应→拍照</p></div>
+<div class="flow-arrow">→</div>
+<div class="flow-box"><h4>④ 双人合拍</h4><p>横版取景+水印</p></div>
+<div class="flow-arrow">→</div>
+<div class="flow-box" style="border-color:#52c41a"><h4>⑤ 人脸核验</h4><p>百度多搜V3</p></div>
+<div class="flow-arrow">→</div>
+<div class="flow-box" style="border-color:#52c41a"><h4>⑥ 打卡成功</h4><p>或降级单人打卡</p></div>
+</div>
+<div class="callout info">详细完整流程图见 <a href="flow-business.html" target="_blank">flow-business.html</a>（新窗口打开），包含所有分支、判定节点和降级路径。</div>
 
 <h3>3.2 合拍人响应流程</h3>
 <div class="flow-row">
 <div class="flow-box"><h4>收到通知</h4><p>消息中"去处理"</p></div>
 <div class="flow-arrow">→</div>
-<div class="flow-box" style="border-color:#fa8c16"><h4>查看邀请</h4><p>5分钟倒计时</p></div>
+<div class="flow-box" style="border-color:#fa8c16"><h4>查看邀请</h4><p>5分钟确认窗口</p></div>
 <div class="flow-arrow">→</div>
-<div class="flow-box" style="border-color:#52c41a"><h4>接受</h4><p>获知打卡人信息</p></div>
-<div class="flow-arrow">→</div>
-<div class="flow-box"><h4>前往汇合</h4><p>与打卡人碰面</p></div>
+<div class="flow-box" style="border-color:#52c41a"><h4>接受</h4><p>提示前往汇合</p></div>
 <div class="flow-arrow">→</div>
 <div class="flow-box"><h4>配合拍照</h4><p>打卡人手机拍摄</p></div>
-<div class="flow-arrow">→</div>
-<div class="flow-box" style="border-color:#ff4d4f"><h4>拒绝</h4><p>选原因→系统换人</p></div>
+</div>
+<div class="flow-row" style="margin-top:8px;padding-left:234px">
+<div class="flow-box" style="border-color:#ff4d4f"><h4>拒绝 / 超时</h4><p>选原因→进入 N 次判定</p></div>
 </div>
 
-<h3>3.3 换人场景流程</h3>
+<h3>3.3 换人与降级流程</h3>
+<p>合拍人拒绝或确认超时后，系统判定是否超过配置的更换次数上限（默认 <strong>N=2 次</strong>，即最多尝试 3 个候选人）：</p>
 <div class="flow-row">
-<div class="flow-box" style="border-color:#ff4d4f"><h4>第1人拒绝</h4><p>记录原因</p></div>
+<div class="flow-box" style="border-color:#ff4d4f"><h4>拒绝/超时</h4><p>记录原因</p></div>
 <div class="flow-arrow">→</div>
-<div class="flow-box"><h4>系统自动换人</h4><p>抽取第2候选人</p></div>
-<div class="flow-arrow">→</div>
-<div class="flow-box" style="border-color:#ff4d4f"><h4>第2人拒绝</h4><p>"最后一个合拍机会"</p></div>
-<div class="flow-arrow">→</div>
-<div class="flow-box"><h4>第3人</h4><p>不可再拒绝</p></div>
-<div class="flow-arrow">→</div>
-<div class="flow-box" style="border-color:#ff4d4f"><h4>仍拒绝/超时</h4><p>降级单人打卡</p></div>
+<div class="flow-box" style="border-color:#fa8c16"><h4>超过N次？</h4><p>系统判定</p></div>
+<div class="flow-arrow" style="color:#52c41a">否↓</div>
+<div class="flow-box"><h4>自动换人</h4><p>回"抽取合拍人"</p></div>
 </div>
+<div class="flow-row" style="margin-top:4px;padding-left:234px">
+<div class="flow-arrow" style="color:#ff4d4f">是→</div>
+<div class="flow-box" style="border-color:#ff4d4f"><h4>降级单人打卡</h4><p>记录异常</p></div>
+</div>
+<div class="callout"><strong>兜底逻辑：</strong>候选人池枯竭直接降级，不经 N 次判定。参见下方第 3.4 节。</div>
 
 <h3>3.4 候选人池枯竭流程</h3>
 <div class="flow-row">
@@ -189,10 +196,11 @@ table td{color:#555}
 </table>
 
 <h3>4.2 时间窗口规则</h3>
+<div class="callout info"><strong>运维说明：</strong>以下时长均为系统默认值，各组织域可在规则配置模块按实际需要调整，属运维可配置参数。</div>
 <table>
 <tr><th>计时器</th><th>时长</th><th>起点</th><th>超时后果</th></tr>
-<tr><td>确认倒计时</td><td><strong>5分钟</strong></td><td>系统推送通知给合拍人</td><td>自动视为拒绝，系统换下一个候选人</td></tr>
-<tr><td>合拍执行窗口</td><td><strong>15分钟</strong></td><td>打卡人被抽中时</td><td>验证失败，系统标记后降级为单人打卡</td></tr>
+<tr><td>确认倒计时</td><td><strong>5分钟</strong>（默认值，可配）</td><td>系统推送通知给合拍人</td><td>自动视为拒绝，系统换下一个候选人</td></tr>
+<tr><td>合拍执行窗口</td><td><strong>15分钟</strong>（默认值，可配）</td><td>打卡人被抽中时</td><td>验证失败，系统标记后降级为单人打卡</td></tr>
 </table>
 
 <h3>4.3 抽取规则</h3>
@@ -209,13 +217,16 @@ table td{color:#555}
 <li><strong>横版取景框：</strong>包含两个虚线头肩轮廓引导框，辅助站位</li>
 <li><strong>自动水印叠加：</strong>GPS定位坐标 + 项目名称 + 打卡人姓名 + 拍摄时间戳</li>
 <li><strong>拍照人：</strong>始终由打卡人手机完成，合拍人只需到场配合</li>
+<li><strong>确认后方可拍照：</strong>打卡人需等待合拍人确认接受后，方可点击"开始拍照"进行合拍</li>
+<li><strong>状态刷新：</strong>等待合拍人确认期间，点击"刷新"可即时查询确认状态；系统每45秒自动轮询一次</li>
 </ul>
 
 <h3>4.5 换人与降级规则</h3>
 <ul>
-<li>候选人更换上限 2 次（即最多 3 个候选人）</li>
-<li>第 3 人为最后机会，界面提示"最后一个合拍机会"</li>
-<li>候选人池枯竭或全部拒绝/超时后，降级为单人打卡并记录异常</li>
+<li>合拍人拒绝或确认超时后，系统首先判定<strong>"是否大于配置的更换次数 N"</strong>（N 为运维参数，默认 2 次即最多 3 个候选人）</li>
+<li><strong>未超过 N 次：</strong>系统自动更换候选人，重新回到"抽取合拍人"步骤，触发新一轮通知和等待</li>
+<li><strong>超过 N 次：</strong>全部候选人已尝试完毕，降级为单人打卡并记录异常</li>
+<li><strong>候选人池枯竭：</strong>不经过 N 次判定，直接降级（池中无可抽取人选）</li>
 <li>降级记录在监管端可查，作为风险评分输入数据</li>
 </ul>
 </div>

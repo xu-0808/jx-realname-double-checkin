@@ -51,12 +51,12 @@ table td code{background:#f5f5f5;padding:1px 6px;border-radius:3px;font-size:12p
 </style>
 </head>
 <body>
-<div class="topbar"><div class="brand">江西省建筑工人实名制管理服务信息平台</div><div class="sub">面向研发团队 · 技术交底文档 v1.0</div></div>
+<div class="topbar"><div class="brand">江西省建筑工人实名制管理服务信息平台</div><div class="sub">面向研发团队 · 技术交底文档 v1.1</div></div>
 <div class="wrapper">
 
 <div class="title-block">
 <h1>实名制双人打卡 — 技术交底文档</h1>
-<div class="meta"><span>版本 v1.0</span><span>2026-07-30</span><span>范围：监管端Web + 赣建宝小程序</span></div>
+<div class="meta"><span>版本 v1.1</span><span>2026-07-31</span><span>范围：监管端Web + 赣建宝小程序</span></div>
 </div>
 
 <!-- 1. 系统概述 -->
@@ -71,8 +71,8 @@ table td code{background:#f5f5f5;padding:1px 6px;border-radius:3px;font-size:12p
 <tr><td>合拍人</td><td><code>partner_user</code></td><td>从候选人池随机抽取，需配合打卡人完成双人合拍的人员。合拍人只需到场，拍照由打卡人手机完成</td></tr>
 <tr><td>抽验</td><td><code>co-photo-verification</code></td><td>"双人合拍验证"的简称，在常规打卡基础上增加的随机验证环节</td></tr>
 <tr><td>候选人池</td><td><code>candidate_pool</code></td><td>可供抽取作为合拍人的在册人员集合，分上班卡/下班卡不同范围</td></tr>
-<tr><td>确认窗口</td><td><code>confirm_window</code></td><td>合拍人响应时限 = <strong>5分钟</strong>，写死不可配置</td></tr>
-<tr><td>执行窗口</td><td><code>execution_window</code></td><td>从被抽中到完成合拍的总时限 = <strong>15分钟</strong>，写死不可配置</td></tr>
+<tr><td>确认窗口</td><td><code>confirm_window</code></td><td>合拍人响应时限，<strong>运维配置项</strong>（默认5分钟），在规则配置模块按组织域调整</td></tr>
+<tr><td>执行窗口</td><td><code>execution_window</code></td><td>从被抽中到完成合拍的总时限，<strong>运维配置项</strong>（默认15分钟），在规则配置模块按组织域调整</td></tr>
 <tr><td>降级打卡</td><td><code>downgrade</code></td><td>候选人池枯竭或执行窗口超时后，降级为单人打卡并标记异常</td></tr>
 <tr><td>项目规则例外</td><td><code>rule_exception</code></td><td>特定项目的独立规则配置，标记 <code>is_locked=true</code>，不被上级组织域下发覆盖</td></tr>
 </table>
@@ -81,7 +81,7 @@ table td code{background:#f5f5f5;padding:1px 6px;border-radius:3px;font-size:12p
 <table>
 <tr><th>角色</th><th>端</th><th>主要操作</th></tr>
 <tr><td>打卡人（未抽中）</td><td>小程序</td><td>正常打卡 → 拍照上传（考勤人脸照片） → 微信人脸核验 → 打卡成功</td></tr>
-<tr><td>打卡人（被抽中）</td><td>小程序</td><td>单人打卡 → 被抽中 → 查看合拍通知 → 等待合拍人确认 → 双人合拍拍照 → 查看核验结果</td></tr>
+<tr><td>打卡人（被抽中）</td><td>小程序</td><td>进入打卡页（GPS+WiFi） → 点击打卡 → 被抽中 → 查看合拍通知 → 等待合拍人确认 → 拍照启用 → 双人合拍 → 查看核验结果</td></tr>
 <tr><td>合拍人</td><td>小程序</td><td>收到通知 → 查看邀请 → 接受/拒绝 → （接受后）前往汇合 → 配合拍照</td></tr>
 <tr><td>省级监管</td><td>监管端</td><td>全省看板 → 配置省级默认规则 → 下发至地市 → 风险预警全局视图</td></tr>
 <tr><td>市级监管</td><td>监管端</td><td>本市看板 → 微调规则 → 本市风险预警 → 下发督办</td></tr>
@@ -107,7 +107,7 @@ table td code{background:#f5f5f5;padding:1px 6px;border-radius:3px;font-size:12p
 &nbsp;&nbsp;<span class="entry">project-warning-detail.html</span><span class="comment"># 项目风险详情</span><br>
 &nbsp;&nbsp;<span class="comment"># === 小程序端 (15 个文件) ===</span><br>
 &nbsp;&nbsp;<span class="entry">mp-my.html</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># 我的（打卡人/合拍人 双角色 demo 切换）</span><br>
-&nbsp;&nbsp;<span class="entry">mp-co-photo-trigger.html</span>&nbsp;&nbsp;&nbsp;<span class="comment"># 合拍触发通知页（6模块/6情景 hash路由）</span><br>
+&nbsp;&nbsp;<span class="entry">mp-co-photo-trigger.html</span>&nbsp;&nbsp;&nbsp;<span class="comment"># 合拍触发通知页（6模块/5情景 hash路由）</span><br>
 &nbsp;&nbsp;<span class="entry">mp-co-photo-records.html</span>&nbsp;&nbsp;&nbsp;<span class="comment"># 合拍验证（验证请求/抽验记录/协助记录 三页签）</span><br>
 &nbsp;&nbsp;<span class="entry">mp-message.html</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># 消息公告（含合拍请求类型消息）</span><br>
 &nbsp;&nbsp;<span class="entry">mp-partner-invitation.html</span>&nbsp;<span class="comment"># 合拍邀请处理页（5分钟倒计时+拒绝原因）</span><br>
@@ -130,7 +130,7 @@ table td code{background:#f5f5f5;padding:1px 6px;border-radius:3px;font-size:12p
 <h2><span class="dot"></span>三、小程序端 — 完整交互规范</h2>
 
 <h3>3.1 合拍触发通知页（mp-co-photo-trigger.html）</h3>
-<p>打卡人完成单人打卡后被系统抽中，进入此页。页面通过 URL hash 切换 6 种情景：</p>
+<p>打卡人完成单人打卡后被系统抽中，进入此页。页面通过 URL hash 切换 5 种情景：</p>
 <table>
 <tr><th>Hash</th><th>情景</th><th>触发条件</th><th>模块②</th><th>模块④</th><th>模块⑤</th><th>模块⑥</th></tr>
 <tr><td><code>#normal</code></td><td>正常等待</td><td>抽中，等待确认</td><td>—（不显示）</td><td>显示</td><td>待确认（旋转）</td><td>占位15:00</td></tr>
@@ -138,9 +138,8 @@ table td code{background:#f5f5f5;padding:1px 6px;border-radius:3px;font-size:12p
 <tr><td><code>#swapped</code></td><td>被拒换人</td><td>第1人拒绝，系统换第2人</td><td>1人拒绝→换人提示</td><td>显示</td><td>待确认（旋转）</td><td>占位15:00</td></tr>
 <tr><td><code>#lastperson</code></td><td>最后一人</td><td>第2人拒绝，最后机会</td><td>2人拒绝轨迹</td><td>显示</td><td>待确认（旋转）</td><td>占位15:00</td></tr>
 <tr><td><code>#exhausted</code></td><td>候选人枯竭</td><td>池中无可用候选人</td><td>—（不显示）</td><td>不显示</td><td>不显示</td><td>不显示</td></tr>
-<tr><td><code>#offduty</code></td><td>下班卡抽中</td><td>下班卡被抽中</td><td>—（不显示）</td><td>显示</td><td>待确认（旋转）</td><td>占位15:00</td></tr>
 </table>
-<div class="callout info"><strong>开发要点：</strong>6种情景通过 hash 路由切换，模块②④⑤⑥按上述规则显隐。合拍人姓名/头像/手机号为 demo 静态数据，实际开发需从接口获取。<br><br><strong>拍照按钮逻辑：</strong>合拍人确认前，「开始拍照」按钮灰显不可点击，下方提示"待合拍人确认后方可开始拍照"。合拍人确认后（情景二）按钮恢复可点击，跳转合拍相机页。情景五（池枯竭）不受此限制，直接跳转单人打卡拍照页。</div>
+<div class="callout info"><strong>开发要点：</strong>5种情景通过 hash 路由切换，模块②④⑤⑥按上述规则显隐。合拍人姓名/头像/手机号为 demo 静态数据，实际开发需从接口获取。<br><br><strong>拍照按钮逻辑：</strong>合拍人确认前，「开始拍照」按钮灰显不可点击，下方提示"待合拍人确认后方可开始拍照"。合拍人确认后（情景二）按钮恢复可点击，跳转合拍相机页。情景五（池枯竭）不受此限制，直接跳转单人打卡拍照页。<br><br><strong>确认状态刷新机制：</strong>等待合拍人确认的状态卡片中，标题右侧提供蓝色「刷新」按钮，用户可手动点击立即查询合拍人是否已确认/拒绝。若用户未手动点击刷新，前端每 <strong>45秒</strong> 自动轮询一次合拍人确认状态。刷新期间按钮显示"刷新中…"并暂时禁用，防止重复请求。</div>
 
 <h3>3.2 合拍邀请处理页（mp-partner-invitation.html）</h3>
 <ul>
@@ -288,7 +287,7 @@ table td code{background:#f5f5f5;padding:1px 6px;border-radius:3px;font-size:12p
 <h3>5.3 定时任务</h3>
 <table>
 <tr><th>任务</th><th>频率</th><th>逻辑</th></tr>
-<tr><td>确认窗口超时扫描</td><td>每 30 秒</td><td>扫描 <code>status=pending AND now() > confirm_deadline</code>，自动标记 timeout 并触发换人</td></tr>
+<tr><td>确认窗口超时扫描</td><td>每 30 秒</td><td>扫描 <code>status=pending AND now() &gt; confirm_deadline</code>，自动标记 timeout 并触发换人判定：若当前已尝试的候选人次数超过配置上限 N，则降级为单人打卡；否则自动抽取下一个候选人</td></tr>
 <tr><td>执行窗口超时扫描</td><td>每 30 秒</td><td>扫描 <code>status=confirmed AND now() > expire_at AND result IS NULL</code>，标记 downgrade</td></tr>
 <tr><td>风险评分计算</td><td>每日 02:00</td><td>计算近30天数据，生成 person/project 评分</td></tr>
 </table>
@@ -301,10 +300,9 @@ table td code{background:#f5f5f5;padding:1px 6px;border-radius:3px;font-size:12p
 <!-- 6. 硬编码常量 -->
 <div class="section">
 <h2><span class="dot"></span>六、写死常量</h2>
+<div class="callout info"><strong>注意：</strong>确认窗口（默认5分钟）和执行窗口（默认15分钟）为<strong>运维可配置项</strong>，不在本表列出。其默认值及可调范围见规则配置模块（<code>rule-global.html</code> → 全局配置页签）。</div>
 <table>
 <tr><th>常量</th><th>值</th><th>适用范围</th></tr>
-<tr><td>确认窗口</td><td><code>5 * 60</code>（秒）</td><td>合拍人响应时限</td></tr>
-<tr><td>执行窗口</td><td><code>15 * 60</code>（秒）</td><td>从抽中到完成合拍总时限</td></tr>
 <tr><td>候选人更换上限</td><td><code>2</code>（可换2次，共3个候选人）</td><td>换人限制</td></tr>
 <tr><td>风险评分周期</td><td><code>30</code>（天）</td><td>近30天滚动</td></tr>
 <tr><td>GPS偏离阈值</td><td><code>500</code>（米）</td><td>超过计入偏离</td></tr>
@@ -317,6 +315,7 @@ table td code{background:#f5f5f5;padding:1px 6px;border-radius:3px;font-size:12p
 <!-- 7. 设计规范 -->
 <div class="section">
 <h2><span class="dot"></span>七、UI设计规范</h2>
+<div class="callout info"><strong>通用原则：</strong>整体布局、颜色体系、字体字号、间距、圆角、阴影等样式<strong>参考并复用系统现有模块样式</strong>，保持视觉一致性。原型中的具体色值/尺寸仅供参考布局关系，实际开发以系统现有样式为准。<br><br><strong>图标与图片：</strong>原型中使用的图标为示意占位，实际所需图标（菜单图标、状态图标、操作按钮图标等）、插图及图片资源，<strong>联系UI工程师提供</strong>标准切图。</div>
 
 <h3>7.1 监管端</h3>
 <table>
