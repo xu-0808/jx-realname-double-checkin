@@ -98,13 +98,13 @@ table td{color:#555}
 <h3>2.1 赣建宝小程序端（建筑工人使用）</h3>
 <table>
 <tr><th style="width:20px">#</th><th style="width:120px">功能模块</th><th>定位</th><th>主要功能内容</th></tr>
-<tr><td>1</td><td><strong>单人打卡</strong></td><td>日常考勤基础功能，保持不变</td><td>WiFi校验→人脸采集→活体检测→打卡成功。在此基础上增加：打卡完成后系统随机判定是否触发双人合拍</td></tr>
-<tr><td>2</td><td><strong>合拍触发通知</strong></td><td>告知打卡人被抽中需完成双人合拍</td><td>展示合拍人信息、确认状态、拒绝历史、倒计时。不可拒绝/换人，需联系合拍人配合完成</td></tr>
+<tr><td>1</td><td><strong>单人打卡</strong></td><td>日常考勤基础功能，保持不变</td><td>未抽中：打卡页→拍照上传→微信人脸核验→打卡成功。被抽中：打卡完成后系统随机触发双人合拍验证</td></tr>
+<tr><td>2</td><td><strong>合拍触发通知</strong></td><td>告知打卡人被抽中需完成双人合拍</td><td>展示合拍人信息、确认状态、拒绝历史、倒计时。不可拒绝/换人，需等待合拍人确认后方可开始拍照</td></tr>
 <tr><td>3</td><td><strong>合拍拍照</strong></td><td>完成双人实时合影拍摄</td><td>横版取景框+双人人脸引导框，强制实时拍摄禁止相册，自动叠加GPS+项目+人员+时间水印</td></tr>
 <tr><td>4</td><td><strong>核验结果</strong></td><td>展示合拍照片的人脸核验结果</td><td>加载→核验通过（考勤成功）/ 核验不通过（可重拍，15分钟内不限次数）</td></tr>
 <tr><td>5</td><td><strong>合拍邀请处理</strong></td><td>合拍人响应合拍请求</td><td>5分钟内接受或拒绝，接受后获得打卡人信息与汇合指引（拍照由打卡人手机完成）</td></tr>
 <tr><td>6</td><td><strong>消息通知</strong></td><td>接收合拍请求通知</td><td>在现有消息列表中增加"合拍请求"类型消息，"去处理"按钮跳转至处理页面</td></tr>
-<tr><td>7</td><td><strong>合拍验证记录</strong></td><td>查看个人的合拍历史</td><td>两个页签：抽验记录（我作为打卡人）/ 协助记录（我作为合拍人）</td></tr>
+<tr><td>7</td><td><strong>合拍验证</strong></td><td>查看合拍相关的请求与历史</td><td>三个页签：验证请求（待处理的合拍打卡请求）/ 抽验记录（我作为打卡人）/ 协助记录（我作为合拍人）</td></tr>
 </table>
 
 <h3>2.2 监管端Web（主管部门使用）</h3>
@@ -113,7 +113,7 @@ table td{color:#555}
 <tr><td>1</td><td><strong>数据看板</strong></td><td>全局数据概览，一屏掌握整体态势</td><td>统计卡片（触发人次/通过率/预警/高风险）、项目排名、预警分布、通过率趋势图、辖区动态</td></tr>
 <tr><td>2</td><td><strong>规则配置</strong></td><td>按组织层级配置合拍参数</td><td>全局配置：上班卡/下班卡抽取率、候选人池阈值、下发至下级组织域。项目规则例外：特定项目独立规则且不被下发覆盖</td></tr>
 <tr><td>3</td><td><strong>抽验记录</strong></td><td>按时间线查看每条抽验详情</td><td>支持按项目/人员/区划/类型/结果/时间多维筛选。详情页含完整核验轨迹（换人记录+多次拍照+每次分数）</td></tr>
-<tr><td>4</td><td><strong>抽验汇总</strong></td><td>以人员/项目维度聚合查看全量累计数据</td><td>人员汇总：每人总抽验次数、通过率、角色分布、常见合拍人。项目汇总：项目抽验总人次、通过率、关键岗位表现</td></tr>
+<tr><td>4</td><td><strong>抽验汇总</strong></td><td>以人员/项目维度聚合查看全量累计数据</td><td>人员汇总：每人总抽验次数、通过率、角色分布、常见合拍人、当前所在项目（用于区划归属）。项目汇总：项目抽验总人次、通过率、关键岗位表现。人员详情含跨项目抽验明细。</td></tr>
 <tr><td>5</td><td><strong>风险预警</strong></td><td>自动化风险评分与排序</td><td>人员风险排名（5指标加权评分）、项目风险排名（5指标加权评分），近30天滚动计算</td></tr>
 </table>
 </div>
@@ -130,7 +130,7 @@ table td{color:#555}
 <div class="flow-arrow">→</div>
 <div class="flow-box" style="border-color:#fa8c16"><h4>③ 被抽中</h4><p>6模块触发通知</p></div>
 <div class="flow-arrow">→</div>
-<div class="flow-box"><h4>④ 联系合拍人</h4><p>等待确认/直接拍照</p></div>
+<div class="flow-box"><h4>④ 等待确认</h4><p>合拍人确认后拍照</p></div>
 <div class="flow-arrow">→</div>
 <div class="flow-box"><h4>⑤ 双人合拍</h4><p>横版取景+水印</p></div>
 <div class="flow-arrow">→</div>
