@@ -259,6 +259,42 @@
 
     .exhausted-empty { text-align: center; padding: 28px 0; color: #bbb; }
 
+    /* ====== ⑦ 拍照设备弹窗 ====== */
+    .modal-overlay {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.45);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 200; padding: 40px;
+    }
+    .modal-card {
+      background: #fff; border-radius: 16px;
+      padding: 28px 24px 24px; text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      width: 100%; max-width: 280px;
+      animation: modalIn 0.25s ease;
+    }
+    @keyframes modalIn {
+      from { transform: scale(0.85); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .modal-icon-circle {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: #eef4ff; margin: 0 auto 16px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .modal-icon-circle svg { width: 28px; height: 28px; color: #2563ff; }
+    .modal-title { font-size: 17px; font-weight: 700; color: #1a1a2e; margin-bottom: 10px; }
+    .modal-content { font-size: 13.5px; color: #666; line-height: 1.7; margin-bottom: 22px; }
+    .modal-content strong { color: #2563ff; }
+    .modal-btn {
+      width: 100%; background: linear-gradient(135deg, #2563ff, #1d4ed8);
+      color: #fff; border: none; border-radius: 10px;
+      padding: 12px; font-size: 15px; font-weight: 600; cursor: pointer;
+      box-shadow: 0 4px 12px rgba(37,99,255,0.2);
+      transition: all 0.15s;
+    }
+    .modal-btn:active { opacity: 0.9; transform: scale(0.98); }
+
     .scenario { display: none; }
     .scenario.active { display: block; }
   </style>
@@ -284,6 +320,9 @@
     </button>
     <button class="demo-scenario" onclick="switchScenario('exhausted')">
       <span class="dot dot-orange"></span>情景五：候选人池枯竭
+    </button>
+    <button class="demo-scenario" onclick="switchScenario('cophone')">
+      <span class="dot dot-purple"></span>拍照设备-合拍人手机
     </button>
     <button class="demo-scenario" onclick="location.href='mp-checkin-4.html'">
       <span class="dot dot-gray"></span>情景六：普通单人打卡
@@ -746,9 +785,106 @@
         </div>
       </div>
 
+      <!-- ========================
+           SCENARIO 6: 拍照设备-合拍人手机
+           ======================== -->
+      <div class="scenario" id="sc-cophone">
+
+        <!-- ① 横幅 -->
+        <div class="section-banner">
+          <div class="banner-strip">
+            <svg class="banner-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="1" fill="currentColor"/>
+            </svg>
+            <span class="banner-text">您被抽中需双人合拍验证</span>
+          </div>
+        </div>
+
+        <!-- ② 合拍人员信息卡片 -->
+        <div class="section-partner">
+          <div class="partner-card">
+            <div class="partner-stamp">合<br>拍<br>人</div>
+            <div class="partner-avatar-wrap">
+              <img src="avatar-worker-1.png" alt="刘建国">
+            </div>
+            <div class="partner-info">
+              <div class="name">刘建国</div>
+              <div class="role">施工员 · 施工单位</div>
+              <div class="phone">138****5678</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑤ 确认状态：已确认 -->
+        <div class="section-confirm">
+          <div class="confirm-box confirmed">
+            <div class="confirm-row">
+              <div class="confirm-icon-circle confirmed-bg">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#16a34a" stroke-width="3">
+                  <polyline points="4,12 10,18 20,6"/>
+                </svg>
+              </div>
+              <div class="confirm-text">
+                <div class="confirm-title green">刘建国已确认就位</div>
+                <div class="confirm-sub">合拍人已在手机上确认，可以开始合拍。</div>
+              </div>
+            </div>
+            <div class="confirm-accepted-time">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><polyline points="20,6 9,17 4,12"/></svg>
+              确认时间：2026-07-28 11:01:15（用时 35 秒）
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑥ 合拍执行倒计时 -->
+        <div class="section-countdown">
+          <div class="countdown-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+            合拍执行倒计时
+          </div>
+          <div class="countdown-start-time">开始计时时间：<strong>2026-07-28 11:01:15</strong></div>
+          <div class="countdown-remaining">14:20</div>
+          <div class="countdown-sub">合拍执行时限为15分钟，超时未完成则验证失败，系统标记后降级为单人打卡</div>
+        </div>
+
+        <!-- ⑤ 合拍规范示例 -->
+        <div class="section-guide">
+          <div class="guide-photo">
+            <div class="guide-photo-label">合拍规范示例图</div>
+            <img src="co-photo-demo.jpg" alt="双人合拍示意">
+          </div>
+          <div class="guide-tips">
+            <div class="guide-tip-item"><span class="blue-dot"></span>合拍必须调用手机摄像头<strong>实时拍摄</strong>，禁止从相册选取</div>
+            <div class="guide-tip-item"><span class="blue-dot"></span>系统将自动记录拍摄时间戳与 GPS 定位信息</div>
+            <div class="guide-tip-item"><span class="blue-dot"></span>合拍照片将作为打卡凭证存档，请确保两人面部清晰可见</div>
+          </div>
+        </div>
+
+        <!-- ⑥ 操作区 -->
+        <div class="section-actions" id="cophone-actions">
+          <a href="javascript:void(0)" class="btn-photo" onclick="showPhotoDeviceModal()">📷 开始拍照</a>
+        </div>
+      </div>
+
     </div><!-- .content -->
 
     </div><!-- .phone -->
+
+    <!-- 拍照设备弹窗 -->
+    <div class="modal-overlay" id="photoDeviceModal" style="display:none;">
+      <div class="modal-card">
+        <div class="modal-icon-circle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+            <line x1="12" y1="18" x2="12.01" y2="18"/>
+          </svg>
+        </div>
+        <div class="modal-title">拍照设备提示</div>
+        <div class="modal-content">系统抽中需使用合拍人 <strong>刘建国</strong> 手机进行合拍验证。请配合合拍人完整验证。</div>
+        <button class="modal-btn" onclick="closePhotoDeviceModal()">知道了，等待合拍人</button>
+      </div>
+    </div>
+
     <div class="home-bar"></div>
   </div>
   <div class="side-btn btn-power"></div>
@@ -759,12 +895,14 @@
 
 <script>
 function switchScenario(name) {
+  resetCophoneState();
   document.querySelectorAll('.scenario').forEach(el => el.classList.remove('active'));
   document.getElementById('sc-' + name).classList.add('active');
   document.querySelectorAll('.demo-scenario').forEach(btn => btn.classList.remove('active'));
   var map = {
     normal:'情景一', confirmed:'情景二', swapped:'情景三',
-    lastperson:'情景四', exhausted:'情景五'
+    lastperson:'情景四', exhausted:'情景五',
+    cophone:'拍照设备-合拍人'
   };
   var match = map[name] || '';
   document.querySelectorAll('.demo-scenario').forEach(function(btn) {
@@ -773,7 +911,7 @@ function switchScenario(name) {
   var titles = {
     normal:'双人合拍验证', confirmed:'双人合拍验证',
     swapped:'双人合拍验证', lastperson:'双人合拍验证',
-    exhausted:'双人合拍验证'
+    exhausted:'双人合拍验证', cophone:'双人合拍验证'
   };
   document.getElementById('headerTitle').textContent = titles[name] || '双人合拍验证';
   window.location.hash = name;
@@ -781,7 +919,7 @@ function switchScenario(name) {
 
 (function(){
   var h = window.location.hash.replace('#','');
-  var valid = ['normal','confirmed','swapped','lastperson','exhausted'];
+  var valid = ['normal','confirmed','swapped','lastperson','exhausted','cophone'];
   if (valid.indexOf(h) >= 0) switchScenario(h);
 })();
 
@@ -793,6 +931,25 @@ function refreshConfirm(el) {
     el.classList.remove('refreshing');
     el.textContent = '刷新';
   }, 800);
+}
+
+function showPhotoDeviceModal() {
+  document.getElementById('photoDeviceModal').style.display = 'flex';
+}
+
+function closePhotoDeviceModal() {
+  document.getElementById('photoDeviceModal').style.display = 'none';
+  var actions = document.getElementById('cophone-actions');
+  actions.innerHTML = '<a class="btn-photo disabled">⏳ 等待合拍人拍照中...</a><div class="btn-hint">合拍人正在使用其手机进行合拍拍摄，请耐心等待</div>';
+}
+
+function resetCophoneState() {
+  var modal = document.getElementById('photoDeviceModal');
+  if (modal) modal.style.display = 'none';
+  var actions = document.getElementById('cophone-actions');
+  if (actions) {
+    actions.innerHTML = '<a href="javascript:void(0)" class="btn-photo" onclick="showPhotoDeviceModal()">📷 开始拍照</a>';
+  }
 }
 </script>
 

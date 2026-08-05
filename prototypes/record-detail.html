@@ -122,7 +122,7 @@
       <div class="submenu-item"><a href="index.html">数据看板</a></div>
       <div class="submenu-item"><a href="rule-global.html">规则配置</a></div>
       <div class="submenu-item active"><a href="records.html">抽验记录</a></div>
-      <div class="submenu-item"><a href="risk-warning.html">风险预警</a></div>
+      <div class="submenu-item"><a href="data-stats.html">数据统计</a></div>
     </div>
     <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 22V2h12v20"/><path d="M18 22H6"/></svg> 工程发检监管</span></div>
     <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12a2 2 0 0 0 2 2h14v-4"/></svg> 劳务用工监管</span></div>
@@ -145,7 +145,7 @@
     <div class="info-grid">
       <div class="card"><div class="card-header"><div class="card-title">人员信息</div></div><div class="card-body" id="personInfo"></div></div>
       <div class="card"><div class="card-header"><div class="card-title">项目信息</div></div><div class="card-body" id="projectInfo"></div></div>
-      <div class="card"><div class="card-header"><div class="card-title">合拍照片</div></div><div class="card-body" id="photoInfo"></div></div>
+      <div class="card"><div class="card-header"><div class="card-title">验证结果</div></div><div class="card-body" id="photoInfo"></div></div>
     </div>
 
     <div class="card"><div class="card-header"><div class="card-title">核验轨迹</div></div>
@@ -176,12 +176,12 @@
       '<div class="info-row"><span class="info-label">所属区县</span><span class="info-value">南昌经济技术开发区</span></div>'+
       '<div class="info-row"><span class="info-label">打卡GPS</span><span class="info-value">115.853, 28.684</span></div>';
     document.getElementById('photoInfo').innerHTML =
-      mkPhoto()+
-      '<div class="score-row">'+
+      '<div class="score-row" style="margin-top:0;">'+
         '<div class="score-item"><div class="score-val" style="color:#52c41a;">96.2%</div><div class="score-label">核验分数</div></div>'+
         '<div class="score-item"><div class="score-val" style="color:#1890ff;">实时</div><div class="score-label">拍摄方式</div></div>'+
         '<div class="score-item"><div class="score-val" style="color:#52c41a;">通过</div><div class="score-label">活体检测</div></div>'+
-      '</div>';
+      '</div>'+
+      '<div style="margin-top:10px;padding:8px 12px;background:#f5f5f5;border-radius:4px;font-size:12px;color:#999;">📷 合拍照片已后台留存，不对外展示</div>';
     document.getElementById('timelineBody').innerHTML =
       '<div class="timeline-item"><div class="tl-dot blue"></div><div class="tl-time">07-27 18:05:10</div><div class="tl-body"><div class="tl-title">触发抽验</div><div class="tl-desc">系统按规则（下班卡15%抽取率）随机抽中 <strong>张工（技术负责人）</strong>，本次下班打卡需进行双人合拍验证。15分钟合拍窗口开始计时。</div></div></div>'+
       '<div class="timeline-item"><div class="tl-dot blue"></div><div class="tl-time">07-27 18:05:11</div><div class="tl-body"><div class="tl-title">分配合拍人（第1次）</div><div class="tl-desc">系统从候选人池抽取 <strong>李明华（安全员）</strong> 作为合拍人。同时向张工与李明华推送合拍通知。5分钟确认窗口开始。</div></div></div>'+
@@ -190,7 +190,7 @@
       '<div class="timeline-item"><div class="tl-dot blue"></div><div class="tl-time">07-27 18:07:36</div><div class="tl-body"><div class="tl-title">分配合拍人（第2次·更换）</div><div class="tl-desc">系统从候选人池重新抽取 <strong>刘建国（施工员）</strong> 作为新合拍人。向刘建国推送合拍通知，重新开始5分钟确认窗口。</div></div></div>'+
       '<div class="timeline-item"><div class="tl-dot green"></div><div class="tl-time">07-27 18:09:50</div><div class="tl-body"><div class="tl-title">合拍人确认接受（第2人）</div><div class="tl-desc">刘建国在确认窗口内<span style="color:#52c41a;">接受</span>了合拍请求（距通知发出 2分14秒）。张工与刘建国开始汇合准备拍照。</div></div></div>'+
       '<div class="timeline-item"><div class="tl-dot blue"></div><div class="tl-time">07-27 18:16:00</div><div class="tl-body"><div class="tl-title">开始合拍拍照</div><div class="tl-desc">打卡人 张工 使用 OPPO Find X7 启动合拍相机，开始实时拍摄。</div></div></div>'+
-      '<div class="timeline-item"><div class="tl-dot orange"></div><div class="tl-time">07-27 18:16:45</div><div class="tl-body"><div class="tl-title">提交核验</div><div class="tl-desc">一次拍摄即提交系统进行人脸核验。</div><div class="tl-extra"><div class="tl-extra-label">📷 提交照片</div><div class="mini-photo pass"><div class="watermark">最终</div><div class="mp2"><div class="mpa"></div><div class="mpa"></div></div></div></div></div>'+
+      '<div class="timeline-item"><div class="tl-dot orange"></div><div class="tl-time">07-27 18:16:45</div><div class="tl-body"><div class="tl-title">提交核验</div><div class="tl-desc">一次拍摄即提交系统进行人脸核验。</div></div>'+
       '<div class="timeline-item"><div class="tl-dot green"></div><div class="tl-time">07-27 18:22:10</div><div class="tl-body"><div class="tl-title">核验通过 ✓</div><div class="tl-desc">人脸核验得分 <span style="color:#52c41a;font-weight:600;">96.2%</span>。本次合拍经历 <strong>1次换人</strong>（李明华→刘建国），一次拍摄通过。总耗时约 17分钟。</div></div></div>';
 
   } else {
@@ -208,20 +208,20 @@
       '<div class="info-row"><span class="info-label">所属区县</span><span class="info-value">南昌经济技术开发区</span></div>'+
       '<div class="info-row"><span class="info-label">打卡GPS</span><span class="info-value">115.854, 28.683</span></div>';
     document.getElementById('photoInfo').innerHTML =
-      mkPhoto()+
-      '<div class="score-row">'+
+      '<div class="score-row" style="margin-top:0;">'+
         '<div class="score-item"><div class="score-val" style="color:#52c41a;">94.7%</div><div class="score-label">核验分数</div></div>'+
         '<div class="score-item"><div class="score-val" style="color:#1890ff;">实时</div><div class="score-label">拍摄方式</div></div>'+
         '<div class="score-item"><div class="score-val" style="color:#52c41a;">通过</div><div class="score-label">活体检测</div></div>'+
-      '</div>';
+      '</div>'+
+      '<div style="margin-top:10px;padding:8px 12px;background:#f5f5f5;border-radius:4px;font-size:12px;color:#999;">📷 合拍照片已后台留存，不对外展示</div>';
     document.getElementById('timelineBody').innerHTML =
       '<div class="timeline-item"><div class="tl-dot blue"></div><div class="tl-time">07-28 10:23:05</div><div class="tl-body"><div class="tl-title">触发抽验</div><div class="tl-desc">系统按规则（上班卡30%抽取率）随机抽中 <strong>德小拓（项目经理）</strong>，本次打卡需进行双人合拍验证。15分钟合拍执行窗口开始计时。</div></div></div>'+
       '<div class="timeline-item"><div class="tl-dot blue"></div><div class="tl-time">07-28 10:23:06</div><div class="tl-body"><div class="tl-title">分配合拍人（第1次）</div><div class="tl-desc">系统从候选人池抽取 <strong>刘建国（施工员）</strong> 作为合拍人。同时向德小拓与刘建国推送合拍通知，合拍人需在 5分钟确认窗口内响应。</div></div></div>'+
       '<div class="timeline-item"><div class="tl-dot green"></div><div class="tl-time">07-28 10:25:18</div><div class="tl-body"><div class="tl-title">合拍人确认接受</div><div class="tl-desc">刘建国在确认窗口内<span style="color:#52c41a;">接受</span>了合拍请求（距通知发出 2分12秒）。双方开始汇合准备拍照。</div></div></div>'+
       '<div class="timeline-item"><div class="tl-dot blue"></div><div class="tl-time">07-28 10:58:30</div><div class="tl-body"><div class="tl-title">开始合拍拍照</div><div class="tl-desc">打卡人 德小拓 使用 Xiaomi 15 Pro 启动合拍相机。</div></div></div>'+
-      '<div class="timeline-item"><div class="tl-dot red"></div><div class="tl-time">07-28 10:58:45</div><div class="tl-body"><div class="tl-title">第 1 次拍照 · 核验未通过</div><div class="tl-desc">人脸核验分数 <span style="color:#ff4d4f;">62.3%</span>，低于通过阈值。原因：光线不足导致面部特征模糊。</div><div class="tl-extra"><div class="tl-extra-label">📷 本次拍摄照片</div><div class="mini-photo"><div class="watermark">第1次</div><div class="mp2"><div class="mpa"></div><div class="mpa"></div></div></div><span class="score-tag" style="color:#ff4d4f;">分数 62.3%</span></div></div>'+
-      '<div class="timeline-item"><div class="tl-dot red"></div><div class="tl-time">07-28 10:59:20</div><div class="tl-body"><div class="tl-title">第 2 次拍照 · 核验未通过</div><div class="tl-desc">人脸核验分数 <span style="color:#ff4d4f;">71.5%</span>，低于通过阈值。原因：合拍人面部部分被遮挡。</div><div class="tl-extra"><div class="tl-extra-label">📷 本次拍摄照片</div><div class="mini-photo"><div class="watermark">第2次</div><div class="mp2"><div class="mpa"></div><div class="mpa"></div></div></div><span class="score-tag" style="color:#ff4d4f;">分数 71.5%</span></div></div>'+
-      '<div class="timeline-item"><div class="tl-dot orange"></div><div class="tl-time">07-28 11:02:05</div><div class="tl-body"><div class="tl-title">第 3 次拍照 · 提交核验</div><div class="tl-desc">打卡人调整光线和角度后重新拍摄，提交系统进行第 3 次人脸核验。</div><div class="tl-extra"><div class="tl-extra-label">📷 本次拍摄照片（最终提交）</div><div class="mini-photo pass"><div class="watermark">第3次</div><div class="mp2"><div class="mpa"></div><div class="mpa"></div></div></div></div></div>'+
+      '<div class="timeline-item"><div class="tl-dot red"></div><div class="tl-time">07-28 10:58:45</div><div class="tl-body"><div class="tl-title">第 1 次拍照 · 核验未通过</div><div class="tl-desc">人脸核验分数 <span style="color:#ff4d4f;">62.3%</span>，低于通过阈值。原因：光线不足导致面部特征模糊。</div></div>'+
+      '<div class="timeline-item"><div class="tl-dot red"></div><div class="tl-time">07-28 10:59:20</div><div class="tl-body"><div class="tl-title">第 2 次拍照 · 核验未通过</div><div class="tl-desc">人脸核验分数 <span style="color:#ff4d4f;">71.5%</span>，低于通过阈值。原因：合拍人面部部分被遮挡。</div></div>'+
+      '<div class="timeline-item"><div class="tl-dot orange"></div><div class="tl-time">07-28 11:02:05</div><div class="tl-body"><div class="tl-title">第 3 次拍照 · 提交核验</div><div class="tl-desc">打卡人调整光线和角度后重新拍摄，提交系统进行第 3 次人脸核验。</div></div>'+
       '<div class="timeline-item"><div class="tl-dot green"></div><div class="tl-time">07-28 11:05:35</div><div class="tl-body"><div class="tl-title">核验通过 ✓</div><div class="tl-desc">人脸核验得分 <span style="color:#52c41a;font-weight:600;">94.7%</span>。本次共尝试 3 次拍照，2 次未通过后最终通过。</div></div></div>';
   }
 })();

@@ -60,12 +60,12 @@ table td{color:#555}
 </style>
 </head>
 <body>
-<div class="topbar"><div class="brand">江西省建筑工人实名制管理服务信息平台</div><div class="sub">面向客户 · 方案说明书 v1.1</div></div>
+<div class="topbar"><div class="brand">江西省建筑工人实名制管理服务信息平台</div><div class="sub">面向客户 · 方案说明书 v1.2</div></div>
 <div class="wrapper">
 
 <div class="title-block">
 <h1>实名制双人打卡 — 方案说明书</h1>
-<div class="meta"><span>版本 v1.1</span><span>2026-07-31</span><span>适用范围：江西省住建厅 / 各地市住建局 / 各区县主管部门</span></div>
+<div class="meta"><span>版本 v1.2</span><span>2026-07-31</span><span>适用范围：江西省住建厅 / 各地市住建局 / 各区县主管部门</span></div>
 </div>
 
 <!-- 1. 背景 -->
@@ -98,23 +98,23 @@ table td{color:#555}
 <h3>2.1 赣建宝小程序端（建筑工人使用）</h3>
 <table>
 <tr><th style="width:20px">#</th><th style="width:120px">功能模块</th><th>定位</th><th>主要功能内容</th></tr>
-<tr><td>1</td><td><strong>单人打卡</strong></td><td>日常考勤基础功能，保持不变</td><td>未抽中：打卡页→拍照上传→微信人脸核验→打卡成功。被抽中：打卡完成后系统随机触发双人合拍验证</td></tr>
-<tr><td>2</td><td><strong>合拍触发通知</strong></td><td>告知打卡人被抽中需完成双人合拍</td><td>展示合拍人信息、确认状态、拒绝历史、倒计时。不可拒绝/换人，需等待合拍人确认后方可开始拍照</td></tr>
-<tr><td>3</td><td><strong>合拍拍照</strong></td><td>完成双人实时合影拍摄</td><td>横版取景框+双人人脸引导框，强制实时拍摄禁止相册，自动叠加GPS+项目+人员+时间水印</td></tr>
+<tr><td>1</td><td><strong>单人打卡</strong></td><td>日常考勤基础功能，保持不变</td><td>未抽中：打卡页→拍照上传→微信人脸核验→打卡成功。被抽中：微信刷脸验证→双人合拍验证（自选或系统随机分配合拍人）</td></tr>
+<tr><td>2</td><td><strong>合拍触发通知</strong></td><td>告知打卡人被抽中需完成双人合拍</td><td>展示合拍人信息、确认状态、拒绝历史、倒计时。拍照设备随机分配（可配置由谁手机拍照），合拍人确认后方可开始拍照</td></tr>
+<tr><td>3</td><td><strong>合拍拍照</strong></td><td>完成双人实时合影拍摄</td><td>横版取景框+双人人脸引导框，强制实时拍摄禁止相册，自动叠加GPS+项目+人员+时间水印。可由打卡人或合拍人手机完成</td></tr>
 <tr><td>4</td><td><strong>核验结果</strong></td><td>展示合拍照片的人脸核验结果</td><td>加载→核验通过（考勤成功）/ 核验不通过（可重拍，15分钟内不限次数）</td></tr>
-<tr><td>5</td><td><strong>合拍邀请处理</strong></td><td>合拍人响应合拍请求</td><td>5分钟内接受或拒绝，接受后获得打卡人信息与汇合指引（拍照由打卡人手机完成）</td></tr>
+<tr><td>5</td><td><strong>合拍邀请处理</strong></td><td>合拍人响应合拍请求</td><td>5分钟内接受或拒绝，接受后获得打卡人信息与汇合指引（拍照设备随机分配，可能由合拍人手机完成拍照）</td></tr>
 <tr><td>6</td><td><strong>消息通知</strong></td><td>接收合拍请求通知</td><td>在现有消息列表中增加"合拍请求"类型消息，"去处理"按钮跳转至处理页面</td></tr>
-<tr><td>7</td><td><strong>合拍验证</strong></td><td>查看合拍相关的请求与历史</td><td>三个页签：验证请求（待处理的合拍打卡请求）/ 抽验记录（我作为打卡人）/ 协助记录（我作为合拍人）</td></tr>
+<tr><td>7</td><td><strong>合拍验证</strong></td><td>查看合拍相关的请求与历史</td><td>三个页签：验证请求（待处理的合拍打卡请求，有待处理时图标显示<strong>红点提醒</strong>）/ 抽验记录（我作为打卡人）/ 协助记录（我作为合拍人）</td></tr>
 </table>
 
 <h3>2.2 监管端Web（主管部门使用）</h3>
 <table>
 <tr><th style="width:20px">#</th><th style="width:120px">功能模块</th><th>定位</th><th>主要功能内容</th></tr>
 <tr><td>1</td><td><strong>数据看板</strong></td><td>全局数据概览，一屏掌握整体态势</td><td>统计卡片（触发人次/通过率/预警/高风险）、项目排名、预警分布、通过率趋势图、辖区动态</td></tr>
-<tr><td>2</td><td><strong>规则配置</strong></td><td>按组织层级配置合拍参数</td><td>全局配置：上班卡/下班卡抽取率、候选人池阈值、下发至下级组织域。项目规则例外：特定项目独立规则且不被下发覆盖</td></tr>
-<tr><td>3</td><td><strong>抽验记录</strong></td><td>按时间线查看每条抽验详情</td><td>支持按项目/人员/区划/类型/结果/时间多维筛选。详情页含完整核验轨迹（换人记录+多次拍照+每次分数）</td></tr>
+<tr><td>2</td><td><strong>规则配置</strong></td><td>按组织层级配置合拍参数</td><td>全局配置：上班卡/下班卡抽取率、候选人池阈值、合拍人产生方式（系统随机/自选）、拍照设备分配、下发至下级组织域。项目规则例外：<strong>权限下放至地市/区县</strong>自行管理辖区内特殊规则项目</td></tr>
+<tr><td>3</td><td><strong>抽验记录</strong></td><td>按时间线查看每条抽验详情</td><td>支持按项目/人员/区划/类型/结果/时间多维筛选。详情页含完整核验轨迹（换人记录+多次核验结果），<strong>不展示双人打卡照片</strong>（后台留存）</td></tr>
 <tr><td>4</td><td><strong>抽验汇总</strong></td><td>以人员/项目维度聚合查看全量累计数据</td><td>人员汇总：每人总抽验次数、通过率、角色分布、常见合拍人、当前所在项目（用于区划归属）。项目汇总：项目抽验总人次、通过率、关键岗位表现。人员详情含跨项目抽验明细。</td></tr>
-<tr><td>5</td><td><strong>风险预警</strong></td><td>自动化风险评分与排序</td><td>人员风险排名（5指标加权评分）、项目风险排名（5指标加权评分），近30天滚动计算</td></tr>
+<tr><td>5</td><td><strong>数据统计</strong></td><td>真实客观数据展示</td><td>展示累计抽验/拒绝/通过/未通过/降级次数等客观数据，不做风险评级和颜色标注。人员/项目双维度统计表，监管人员自行判断</td></tr>
 </table>
 </div>
 
@@ -133,11 +133,11 @@ table td{color:#555}
 <div class="flow-row" style="margin-top:8px">
 <div class="flow-box" style="border-color:#52c41a"><h4>├ 未抽中</h4><p>拍照→人脸核验→成功</p></div>
 <div style="width:60px;flex-shrink:0"></div>
-<div class="flow-box" style="border-color:#fa8c16"><h4>└ 被抽中</h4><p>抽取合拍人→合拍人响应→拍照</p></div>
+<div class="flow-box" style="border-color:#fa8c16"><h4>└ 被抽中</h4><p>微信刷脸验证→选合拍人</p></div>
 <div class="flow-arrow">→</div>
-<div class="flow-box"><h4>④ 双人合拍</h4><p>横版取景+水印</p></div>
+<div class="flow-box" style="border-color:#722ed1"><h4>④ 刷脸+选人</h4><p>刷脸通过→自选/随机</p></div>
 <div class="flow-arrow">→</div>
-<div class="flow-box" style="border-color:#52c41a"><h4>⑤ 人脸核验</h4><p>百度多搜V3</p></div>
+<div class="flow-box"><h4>⑤ 双人合拍</h4><p>随机设备拍照+水印</p></div>
 <div class="flow-arrow">→</div>
 <div class="flow-box" style="border-color:#52c41a"><h4>⑥ 打卡成功</h4><p>或降级单人打卡</p></div>
 </div>
@@ -149,9 +149,9 @@ table td{color:#555}
 <div class="flow-arrow">→</div>
 <div class="flow-box" style="border-color:#fa8c16"><h4>查看邀请</h4><p>5分钟确认窗口</p></div>
 <div class="flow-arrow">→</div>
-<div class="flow-box" style="border-color:#52c41a"><h4>接受</h4><p>提示前往汇合</p></div>
+<div class="flow-box" style="border-color:#52c41a"><h4>接受</h4><p>系统分配拍照设备</p></div>
 <div class="flow-arrow">→</div>
-<div class="flow-box"><h4>配合拍照</h4><p>打卡人手机拍摄</p></div>
+<div class="flow-box"><h4>配合拍照</h4><p>打卡人或合拍人手机</p></div>
 </div>
 <div class="flow-row" style="margin-top:8px;padding-left:234px">
 <div class="flow-box" style="border-color:#ff4d4f"><h4>拒绝 / 超时</h4><p>选原因→进入 N 次判定</p></div>
@@ -211,17 +211,32 @@ table td{color:#555}
 <li>每天每次打卡独立抽取，跨天重置</li>
 </ul>
 
+<h3>4.4 合拍人产生方式</h3>
+<p>合拍人的产生方式为<strong>运维配置项</strong>，支持两种模式：</p>
+<ul>
+<li><strong>系统随机（默认）：</strong>系统从候选人池中随机抽取一名合拍人</li>
+<li><strong>自选：</strong>被抽中人员自行从可选人员列表中选择合拍人。可选列表来源：当前工地在场已打上班卡未打下班卡的岗位人员（排除自己）。选择限时5分钟（可配），超时系统随机抽取。列表为空时降级为单人打卡</li>
+</ul>
+
 <h3>4.4 合拍拍照规则</h3>
 <ul>
 <li><strong>强制实时拍摄：</strong>调用手机摄像头实时取景，禁止从相册选择</li>
 <li><strong>横版取景框：</strong>包含两个虚线头肩轮廓引导框，辅助站位</li>
 <li><strong>自动水印叠加：</strong>GPS定位坐标 + 项目名称 + 打卡人姓名 + 拍摄时间戳</li>
-<li><strong>拍照人：</strong>始终由打卡人手机完成，合拍人只需到场配合</li>
+<li><strong>拍照设备随机分配：</strong>合拍人确认后系统随机判定由谁手机拍照，概率可配置（默认各50%）</li>
+<li><strong>合拍人手机拍照时：</strong>打卡人端弹窗提示"系统抽中需使用合拍人手机拍照"，合拍人端展示"开始合拍"按钮</li>
 <li><strong>确认后方可拍照：</strong>打卡人需等待合拍人确认接受后，方可点击"开始拍照"进行合拍</li>
 <li><strong>状态刷新：</strong>等待合拍人确认期间，点击"刷新"可即时查询确认状态；系统每45秒自动轮询一次</li>
 </ul>
 
-<h3>4.5 换人与降级规则</h3>
+<h3>4.5 被抽中刷脸验证规则</h3>
+<ul>
+<li>被抽中需双人打卡的人员，点击打卡按钮后<strong>先进行微信真人刷脸验证</strong></li>
+<li>刷脸通过 → 进入双人打卡流程；刷脸失败 → 返回打卡页，不能打卡</li>
+<li><strong>当日免重复：</strong>当日双人打卡流程未走完前，退出小程序再进入无需重复刷脸</li>
+</ul>
+
+<h3>4.6 换人与降级规则</h3>
 <ul>
 <li>合拍人拒绝或确认超时后，系统首先判定<strong>"是否大于配置的更换次数 N"</strong>（N 为运维参数，默认 2 次即最多 3 个候选人）</li>
 <li><strong>未超过 N 次：</strong>系统自动更换候选人，重新回到"抽取合拍人"步骤，触发新一轮通知和等待</li>
@@ -231,40 +246,29 @@ table td{color:#555}
 </ul>
 </div>
 
-<!-- 5. 风险预警 -->
+<!-- 5. 数据统计 -->
 <div class="section">
-<h2><span class="dot"></span>五、风险预警体系</h2>
-<p>基于<strong>近30天滚动数据</strong>，对人员和项目分别进行自动化风险评分。评分每日凌晨更新。</p>
+<h2><span class="dot"></span>五、数据统计</h2>
+<p>取消风险预警模块，改为展示<strong>真实客观数据统计</strong>。不进行风险评级，不以颜色标注风险等级。监管人员根据数据自行判断。</p>
 
-<h3>5.1 人员风险评分算法</h3>
+<h3>5.1 统计维度</h3>
 <table>
-<tr><th style="width:30px">#</th><th>指标</th><th style="width:60px">权重</th><th>计算方式</th><th>说明</th></tr>
-<tr><td>1</td><td>拒绝配合率</td><td><strong>30%</strong></td><td>作为合拍人被抽中后拒绝次数 ÷ 被抽中总次数</td><td>核心反挂职指标。项目经理常被抽中又常拒绝，说明不在工地</td></tr>
-<tr><td>2</td><td>抽验未通过率</td><td><strong>25%</strong></td><td>作为打卡人抽验未通过次数 ÷ 抽验总次数</td><td>核查不通过可能意味着非本人或两人未真实同框</td></tr>
-<tr><td>3</td><td>超时/降级率</td><td><strong>20%</strong></td><td>超时或候选人枯竭降级次数 ÷ 抽验总次数</td><td>操作异常信号：找人不积极、合拍人不到场</td></tr>
-<tr><td>4</td><td>GPS偏离次数</td><td><strong>15%</strong></td><td>GPS与工地中心点距离 &gt;500m 的累计次数</td><td>虚拟定位嫌疑</td></tr>
-<tr><td>5</td><td>核验重试率</td><td><strong>10%</strong></td><td>单次合拍需拍摄 ≥2次的次数 ÷ 总合拍次数</td><td>反复尝试蒙混过关</td></tr>
+<tr><th>维度</th><th>展示字段</th><th>说明</th></tr>
+<tr><td>人员统计</td><td>姓名 / 项目 / 抽中次数 / 拒绝次数 / 通过次数 / 未通过次数 / 降级次数</td><td>按人员维度展示累计抽验数据</td></tr>
+<tr><td>项目统计</td><td>项目名称 / 项目区划 / 抽验总人次 / 拒绝次数 / 通过次数 / 未通过次数 / 降级次数</td><td>按项目维度展示累计抽验数据</td></tr>
 </table>
 
-<h3>5.2 项目风险评分算法</h3>
+<h3>5.2 顶部统计卡片</h3>
 <table>
-<tr><th style="width:30px">#</th><th>指标</th><th style="width:60px">权重</th><th>计算方式</th><th>说明</th></tr>
-<tr><td>1</td><td>关键岗位拒绝率</td><td><strong>30%</strong></td><td>项目经理/安全员等关键岗位被抽为合拍人后拒绝次数 ÷ 被抽总次数</td><td>关键岗位人员频繁拒绝说明项目管理松散</td></tr>
-<tr><td>2</td><td>抽验未通过率</td><td><strong>25%</strong></td><td>项目内所有人员抽验未通过次数 ÷ 总抽验次数</td><td>整体核验质量</td></tr>
-<tr><td>3</td><td>超时/降级率</td><td><strong>20%</strong></td><td>项目内超时降级次数 ÷ 总抽验次数</td><td>项目配合度</td></tr>
-<tr><td>4</td><td>合拍人集中度</td><td><strong>15%</strong></td><td>同一合拍人被≥3个不同打卡人使用的集中程度</td><td>疑似"职业配合者"长期蹲守代拍</td></tr>
-<tr><td>5</td><td>异常打卡人次比</td><td><strong>10%</strong></td><td>(GPS偏离+人脸核验不通过人次) ÷ 总打卡人次</td><td>项目级异常打卡严重程度</td></tr>
+<tr><th>统计项</th><th>说明</th></tr>
+<tr><td>累计抽验</td><td>上线至今双人打卡抽验总人次</td></tr>
+<tr><td>拒绝次数</td><td>合拍人拒绝合拍请求的累计次数</td></tr>
+<tr><td>通过次数</td><td>双人合拍核验通过的累计次数</td></tr>
+<tr><td>未通过次数</td><td>双人合拍核验未通过的累计次数</td></tr>
+<tr><td>降级次数</td><td>因候选人池枯竭或超时降级为单人打卡的累计次数</td></tr>
 </table>
 
-<h3>5.3 风险等级与处理建议</h3>
-<table>
-<tr><th>得分区间</th><th>等级</th><th>处理建议</th></tr>
-<tr><td>≥ 80</td><td><span class="tag red">高风险</span></td><td>重点核查，下发督办，必要时现场检查</td></tr>
-<tr><td>50 — 79</td><td><span class="tag orange">中风险</span></td><td>持续关注，定期复查数据分析</td></tr>
-<tr><td>&lt; 50</td><td><span class="tag green">低风险</span></td><td>正常管理，日常巡检</td></tr>
-</table>
-
-<div class="callout success"><strong>风险评分的价值：</strong>不同于单条预警规则的"是/否"判断，风险评分综合多维数据给出量化得分，帮助主管部门从海量人员/项目中精准识别应重点关注的对象。</div>
+<div class="callout"><strong>设计理念：</strong>监管人员看到客观数据（如某人被抽中10次、拒绝8次），可自行判断是否需要关注。不做主观风险评级，避免不同人员对同一数据有不同理解。</div>
 </div>
 
 <!-- 6. 权限 -->
@@ -272,20 +276,21 @@ table td{color:#555}
 <h2><span class="dot"></span>六、权限体系</h2>
 <table>
 <tr><th>账号级别</th><th>可查看范围</th><th>可操作权限</th></tr>
-<tr><td><strong>省级</strong>（省住建厅）</td><td>全省所有地市、区县数据</td><td>全省看板、配置省级默认规则、下发至地市、风险预警全局视图</td></tr>
-<tr><td><strong>市级</strong>（市住建局）</td><td>本市及下辖区县数据</td><td>本市看板、在省级框架内微调规则、本市风险预警、下发督办</td></tr>
-<tr><td><strong>区县级</strong>（区住建局）</td><td>本区县数据</td><td>本区县看板、查看风险详情、处理人员标记</td></tr>
+<tr><td><strong>省级</strong>（省住建厅）</td><td>全省所有地市、区县数据</td><td>全省看板、配置省级默认规则、下发至地市、数据统计全局视图、可管理全省所有项目规则例外</td></tr>
+<tr><td><strong>市级</strong>（市住建局）</td><td>本市及下辖区县数据</td><td>本市看板、在省级框架内微调规则、本市数据统计、<strong>管理本市及辖区项目规则例外</strong>、下发督办</td></tr>
+<tr><td><strong>区县级</strong>（区住建局）</td><td>本区县数据</td><td>本区县看板、<strong>管理本辖区项目规则例外</strong>、查看数据统计详情</td></tr>
 </table>
+<div class="callout"><strong>项目规则例外权限下放：</strong>各地市、区县可自行添加/解除其辖区内的特殊规则项目，无需逐级上报省级审批。下级单位添加的例外项目，上级单位可查看但不可修改；上级单位可强制解除下级的例外设置。</div>
 </div>
 
 <!-- 7. 价值 -->
 <div class="section">
 <h2><span class="dot"></span>七、方案核心价值</h2>
 <div class="card-grid">
-<div class="card"><h4>🔍 精准识别挂职</h4><p>合拍人确认制+拒绝/超时记录，让不在工地的人员无处遁形。数据异常直接成为管理证据。</p></div>
-<div class="card"><h4>📊 量化风险评估</h4><p>5维加权评分取代简单规则判断，主管部门可直观看到需要重点关注的人员和项目。</p></div>
+<div class="card"><h4>🔍 精准识别挂职</h4><p>合拍人确认制+刷脸验证+拒绝/超时记录，让不在工地的人员无处遁形。数据异常直接成为管理证据。</p></div>
+<div class="card"><h4>📊 客观数据统计</h4><p>真实数据展示取代主观风险评级，监管人员看到抽中/拒绝/通过/未通过等客观数据自行判断。</p></div>
 <div class="card"><h4>⏱ 轻量不扰民</h4><p>只在打卡时随机触发，正常在岗人员配合拍照仅需十几秒。上班卡30%、下班卡15%抽取率平衡威慑与负担。</p></div>
-<div class="card"><h4>📋 全过程可追溯</h4><p>每次抽验完整记录：谁触发、谁被选、谁拒绝、几次拍照、每次核验分数。全程留痕。</p></div>
+<div class="card"><h4>📋 全过程可追溯</h4><p>每次抽验完整记录：谁触发、谁被选、谁拒绝、几次拍照、每次核验分数。照片后台留存，全程留痕。</p></div>
 </div>
 </div>
 

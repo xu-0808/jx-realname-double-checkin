@@ -123,6 +123,18 @@
     .menu-icon svg { width: 26px; height: 26px; fill: currentColor; }
     .menu-text { font-size: 12px; color: #555; }
 
+    .menu-badge {
+      position: absolute;
+      top: 6px;
+      right: 10px;
+      width: 9px;
+      height: 9px;
+      background: #f44336;
+      border-radius: 50%;
+      border: 1.5px solid #fff;
+      box-shadow: 0 0 0 1px rgba(244,67,54,0.3);
+    }
+
     .icon-pink { background: linear-gradient(135deg, #ff8da1, #ffb3c1); }
     .icon-cyan { background: linear-gradient(135deg, #4ecdc4, #7fdbda); }
     .icon-purple { background: linear-gradient(135deg, #a78bfa, #c4b5fd); }
@@ -445,6 +457,7 @@
         <a href="mp-co-photo-records.html" class="menu-item" id="coPhotoRecordLink">
           <div class="menu-icon" style="background:linear-gradient(135deg,#f97316,#fb923c);">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="16" cy="16" r="3"/><path d="M12 13l-1-1M18 7l-3 3"/><circle cx="9" cy="8" r="4" stroke-dasharray="2 2"/><circle cx="16" cy="16" r="4" stroke-dasharray="2 2"/></svg>
+            <span class="menu-badge" id="coPhotoBadge" style="display:none;"></span>
           </div>
           <span class="menu-text">合拍验证</span>
         </a>
@@ -587,6 +600,7 @@ function switchAccount(role) {
   var userName = document.getElementById('userNameEl');
   var badgeRow = document.getElementById('badgeRowEl');
   var recordLink = document.getElementById('coPhotoRecordLink');
+  var coPhotoBadge = document.getElementById('coPhotoBadge');
   var flowLabel = document.getElementById('currentRoleLabel');
   var tabMsg = document.getElementById('tabMessage');
 
@@ -595,6 +609,7 @@ function switchAccount(role) {
     card2.classList.remove('active');
     notice.style.display = 'none';
     badge.style.display = 'none';
+    coPhotoBadge.style.display = 'none';
     recordLink.style.display = '';
     userName.innerHTML = '德小拓';
     badgeRow.innerHTML = '<span class="badge"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>已实名</span>';
@@ -605,6 +620,7 @@ function switchAccount(role) {
     card2.classList.add('active');
     notice.style.display = 'none';
     badge.style.display = 'flex';
+    coPhotoBadge.style.display = 'block';
     recordLink.style.display = '';
     userName.innerHTML = '刘建国';
     badgeRow.innerHTML = '<span class="badge blue"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>施工员</span>';

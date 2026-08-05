@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>微信刷脸验证 - 赣建宝</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: #e8ecf1;
+      display: flex; justify-content: center; align-items: center;
+      min-height: 100vh; padding: 20px;
+    }
+    .demo-wrapper { display: flex; align-items: flex-start; gap: 28px; }
+
+    /* ==== Demo Panel ==== */
+    .demo-panel {
+      background: #fff; border-radius: 14px;
+      padding: 20px 18px; box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+      width: 240px; flex-shrink: 0;
+    }
+    .demo-panel-title { font-size: 14px; font-weight: 700; color: #333; margin-bottom: 4px; }
+    .demo-panel-sub { font-size: 11px; color: #999; margin-bottom: 14px; }
+    .demo-scenario {
+      display: block; width: 100%;
+      padding: 10px 12px; border: 1.5px solid #e5e7eb; border-radius: 10px;
+      background: #fafbfc; font-size: 13px; color: #555; cursor: pointer;
+      text-align: left; margin-bottom: 8px; transition: all 0.18s; line-height: 1.5;
+      font-family: inherit; text-decoration: none;
+    }
+    .demo-scenario:hover { border-color: #93c5fd; background: #eff6ff; color: #2563ff; }
+    .demo-scenario.active {
+      border-color: #2563ff; background: #eef4ff; color: #1d4ed8;
+      font-weight: 600; box-shadow: 0 0 0 2px rgba(37,99,255,0.12);
+    }
+    .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 7px; vertical-align: middle; position: relative; top: -1px; }
+    .dot-green{background:#22c55e} .dot-red{background:#ef4444} .dot-blue{background:#3b82f6}
+    .demo-hint { font-size: 11px; color: #aaa; margin-top: 12px; padding-top: 10px; border-top: 1px solid #f0f0f0; line-height: 1.6; }
+
+    /* ==== Phone Frame ==== */
+    .phone-frame {
+      background: #1a1c1e; border-radius: 22px; padding: 10px;
+      box-shadow: 0 0 0 2px #2d2f31, 0 0 0 5px #1a1c1e, 0 10px 45px rgba(0,0,0,0.45);
+      position: relative; display: inline-block;
+    }
+    .phone-screen { width: 380px; height: 844px; border-radius: 14px; overflow: hidden; position: relative; border: 1px solid #333; }
+    .punch-hole { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); width: 10px; height: 10px; background: #111; border: 1px solid #333; border-radius: 50%; z-index: 100; }
+    .home-bar { position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); width: 110px; height: 4px; background: rgba(255,255,255,0.22); border-radius: 2px; z-index: 100; }
+    .side-btn { position: absolute; background: #2d2f31; border-radius: 2px; opacity: 0.7; }
+    .btn-power { right: -3px; top: 190px; width: 2px; height: 55px; }
+    .btn-vol-up { left: -3px; top: 180px; width: 2px; height: 38px; }
+    .btn-vol-down { left: -3px; top: 225px; width: 2px; height: 38px; }
+
+    .phone { width: 380px; height: 100%; background: #f5f6fa; position: relative; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; }
+
+    /* blue gradient header */
+    .status-bar {
+      height: 44px;
+      background: linear-gradient(135deg, #2563ff 0%, #1e90ff 100%);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 16px; color: #fff; font-size: 14px; font-weight: 600; z-index: 10;
+    }
+    .status-bar .time { font-size: 15px; }
+    .status-bar .icons { display: flex; align-items: center; gap: 5px; }
+    .status-bar .icons svg { width: 16px; height: 16px; fill: currentColor; }
+    .status-bar .battery { display: flex; align-items: center; gap: 2px; font-size: 13px; }
+
+    .header {
+      background: linear-gradient(135deg, #2563ff 0%, #1e90ff 100%);
+      padding: 4px 16px 20px; color: #fff;
+      display: flex; align-items: center; justify-content: space-between;
+      z-index: 10;
+    }
+    .back-btn {
+      width: 36px; display: flex; align-items: center;
+      cursor: pointer; text-decoration: none; color: #fff;
+    }
+    .back-btn svg { width: 22px; height: 22px; }
+    .header-title { font-size: 17px; font-weight: 500; flex: 1; text-align: center; }
+    .header-spacer { width: 36px; }
+
+    /* ====== Content Area ====== */
+    .content {
+      flex: 1;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 40px 28px 28px;
+    }
+
+    .face-icon-wrap {
+      width: 90px; height: 90px; border-radius: 50%;
+      background: linear-gradient(135deg, #e8f0fe, #d4e4ff);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 24px;
+      border: 3px solid #bfdbfe;
+    }
+    .face-icon-wrap.success {
+      background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+      border-color: #86efac;
+    }
+    .face-icon-wrap.fail {
+      background: linear-gradient(135deg, #fee2e2, #fecaca);
+      border-color: #fca5a5;
+    }
+    .face-icon-wrap svg { width: 44px; height: 44px; }
+
+    .main-text { font-size: 19px; font-weight: 600; color: #1a1a2e; margin-bottom: 10px; text-align: center; }
+    .main-text.success { color: #15803d; }
+    .main-text.fail { color: #dc2626; }
+
+    .desc-text {
+      font-size: 13px; color: #888; line-height: 1.6; text-align: center;
+      margin-bottom: 36px; padding: 0 10px;
+    }
+
+    /* Start button */
+    .btn-start {
+      width: 100%;
+      background: linear-gradient(135deg, #2563ff, #1d4ed8);
+      color: #fff; border: none; border-radius: 12px;
+      padding: 15px; font-size: 17px; font-weight: 600;
+      cursor: pointer; text-align: center;
+      box-shadow: 0 4px 14px rgba(37,99,255,0.25);
+      transition: all 0.2s; font-family: inherit;
+    }
+    .btn-start:active { opacity: 0.9; transform: scale(0.98); }
+    .btn-start.disabled { opacity: 0.5; pointer-events: none; }
+
+    /* Loading state */
+    .loading-area { display: none; flex-direction: column; align-items: center; margin-bottom: 36px; }
+    .loading-area.show { display: flex; }
+    .spinner-face {
+      width: 90px; height: 90px; border-radius: 50%;
+      background: linear-gradient(135deg, #e8f0fe, #d4e4ff);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 24px; position: relative; overflow: hidden;
+      border: 3px solid #bfdbfe;
+    }
+    .spinner-face-inner {
+      width: 50px; height: 50px;
+      border: 3px solid #bfdbfe;
+      border-top-color: #2563ff;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-size: 15px; color: #2563ff; font-weight: 500; }
+
+    /* Result area */
+    .result-area { display: none; flex-direction: column; align-items: center; }
+    .result-area.show { display: flex; }
+
+    .retry-btn {
+      width: 100%;
+      background: #fff; color: #666;
+      border: 1.5px solid #d1d5db; border-radius: 12px;
+      padding: 14px; font-size: 16px; cursor: pointer;
+      text-align: center; margin-top: 12px;
+      font-family: inherit;
+      text-decoration: none; display: block;
+      transition: all 0.2s;
+    }
+    .retry-btn:hover { border-color: #93c5fd; color: #2563ff; background: #eff6ff; }
+
+    /* Bottom tip */
+    .bottom-tip {
+      width: 100%; text-align: center; font-size: 11px; color: #bbb;
+      padding: 16px 28px 24px; line-height: 1.6;
+      border-top: 1px solid #f0f0f0;
+    }
+
+    /* ====== Toast ====== */
+    .toast-overlay {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.45); display: none;
+      align-items: center; justify-content: center; z-index: 200;
+    }
+    .toast-overlay.show { display: flex; }
+    .toast-box {
+      background: #fff; border-radius: 14px; padding: 28px 24px 24px;
+      width: 280px; text-align: center; box-shadow: 0 8px 30px rgba(0,0,0,0.18);
+    }
+    .toast-icon {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: linear-gradient(135deg, #fee2e2, #fecaca);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+    }
+    .toast-icon svg { width: 30px; height: 30px; }
+    .toast-title { font-size: 17px; font-weight: 700; color: #dc2626; margin-bottom: 10px; }
+    .toast-desc { font-size: 13px; color: #888; line-height: 1.6; margin-bottom: 20px; }
+    .toast-btn {
+      display: block; width: 100%;
+      background: linear-gradient(135deg, #2563ff, #1d4ed8);
+      color: #fff; border: none; border-radius: 10px;
+      padding: 12px; font-size: 15px; font-weight: 600;
+      cursor: pointer; font-family: inherit;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+<div class="demo-wrapper">
+
+  <!-- ==== Demo Panel ==== -->
+  <div class="demo-panel">
+    <div class="demo-panel-title">🎬 演示控制</div>
+    <div class="demo-panel-sub">微信刷脸验证流程演示</div>
+    <button class="demo-scenario active" onclick="resetAndShowStart()">
+      <span class="dot dot-blue"></span>初始状态
+    </button>
+    <button class="demo-scenario" onclick="simulateVerify()">
+      <span class="dot dot-green"></span>刷脸验证成功
+    </button>
+    <button class="demo-scenario" onclick="simulateFail()">
+      <span class="dot dot-red"></span>刷脸验证失败
+    </button>
+    <div class="demo-hint">💡 点击不同按钮模拟刷脸验证的结果。刷脸通过后跳转到双人打卡验证页；失败则停留在当前页面。</div>
+  </div>
+
+  <!-- ==== Phone ==== -->
+  <div class="phone-frame">
+  <div class="phone-screen">
+    <div class="punch-hole"></div>
+    <div class="phone">
+
+    <!-- status bar -->
+    <div class="status-bar">
+      <span class="time">10:24</span>
+      <div class="icons">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M17 4h-3V2h-4v2H7v18h10V4zm-4 16h-2v-2h2v2zm0-4h-2V8h2v8z"/></svg>
+        <span class="battery">
+          <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+          78
+        </span>
+      </div>
+    </div>
+
+    <!-- header -->
+    <div class="header">
+      <a href="mp-checkin-2.html" class="back-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+      </a>
+      <div class="header-title" id="headerTitle">微信刷脸验证</div>
+      <div class="header-spacer"></div>
+    </div>
+
+    <!-- Content: Start state -->
+    <div class="content" id="startState">
+      <div class="face-icon-wrap" id="faceIcon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#2563ff" stroke-width="1.5">
+          <circle cx="12" cy="8" r="4"/>
+          <path d="M5 20v-1a7 7 0 0114 0v1"/>
+          <circle cx="8.5" cy="7" r="0.5" fill="#2563ff"/>
+          <circle cx="15.5" cy="7" r="0.5" fill="#2563ff"/>
+          <path d="M9 11c.7.8 2 1.5 3 1.5s2.3-.7 3-1.5" stroke="#2563ff" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="main-text" id="mainText">请进行微信人脸核身验证</div>
+      <div class="desc-text" id="descText">您已被抽中双人打卡验证，需先完成真人刷脸验证</div>
+      <button class="btn-start" id="btnStart" onclick="startVerify()">开始刷脸验证</button>
+    </div>
+
+    <!-- Loading state (hidden initially) -->
+    <div class="loading-area" id="loadingState">
+      <div class="spinner-face">
+        <div class="spinner-face-inner"></div>
+      </div>
+      <div class="loading-text">正在验证，请勿离开…</div>
+    </div>
+
+    <!-- Result: Success (hidden initially) -->
+    <div class="result-area" id="resultSuccess">
+      <div class="face-icon-wrap success">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3">
+          <polyline points="4,12 10,18 20,6"/>
+        </svg>
+      </div>
+      <div class="main-text success">验证通过</div>
+      <div class="desc-text">真人刷脸验证成功，即将进入双人打卡验证页面</div>
+    </div>
+
+    <!-- Result: Fail (hidden initially) -->
+    <div class="result-area" id="resultFail">
+      <div class="face-icon-wrap fail">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="3">
+          <line x1="6" y1="6" x2="18" y2="18"/>
+          <line x1="18" y1="6" x2="6" y2="18"/>
+        </svg>
+      </div>
+      <div class="main-text fail">验证失败</div>
+      <div class="desc-text">刷脸验证未通过，请返回打卡页重新尝试</div>
+      <a href="mp-checkin-2.html" class="retry-btn">返回打卡页</a>
+    </div>
+
+    <!-- Bottom tip -->
+    <div class="bottom-tip" id="bottomTip">
+      当日首次双人打卡需刷脸验证，<br>通过后当日无需重复验证
+    </div>
+
+    </div><!-- .phone -->
+    <div class="home-bar"></div>
+  </div>
+  <div class="side-btn btn-power"></div>
+  <div class="side-btn btn-vol-up"></div>
+  <div class="side-btn btn-vol-down"></div>
+  </div>
+
+  <!-- Toast overlay for fail demo -->
+  <div class="toast-overlay" id="toastOverlay">
+    <div class="toast-box">
+      <div class="toast-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="3">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16" r="1" fill="#dc2626"/>
+        </svg>
+      </div>
+      <div class="toast-title">刷脸验证未通过</div>
+      <div class="toast-desc">请返回打卡页面重新尝试</div>
+      <button class="toast-btn" onclick="closeToast()">知道了</button>
+    </div>
+  </div>
+
+</div><!-- .demo-wrapper -->
+
+<script>
+  /* ===== State management ===== */
+  var els = {
+    start:   document.getElementById('startState'),
+    loading: document.getElementById('loadingState'),
+    success: document.getElementById('resultSuccess'),
+    fail:    document.getElementById('resultFail'),
+    tip:     document.getElementById('bottomTip'),
+    overlay: document.getElementById('toastOverlay')
+  };
+
+  function showOnly(id) {
+    var keys = ['start','loading','success','fail'];
+    for (var i = 0; i < keys.length; i++) {
+      var el = els[keys[i]];
+      if (keys[i] === id) {
+        el.classList.add('show');
+        if (keys[i] === 'start') el.style.display = '';
+      } else {
+        el.classList.remove('show');
+        if (keys[i] === 'start') el.style.display = 'none';
+      }
+    }
+  }
+
+  function resetAndShowStart() {
+    showOnly('start');
+    els.tip.style.display = '';
+    setDemoActive(0);
+  }
+
+  function startVerify() {
+    showOnly('loading');
+    els.tip.style.display = 'none';
+
+    setTimeout(function() {
+      showOnly('success');
+      els.tip.style.display = '';
+    }, 2000);
+  }
+
+  function simulateVerify() {
+    showOnly('loading');
+    els.tip.style.display = 'none';
+
+    setTimeout(function() {
+      showOnly('success');
+      els.tip.style.display = '';
+      setTimeout(function() {
+        window.location.href = 'mp-co-photo-trigger.html';
+      }, 800);
+    }, 2000);
+  }
+
+  function simulateFail() {
+    showOnly('loading');
+    els.tip.style.display = 'none';
+
+    setTimeout(function() {
+      showOnly('fail');
+      els.tip.style.display = '';
+      setDemoActive(2);
+      els.overlay.classList.add('show');
+    }, 2000);
+  }
+
+  function closeToast() {
+    els.overlay.classList.remove('show');
+  }
+
+  function setDemoActive(idx) {
+    var btns = document.querySelectorAll('.demo-scenario');
+    btns.forEach(function(b) { b.classList.remove('active'); });
+    btns[idx].classList.add('active');
+  }
+</script>
+
+</body>
+</html>

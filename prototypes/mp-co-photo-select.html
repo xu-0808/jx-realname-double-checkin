@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>选择合拍人 — 赣建宝</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: #e8ecf1; display: flex; justify-content: center; align-items: flex-start;
+      min-height: 100vh; padding: 20px; gap: 26px;
+    }
+    .phone { width: 380px; background: #f5f6fa; height: 844px; position: relative; overflow-y: auto; overflow-x: hidden; border-radius: 14px; }
+    .status-bar { height: 44px; background: linear-gradient(135deg, #2563ff 0%, #1e90ff 100%); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; color: #fff; font-size: 14px; font-weight: 600; }
+    .header { background: linear-gradient(135deg, #2563ff 0%, #1e90ff 100%); padding: 4px 16px 20px; color: #fff; }
+    .header-top { display: flex; align-items: center; gap: 12px; }
+    .back-btn { background: rgba(255,255,255,0.18); border: none; color: #fff; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; text-decoration: none; }
+    .back-btn svg { width: 16px; height: 16px; }
+    .header-title { font-size: 17px; font-weight: 500; }
+    .content { padding: 14px 14px 24px; }
+
+    /* 横幅通知条 */
+    .banner-strip {
+      position: relative; border-radius: 10px; overflow: hidden;
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px; font-size: 14px; font-weight: 700;
+      background: #fff8f0; border: 1px solid #ffe0c0; margin-bottom: 14px;
+    }
+    .banner-strip::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: #f97316; }
+    .banner-icon { width: 20px; height: 20px; flex-shrink: 0; color: #f97316; }
+    .banner-text { flex: 1; font-size: 14px; line-height: 1.45; color: #9a3412; }
+
+    /* 倒计时卡片 */
+    .timer-card {
+      background: #fff; border-radius: 12px; padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 14px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .timer-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .timer-icon svg { width: 22px; height: 22px; stroke: #d97706; }
+    .timer-body { flex: 1; }
+    .timer-label { font-size: 12px; color: #888; margin-bottom: 2px; }
+    .timer-value { font-size: 22px; font-weight: 700; color: #d97706; font-variant-numeric: tabular-nums; }
+    .timer-hint { font-size: 11px; color: #aaa; margin-top: 2px; }
+
+    /* 人员列表 */
+    .list-title {
+      font-size: 14px; font-weight: 600; color: #333; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .list-title .count-badge {
+      background: #e8f0fe; color: #2563ff; font-size: 11px;
+      padding: 2px 8px; border-radius: 10px; font-weight: 600;
+    }
+    .person-list { }
+    .person-card {
+      background: #fff; border-radius: 12px; padding: 14px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04); margin-bottom: 10px;
+      display: flex; align-items: center; gap: 12px; cursor: pointer;
+      border: 2px solid transparent; transition: all 0.18s;
+      position: relative;
+    }
+    .person-card:hover { border-color: #93c5fd; }
+    .person-card.selected {
+      border-color: #2563ff; background: #eef4ff;
+      box-shadow: 0 0 0 3px rgba(37,99,255,0.08);
+    }
+    .person-card.selected::after {
+      content: ''; position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      width: 20px; height: 20px; border-radius: 50%; background: #2563ff;
+    }
+    .person-card.selected::before {
+      content: ''; position: absolute; right: 19px; top: 50%; transform: translateY(-50%) rotate(45deg);
+      width: 5px; height: 10px; border: 2px solid #fff; border-top: none; border-left: none; z-index: 1;
+    }
+    .person-avatar {
+      width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .person-avatar svg { width: 100%; height: 100%; }
+    .person-avatar.c1 { background: #e8f0fe; } .person-avatar.c1 svg { fill: #2563ff; }
+    .person-avatar.c2 { background: #fff3e0; } .person-avatar.c2 svg { fill: #f97316; }
+    .person-avatar.c3 { background: #e8f5e9; } .person-avatar.c3 svg { fill: #22c55e; }
+    .person-avatar.c4 { background: #f3e8ff; } .person-avatar.c4 svg { fill: #a855f7; }
+    .person-avatar.c5 { background: #fce7f3; } .person-avatar.c5 svg { fill: #ec4899; }
+    .person-info { flex: 1; min-width: 0; }
+    .person-name { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 3px; }
+    .person-meta { font-size: 12px; color: #888; }
+    .person-meta .phone { color: #2563ff; }
+
+    /* 空列表 */
+    .empty-state {
+      text-align: center; padding: 40px 20px;
+    }
+    .empty-icon {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: #f0f2f5; margin: 0 auto 16px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .empty-icon svg { width: 32px; height: 32px; stroke: #bbb; }
+    .empty-title { font-size: 15px; font-weight: 600; color: #555; margin-bottom: 6px; }
+    .empty-desc { font-size: 13px; color: #999; line-height: 1.6; margin-bottom: 20px; }
+    .empty-btn {
+      display: inline-block; padding: 10px 28px; border-radius: 8px;
+      background: linear-gradient(135deg, #2563ff, #1e90ff); color: #fff;
+      font-size: 14px; font-weight: 600; text-decoration: none;
+    }
+
+    /* 底部按钮 */
+    .bottom-bar {
+      position: sticky; bottom: 0; left: 0; right: 0;
+      background: #fff; padding: 12px 14px; border-top: 1px solid #f0f0f0;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.04);
+    }
+    .btn-confirm {
+      width: 100%; background: linear-gradient(135deg, #2563ff, #1e90ff);
+      color: #fff; border: none; border-radius: 12px; padding: 14px;
+      font-size: 16px; font-weight: 600; cursor: pointer; text-decoration: none;
+      display: block; text-align: center;
+    }
+    .btn-confirm:disabled {
+      background: #d0d5dd; cursor: not-allowed;
+    }
+    .bottom-hint {
+      font-size: 11px; color: #aaa; text-align: center; margin-top: 8px;
+    }
+
+    /* Frame */
+    .phone-frame { background: #1a1c1e; border-radius: 22px; padding: 10px; box-shadow: 0 0 0 2px #2d2f31, 0 0 0 5px #1a1c1e, 0 10px 45px rgba(0,0,0,0.45); position: relative; display: inline-block; }
+    .phone-screen { width: 380px; height: 844px; border-radius: 14px; overflow: hidden; position: relative; border: 1px solid #333; }
+    .punch-hole { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); width: 10px; height: 10px; background: #111; border: 1px solid #333; border-radius: 50%; z-index: 100; }
+    .home-bar { position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); width: 110px; height: 4px; background: rgba(255,255,255,0.22); border-radius: 2px; z-index: 100; }
+    .side-btn { position: absolute; background: #2d2f31; border-radius: 2px; opacity: 0.7; }
+    .btn-power { right: -3px; top: 190px; width: 2px; height: 55px; }
+    .btn-vol-up { left: -3px; top: 180px; width: 2px; height: 38px; }
+    .btn-vol-down { left: -3px; top: 225px; width: 2px; height: 38px; }
+
+    /* Demo Panel */
+    .demo-panel { background: #fff; border-radius: 14px; padding: 20px 18px; box-shadow: 0 2px 16px rgba(0,0,0,0.08); width: 240px; flex-shrink: 0; margin-top: 20px; }
+    .demo-panel-title { font-size: 14px; font-weight: 700; color: #333; margin-bottom: 4px; }
+    .demo-panel-sub { font-size: 11px; color: #999; margin-bottom: 14px; }
+    .demo-scenario { display: block; width: 100%; padding: 10px 12px; border: 1.5px solid #e5e7eb; border-radius: 10px; background: #fafbfc; font-size: 13px; color: #555; cursor: pointer; text-align: left; margin-bottom: 8px; transition: all 0.18s; line-height: 1.5; }
+    .demo-scenario:hover { border-color: #93c5fd; background: #eff6ff; color: #2563ff; }
+    .demo-scenario.active { border-color: #2563ff; background: #eef4ff; color: #1d4ed8; font-weight: 600; box-shadow: 0 0 0 2px rgba(37,99,255,0.12); }
+    .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 7px; vertical-align: middle; position: relative; top: -1px; }
+    .dot-green { background: #22c55e; } .dot-orange { background: #f97316; } .dot-gray { background: #94a3b8; }
+    .demo-hint { font-size: 11px; color: #aaa; margin-top: 12px; padding-top: 10px; border-top: 1px solid #f0f0f0; line-height: 1.6; }
+  </style>
+</head>
+<body>
+<div style="display:flex;align-items:flex-start;gap:26px;">
+
+  <!-- ===== Phone Frame ===== -->
+  <div class="phone-frame">
+  <div class="phone-screen">
+    <div class="punch-hole"></div>
+    <div class="phone">
+
+    <div class="status-bar">
+      <span>10:25</span>
+      <div style="display:flex;align-items:center;gap:5px;">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M17 4h-3V2h-4v2H7v18h10V4z"/></svg>
+      </div>
+    </div>
+
+    <div class="header">
+      <div class="header-top">
+        <a href="mp-checkin-2.html" class="back-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6"/></svg>
+        </a>
+        <span class="header-title">选择合拍人</span>
+      </div>
+    </div>
+
+    <div class="content" id="contentArea">
+      <!-- 横幅通知条 -->
+      <div class="banner-strip">
+        <svg class="banner-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7A8.38 8.38 0 0 1 4 11.5a8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        <div class="banner-text">您已被抽中双人打卡验证，请选择一位在场人员作为合拍人</div>
+      </div>
+
+      <!-- 倒计时卡片 -->
+      <div class="timer-card">
+        <div class="timer-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+        </div>
+        <div class="timer-body">
+          <div class="timer-label">选择限时</div>
+          <div class="timer-value" id="timerValue">05:00</div>
+          <div class="timer-hint">超时系统将自动随机抽取</div>
+        </div>
+      </div>
+
+      <!-- 人员列表 -->
+      <div id="listArea">
+        <div class="list-title">
+          可选合拍人 <span class="count-badge" id="countBadge">5 人</span>
+        </div>
+        <div class="person-list" id="personList">
+          <!-- JS render -->
+        </div>
+      </div>
+
+      <!-- 空列表状态（隐藏） -->
+      <div id="emptyArea" style="display:none;">
+        <div class="empty-state">
+          <div class="empty-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><circle cx="9" cy="8" r="3"/><circle cx="16" cy="16" r="3"/><path d="M12 13l-1-1M18 7l-3 3"/></svg>
+          </div>
+          <div class="empty-title">当前无可选合拍人</div>
+          <div class="empty-desc">工地上暂无已打上班卡且未打下班卡的在场人员。<br>本次打卡已降级为单人打卡验证。</div>
+          <a href="mp-checkin-4.html" class="empty-btn">前往单人打卡</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部按钮 -->
+    <div class="bottom-bar" id="bottomBar">
+      <button class="btn-confirm" id="confirmBtn" disabled onclick="confirmSelect()">确认选择合拍人</button>
+      <div class="bottom-hint">选中人员后点击确认，进入双人合拍验证</div>
+    </div>
+
+    </div>
+    <div class="home-bar"></div>
+  </div>
+  <div class="side-btn btn-power"></div><div class="side-btn btn-vol-up"></div><div class="side-btn btn-vol-down"></div>
+</div>
+
+  <!-- ===== Demo Panel ===== -->
+  <div class="demo-panel">
+    <div class="demo-panel-title">📋 情景切换（演示）</div>
+    <div class="demo-panel-sub">自选模式下不同场景</div>
+    <button class="demo-scenario active" onclick="showScenario('normal')">
+      <span class="dot dot-green"></span>正常选择
+      <div style="font-size:11px;color:#aaa;margin-top:3px;">列表有可选人员，正常选择</div>
+    </button>
+    <button class="demo-scenario" onclick="showScenario('empty')">
+      <span class="dot dot-gray"></span>列表为空
+      <div style="font-size:11px;color:#aaa;margin-top:3px;">无可选人员，降级单人打卡</div>
+    </button>
+    <button class="demo-scenario" onclick="showScenario('timeout')">
+      <span class="dot dot-orange"></span>选择超时
+      <div style="font-size:11px;color:#aaa;margin-top:3px;">5分钟未选择，系统随机抽取</div>
+    </button>
+    <div class="demo-hint">
+      <span style="color:#2563ff;">📌</span> 自选模式说明：<br>
+      • 可选人员：已打上班卡未打下班卡，排除自己<br>
+      • 5分钟内未选择→系统随机抽取<br>
+      • 列表为空→降级单人打卡
+    </div>
+  </div>
+
+</div>
+
+<script>
+var selectedPerson = null;
+var persons = [
+  { name: '刘建国', role: '施工员', phone: '138****1234', avatar: 'c2' },
+  { name: '李明华', role: '安全员', phone: '137****5678', avatar: 'c3' },
+  { name: '王大力', role: '质量员', phone: '136****8888', avatar: 'c4' },
+  { name: '赵德柱', role: '材料员', phone: '135****3333', avatar: 'c5' },
+  { name: '陈志远', role: '技术员', phone: '139****7777', avatar: 'c1' }
+];
+
+function renderList() {
+  var html = '';
+  persons.forEach(function(p, i) {
+    var svg = '<svg viewBox="0 0 64 64"><circle cx="32" cy="24" r="12"/><ellipse cx="32" cy="58" rx="22" ry="18"/></svg>';
+    html += '<div class="person-card" onclick="selectPerson('+i+')" id="card-'+i+'">'+
+      '<div class="person-avatar '+p.avatar+'">'+svg+'</div>'+
+      '<div class="person-info">'+
+        '<div class="person-name">'+p.name+'</div>'+
+        '<div class="person-meta">'+p.role+' · <span class="phone">'+p.phone+'</span></div>'+
+      '</div>'+
+    '</div>';
+  });
+  document.getElementById('personList').innerHTML = html;
+  document.getElementById('countBadge').textContent = persons.length + ' 人';
+}
+
+function selectPerson(i) {
+  selectedPerson = i;
+  document.querySelectorAll('.person-card').forEach(function(c){ c.classList.remove('selected'); });
+  document.getElementById('card-'+i).classList.add('selected');
+  document.getElementById('confirmBtn').disabled = false;
+}
+
+function confirmSelect() {
+  if (selectedPerson === null) return;
+  var p = persons[selectedPerson];
+  alert('已选择 ' + p.name + ' 作为合拍人，即将进入双人合拍验证页面...');
+  window.location.href = 'mp-co-photo-trigger.html#confirmed';
+}
+
+function showScenario(type) {
+  document.querySelectorAll('.demo-scenario').forEach(function(b){ b.classList.remove('active'); });
+  event.target.closest('.demo-scenario').classList.add('active');
+
+  if (type === 'normal') {
+    document.getElementById('listArea').style.display = '';
+    document.getElementById('emptyArea').style.display = 'none';
+    document.getElementById('bottomBar').style.display = '';
+    renderList();
+  } else if (type === 'empty') {
+    document.getElementById('listArea').style.display = 'none';
+    document.getElementById('emptyArea').style.display = '';
+    document.getElementById('bottomBar').style.display = 'none';
+  } else if (type === 'timeout') {
+    document.getElementById('timerValue').textContent = '00:00';
+    document.getElementById('timerValue').style.color = '#ef4444';
+    document.getElementById('timerValue').innerHTML = '已超时';
+    document.getElementById('timerValue').style.fontSize = '16px';
+    document.querySelector('.timer-hint').textContent = '系统正在为您随机抽取合拍人...';
+    document.querySelector('.timer-hint').style.color = '#ef4444';
+    setTimeout(function() {
+      alert('系统已随机抽取 刘建国（施工员）作为您的合拍人，即将进入双人合拍验证页面...');
+      window.location.href = 'mp-co-photo-trigger.html#confirmed';
+    }, 2000);
+  }
+}
+
+// Timer countdown
+var timeLeft = 300; // 5 minutes
+var timerInterval = setInterval(function() {
+  timeLeft--;
+  if (timeLeft <= 0) {
+    clearInterval(timerInterval);
+    return;
+  }
+  var m = Math.floor(timeLeft / 60);
+  var s = timeLeft % 60;
+  var el = document.getElementById('timerValue');
+  if (el && el.tagName === 'DIV') {
+    el.textContent = (m<10?'0':'') + m + ':' + (s<10?'0':'') + s;
+  }
+}, 1000);
+
+renderList();
+</script>
+</body>
+</html>

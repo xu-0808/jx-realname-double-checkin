@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>会议记录 — 2026-08-04 方案汇报后调整</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; background: #f0f2f5; color: #333; line-height: 1.7; }
+    .container { max-width: 860px; margin: 0 auto; padding: 32px 24px 60px; }
+
+    .meeting-header { background: #fff; border-radius: 8px; padding: 28px 32px; margin-bottom: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+    .meeting-header h1 { font-size: 22px; font-weight: 600; margin-bottom: 16px; }
+    .meeting-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; font-size: 13px; }
+    .meeting-meta .label { color: #999; }
+    .meeting-meta .value { color: #333; font-weight: 500; }
+
+    .section { background: #fff; border-radius: 8px; padding: 24px 32px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+    .section h2 { font-size: 16px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .section h2 .num { background: #1890ff; color: #fff; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+
+    .req-card { border: 1px solid #e8e8e8; border-radius: 6px; padding: 18px 20px; margin-bottom: 14px; }
+    .req-card:last-child { margin-bottom: 0; }
+    .req-title { font-size: 15px; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .req-tag { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 500; }
+    .req-tag.new { background: #e6f7ff; color: #1890ff; border: 1px solid #91d5ff; }
+    .req-tag.modify { background: #fff7e6; color: #fa8c16; border: 1px solid #ffd591; }
+    .req-tag.remove { background: #fff1f0; color: #ff4d4f; border: 1px solid #ffa39e; }
+    .req-desc { font-size: 13px; color: #555; line-height: 1.8; }
+    .req-desc ul { padding-left: 20px; margin-top: 6px; }
+    .req-desc li { margin-bottom: 4px; }
+    .req-detail { background: #f8fafc; border-radius: 4px; padding: 12px 14px; margin-top: 10px; font-size: 12px; color: #666; line-height: 1.8; }
+    .req-detail strong { color: #333; }
+
+    .summary-box { background: #e6f7ff; border: 1px solid #91d5ff; border-radius: 8px; padding: 16px 20px; margin-bottom: 24px; font-size: 13px; color: #0050b3; line-height: 1.8; }
+    .summary-box strong { color: #003a8c; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="meeting-header">
+    <h1>会议记录 — 方案汇报后需求调整</h1>
+    <div class="meeting-meta">
+      <div><span class="label">日期：</span><span class="value">2026年8月4日</span></div>
+      <div><span class="label">地点：</span><span class="value">方案演示汇报</span></div>
+      <div><span class="label">参与人员：</span><span class="value">领导、项目组</span></div>
+      <div><span class="label">会议性质：</span><span class="value">方案演示汇报后调整意见</span></div>
+    </div>
+  </div>
+
+  <div class="summary-box">
+    <strong>会议概要：</strong>本次会议对"江西实名制双人打卡"方案进行了演示汇报。汇报后领导提出7条调整意见，涉及合拍人产生方式、拍照设备分配、刷脸验证、权限下放、数据展示等方面。以下为各条需求详细记录。
+  </div>
+
+  <!-- 需求1 -->
+  <div class="section">
+    <h2><span class="num">1</span> 新增"自选/系统随机"配置项 + 合拍人选择页</h2>
+    <div class="req-card">
+      <div class="req-title">合拍人产生方式配置 <span class="req-tag new">新增</span></div>
+      <div class="req-desc">
+        新增配置项：合拍人产生方式 = 自选 / 系统随机（默认系统随机）。
+        <ul>
+          <li><strong>系统随机</strong>（现有逻辑）：由系统从候选人池随机抽取</li>
+          <li><strong>自选</strong>：由打卡人自己选择合拍人</li>
+        </ul>
+      </div>
+      <div class="req-detail">
+        <strong>自选模式规则：</strong><br>
+        • 被抽中后进入合拍人选择页，展示可选人员列表<br>
+        • 可选人员：当前工地在场人员（已打上班卡、未打下班卡），排除自己<br>
+        • 选择限时：运维配置项，默认5分钟；超时系统自动按随机抽取原则抽取一名<br>
+        • 可选列表为空：降级为单人打卡<br>
+        • 确认机制保留：选中后进入双人打卡页，合拍人仍需5分钟内确认<br>
+        • 新建原型页面：<code>mp-co-photo-select.html</code>
+      </div>
+    </div>
+  </div>
+
+  <!-- 需求2 -->
+  <div class="section">
+    <h2><span class="num">2</span> 合拍待办红点提醒</h2>
+    <div class="req-card">
+      <div class="req-title">"我的"页合拍验证图标红点 <span class="req-tag new">新增</span></div>
+      <div class="req-desc">
+        当用户有待处理的合拍代办（被分配为合拍人待确认）时，在微信小程序「我的」页面 →「合拍验证」应用图标上显示红点标识，让用户一眼知道有待处理事项，避免遗漏确认。
+      </div>
+    </div>
+  </div>
+
+  <!-- 需求3 -->
+  <div class="section">
+    <h2><span class="num">3</span> 拍照设备随机分配（概率可配置）</h2>
+    <div class="req-card">
+      <div class="req-title">拍照设备随机判定 <span class="req-tag new">新增</span></div>
+      <div class="req-desc">
+        合拍人确认后，系统立即随机判定由谁的手机进行拍照，概率可配置（默认各50%）。
+        <ul>
+          <li><strong>打卡人手机拍照</strong>（原流程）：打卡人手机正常进入双人合拍拍照</li>
+          <li><strong>合拍人手机拍照</strong>：
+            <ul>
+              <li>打卡人手机：点击拍照按钮 → 弹窗提示"系统抽中需使用合拍人XX手机进行合拍验证，请配合合拍人完整验证"</li>
+              <li>合拍人手机：在「合拍确认结果页」调整提示内容 + 展示「合拍」按钮 → 点击进入双人合拍拍照</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <div class="req-detail">
+        <strong>价值：</strong>进一步增加防造假力度——拍照设备随机，合拍人必须真实在场配合，不能仅"确认"了事。<br>
+        <strong>修改文件：</strong>rule-global.html（配置项）、mp-co-photo-accept.html（确认结果页）、mp-co-photo-trigger.html（弹窗提示）
+      </div>
+    </div>
+  </div>
+
+  <!-- 需求4 -->
+  <div class="section">
+    <h2><span class="num">4</span> 被抽中先微信刷脸验证</h2>
+    <div class="req-card">
+      <div class="req-title">双人打卡前增加刷脸验证节点 <span class="req-tag new">新增</span></div>
+      <div class="req-desc">
+        当某人被抽中需双人打卡时，点击打卡按钮后先进行微信真人刷脸验证（活体检测），通过后再进入双人打卡验证页面。
+        <ul>
+          <li><strong>刷脸通过</strong> → 进入双人打卡验证页面</li>
+          <li><strong>刷脸失败</strong> → 回到打卡页，不能打卡（与系统原有刷脸逻辑一致）</li>
+          <li><strong>当日免重复</strong>：当天双人打卡流程未走完时，退出小程序再进入，点击打卡直接到双人打卡页（跳过刷脸）</li>
+        </ul>
+      </div>
+      <div class="req-detail">
+        <strong>新建原型页面：</strong><code>mp-checkin-face.html</code><br>
+        <strong>价值：</strong>增加一道防伪验证，先确认是本人操作，再进入双人合拍。
+      </div>
+    </div>
+  </div>
+
+  <!-- 需求5 -->
+  <div class="section">
+    <h2><span class="num">5</span> 项目规则例外功能下放地市、县区</h2>
+    <div class="req-card">
+      <div class="req-title">权限下放 <span class="req-tag modify">调整</span></div>
+      <div class="req-desc">
+        规则配置中"项目规则例外"页签功能下放给地市、县区级下级单位。下级单位可自行<strong>添加、解除</strong>辖区内的特殊规则项目，权限范围仅限本辖区。
+      </div>
+    </div>
+  </div>
+
+  <!-- 需求6 -->
+  <div class="section">
+    <h2><span class="num">6</span> 抽验记录详情页不展示双人打卡照片</h2>
+    <div class="req-card">
+      <div class="req-title">移除照片展示 <span class="req-tag modify">调整</span></div>
+      <div class="req-desc">
+        抽验记录详情页中不再向监管人员展示双人打卡照片。后台仍记录留存，仅前端展示层面移除。照片相关信息替换为"验证结果"卡片（核验分数、拍摄方式、活体检测），并标注"合拍照片已后台留存，不对外展示"。
+      </div>
+    </div>
+  </div>
+
+  <!-- 需求7 -->
+  <div class="section">
+    <h2><span class="num">7</span> 移除风险预警，改为数据统计展示</h2>
+    <div class="req-card">
+      <div class="req-title">风险预警 → 数据统计 <span class="req-tag remove">移除</span> <span class="req-tag new">替代</span></div>
+      <div class="req-desc">
+        暂不需要风险预警菜单。原因：监管人员精力有限，看到预警不去处理反而尴尬。
+        <ul>
+          <li><strong>移除</strong>：风险预警菜单、风险评级、颜色标注</li>
+          <li><strong>替代</strong>：展示真实情况数据——抽到几次、拒绝几次、通过几次、未通过次数、降级次数等</li>
+          <li><strong>定位</strong>：呈现客观事实，不做主观评级</li>
+        </ul>
+      </div>
+      <div class="req-detail">
+        <strong>新建页面：</strong><code>data-stats.html</code>（数据统计）<br>
+        <strong>侧边栏</strong>：所有监管端页面"风险预警"菜单项统一改为"数据统计"
+      </div>
+    </div>
+  </div>
+
+  <!-- 任务指令 -->
+  <div class="section">
+    <h2 style="color:#52c41a;"><span class="num" style="background:#52c41a;">✓</span> 任务指令</h2>
+    <div class="req-card">
+      <div class="req-title">文档更名 + 会议记录</div>
+      <div class="req-desc">
+        <ul>
+          <li>导航页中"客户方案文档"更名为"文档文件"</li>
+          <li>将本次会议沟通的7条需求整理为会议记录（即本文件），挂在导航页中</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

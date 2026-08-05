@@ -175,7 +175,7 @@
       <div class="submenu-item active"><a href="rule-global.html">规则配置</a></div>
       <div class="submenu-item"><a href="records.html">抽验记录</a></div>
       <div class="submenu-item"><a href="summary.html">抽验汇总</a></div>
-      <div class="submenu-item"><a href="risk-warning.html">风险预警</a></div>
+      <div class="submenu-item"><a href="data-stats.html">数据统计</a></div>
     </div>
     <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><circle cx="8" cy="17" r="1"/></svg> 工程发检监管</span></div>
     <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="9" y1="10" x2="15" y2="10"/></svg> 劳务用工监管</span></div>
@@ -226,10 +226,11 @@
       <!-- ========== Tab 2: 项目规则例外 ========== -->
       <div class="tab-content" id="tabProject">
         <div class="info-banner">
-          <span class="banner-icon">🔒</span>
+          <span class="banner-icon">📋</span>
           <div>
             <strong>项目规则例外说明</strong><br>
-            列入本清单的项目，其合拍规则<strong>独立于组织域全局配置</strong>。当上级修改全局规则并下发时，例外项目的规则不会被覆盖。如需恢复跟随全局配置，请操作"解除例外"。
+            列入本清单的项目，其合拍规则<strong>独立于组织域全局配置</strong>。当上级修改全局规则并下发时，例外项目的规则不会被覆盖。如需恢复跟随全局配置，请操作"解除例外"。<br>
+            <strong>权限下放</strong>：地市、县区级单位可自行<strong>添加、解除</strong>辖区内的特殊规则项目。
           </div>
         </div>
         <div class="card-body" style="padding-top:0;">
@@ -291,6 +292,8 @@
       <div class="form-row"><div class="form-item"><label><span class="required">*</span>上班卡抽取率</label><input type="number" min="0" max="100" value="30"><div class="hint">0-100%，30%表示约3成概率触发抽验</div></div><div class="form-item"><label><span class="required">*</span>下班卡抽取率</label><input type="number" min="0" max="100" value="15"></div></div>
       <div class="form-row"><div class="form-item"><label><span class="required">*</span>候选人池阈值</label><input type="number" min="1" value="2"><div class="hint">低于此值不触发抽验</div></div><div class="form-item"><label><span class="required">*</span>可更换次数</label><input type="number" min="0" value="3"></div></div>
       <div class="form-row"><div class="form-item half"><label>是否要求同一公司</label><label class="switch"><input type="checkbox"><span class="slider"></span></label><div class="hint">开启后优先同公司人员</div></div></div>
+      <div class="form-row"><div class="form-item half"><label>合拍人产生方式</label><select onchange="toggleSelectLimit(this.value)"><option value="random">系统随机</option><option value="self">自选</option></select><div class="hint">系统随机：从候选人池随机抽取；自选：打卡人自行选择</div></div><div class="form-item half" id="selectLimitRow" style="display:none;"><label>自选选择限时</label><input type="number" min="1" value="5"><div class="hint">分钟，超时系统自动随机抽取</div></div></div>
+      <div class="form-row"><div class="form-item half"><label>拍照设备分配</label><select><option value="50">默认（各50%）</option><option value="100">仅打卡人手机（100%）</option><option value="70">打卡人70% / 合拍人30%</option><option value="30">打卡人30% / 合拍人70%</option></select><div class="hint">合拍人确认后随机判定由谁手机拍照</div></div></div>
       <div class="form-item" style="margin-top:8px;">
         <label>下发至下级组织域</label>
         <div class="org-section">
@@ -399,6 +402,7 @@ function switchTab(tab) {
 
 // Modal
 function openGlobalModal(){ document.getElementById('globalModal').classList.add('show'); }
+function toggleSelectLimit(val){ document.getElementById('selectLimitRow').style.display = val==='self' ? 'flex' : 'none'; }
 function openAddModal(){ document.getElementById('addModal').classList.add('show'); }
 function openEditModal(name){ document.getElementById('editProjectName').textContent=name; document.getElementById('editProjectDisplay').textContent=name; document.getElementById('editModal').classList.add('show'); }
 function closeModal(id){ document.getElementById(id).classList.remove('show'); }

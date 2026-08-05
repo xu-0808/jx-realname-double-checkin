@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>风险预警 - 江西省建筑工人实名制管理服务信息平台</title>
+  <title>数据统计 - 江西省建筑工人实名制管理服务信息平台</title>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
     body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif; background:#f0f2f5; color:#333; }
@@ -38,6 +38,13 @@
     .page-header-right label { font-size:12px; color:#999; }
     .page-header-right select { padding:5px 10px; border:1px solid #d9d9d9; border-radius:4px; font-size:12px; }
 
+    .stats-row { display:grid; grid-template-columns:repeat(5, 1fr); gap:16px; margin-bottom:16px; }
+    .stat-card { background:#fff; border-radius:4px; padding:18px 20px; box-shadow:0 1px 4px rgba(0,0,0,0.04); display:flex; align-items:center; gap:14px; }
+    .stat-icon { width:48px; height:48px; border-radius:4px; display:flex; align-items:center; justify-content:center; }
+    .stat-icon svg { width:24px; height:24px; }
+    .stat-value { font-size:24px; font-weight:700; color:#222; }
+    .stat-label { font-size:12px; color:#999; margin-top:2px; }
+
     .card { background:#fff; border-radius:4px; box-shadow:0 1px 4px rgba(0,0,0,0.04); margin-bottom:16px; }
     .card-body { padding:20px; }
 
@@ -47,13 +54,6 @@
     .tab.active { color:#1890ff; border-bottom-color:#1890ff; font-weight:500; }
     .tab-content { display:none; }
     .tab-content.active { display:block; }
-
-    .score-bar-wrap { display:flex; align-items:center; gap:8px; }
-    .score-bar { flex:1; height:10px; background:#f0f0f0; border-radius:5px; overflow:hidden; min-width:80px; }
-    .score-fill { height:100%; border-radius:5px; }
-    .score-fill.red { background:linear-gradient(90deg,#ff4d4f,#ff7875); }
-    .score-fill.orange { background:linear-gradient(90deg,#fa8c16,#ffd591); }
-    .score-num { width:36px; text-align:right; font-size:14px; font-weight:700; flex-shrink:0; }
 
     .filter-bar { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:16px; }
     .filter-item { display:flex; align-items:center; gap:6px; font-size:13px; }
@@ -67,19 +67,11 @@
     .table th { background:#fafafa; color:#666; font-weight:500; text-align:left; padding:10px 12px; border-bottom:1px solid #f0f0f0; white-space:nowrap; }
     .table td { padding:10px 12px; border-bottom:1px solid #f0f0f0; }
     .table tr:hover td { background:#fafafa; }
-    .risk-tag { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:12px; font-size:11px; font-weight:600; }
-    .risk-high { background:#fff1f0; color:#ff4d4f; }
-    .risk-mid { background:#fff7e6; color:#fa8c16; }
-    .risk-low { background:#f6ffed; color:#52c41a; }
-    .action-link { color:#1890ff; cursor:pointer; font-size:12px; margin-right:8px; }
 
     .pagination { display:flex; justify-content:flex-end; align-items:center; gap:6px; margin-top:14px; font-size:13px; color:#666; }
     .pagination button { padding:4px 10px; border:1px solid #d9d9d9; background:#fff; border-radius:4px; cursor:pointer; font-size:12px; }
     .pagination button:hover { border-color:#1890ff; }
     .pagination button.active { background:#1890ff; color:#fff; border-color:#1890ff; }
-
-    .algorithm-info { background:#fafafa; border-radius:4px; padding:12px 18px; margin-bottom:16px; font-size:12px; color:#666; line-height:1.8; }
-    .algorithm-info strong { color:#333; }
   </style>
 </head>
 <body>
@@ -94,7 +86,7 @@
     <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> BI数据看板</span></div>
     <div class="menu-item"><span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/></svg> 实名制管理</span></div>
     <div class="menu-item active open">
-      <span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M17 9h.01"/><circle cx="12" cy="13" r="4"/></svg> 双人打卡管理</span>
+      <span class="left"><svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M17 9h.01"/></svg> 双人打卡管理</span>
     </div>
     <div class="submenu show">
       <div class="submenu-item"><a href="index.html">数据看板</a></div>
@@ -111,8 +103,8 @@
   <div class="main">
     <div class="page-header">
       <div>
-        <h2>双人打卡 · 风险预警</h2>
-        <div class="breadcrumb">首页 / 双人打卡管理 / 风险预警 · 统计周期：近 30 天（截至 2026-07-28）</div>
+        <h2>双人打卡 · 数据统计</h2>
+        <div class="breadcrumb">首页 / 双人打卡管理 / 数据统计 · 统计周期：近 30 天（截至 2026-07-28）</div>
       </div>
       <div class="page-header-right">
         <label>当前账号：</label>
@@ -124,20 +116,50 @@
       </div>
     </div>
 
+    <!-- 顶部统计卡片 -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#e6f7ff;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#1890ff" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06"/></svg>
+        </div>
+        <div><div class="stat-value">1,247</div><div class="stat-label">累计抽验次数</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#fff1f0;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#ff4d4f" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </div>
+        <div><div class="stat-value">87</div><div class="stat-label">合拍人拒绝次数</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#f6ffed;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#52c41a" stroke-width="2"><path d="M9 12l2 2 4-4"/><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg>
+        </div>
+        <div><div class="stat-value">906</div><div class="stat-label">验证通过次数</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#fff7e6;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fa8c16" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+        </div>
+        <div><div class="stat-value">196</div><div class="stat-label">验证未通过次数</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#f0f5ff;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#722ed1" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <div><div class="stat-value">58</div><div class="stat-label">降级单人打卡次数</div></div>
+      </div>
+    </div>
+
     <div class="card">
       <div class="tabs">
-        <div class="tab active" onclick="switchTab('person')">人员风险</div>
-        <div class="tab" onclick="switchTab('project')">项目风险</div>
+        <div class="tab active" onclick="switchTab('person')">人员统计</div>
+        <div class="tab" onclick="switchTab('project')">项目统计</div>
       </div>
 
-      <!-- Tab 1: 人员风险 -->
+      <!-- Tab 1: 人员统计 -->
       <div class="tab-content active" id="tabPerson">
         <div class="card-body">
-          <div class="algorithm-info">
-            <strong>评分算法（近 30 天滚动）</strong>：拒绝配合率(30%) + 抽验未通过率(25%) + 超时/降级率(20%) + GPS偏离次数(15%) + 核验重试率(10%) = 综合风险分
-          </div>
           <div class="filter-bar">
-            <div class="filter-item"><label>风险等级：</label><select><option>全部</option><option>高风险 ≥80</option><option>中风险 50-79</option><option>低风险 &lt;50</option></select></div>
             <div class="filter-item"><label>项目区划：</label><select><option>全部</option><option>南昌市-经开区</option><option>南昌市-红谷滩区</option><option>赣州市-龙南市</option></select></div>
             <div class="filter-item"><label>岗位：</label><select><option>全部</option><option>项目经理</option><option>安全员</option><option>施工员</option></select></div>
             <div class="filter-item"><label>项目：</label><input type="text" placeholder="项目名称"></div>
@@ -145,115 +167,139 @@
           </div>
           <table class="table">
             <thead>
-              <tr><th>排名</th><th>姓名</th><th>岗位</th><th>项目区划</th><th>所属项目</th><th>拒绝配合率</th><th>抽验未通过率</th><th>超时/降级</th><th>GPS偏离</th><th>核验重试</th><th>风险分</th><th>等级</th><th>操作</th></tr>
+              <tr><th>姓名</th><th>项目</th><th>累计抽中次数</th><th>拒绝次数</th><th>通过次数</th><th>未通过次数</th><th>降级次数</th></tr>
             </thead>
             <tbody>
               <tr>
-                <td><strong>1</strong></td>
                 <td>德小拓<div style="font-size:11px;color:#999;">3622********1234</div></td>
-                <td>项目经理</td><td>南昌市-经开区</td><td>豫章师范学院实训大楼</td>
-                <td style="color:#ff4d4f;font-weight:600;">60%</td>
-                <td style="color:#ff4d4f;font-weight:600;">40%</td>
-                <td>2次</td><td>3次</td><td>2次</td>
-                <td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill red" style="width:85%;"></div></div><span class="score-num" style="color:#ff4d4f;">85</span></div></td>
-                <td><span class="risk-tag risk-high">🔴 高风险</span></td>
-                <td><a href="warning-detail.html" class="action-link">详情</a></td>
+                <td>豫章师范学院实训大楼</td>
+                <td>15</td>
+                <td>3</td>
+                <td>8</td>
+                <td>3</td>
+                <td>1</td>
               </tr>
               <tr>
-                <td><strong>2</strong></td>
-                <td>王经理<div style="font-size:11px;color:#999;">3601********5678</div></td>
-                <td>项目经理</td><td>南昌市-红谷滩区</td><td>南昌西站配套工程</td>
-                <td style="color:#ff4d4f;font-weight:600;">50%</td>
-                <td style="color:#fa8c16;font-weight:600;">25%</td>
-                <td>3次</td><td>1次</td><td>1次</td>
-                <td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill red" style="width:82%;"></div></div><span class="score-num" style="color:#ff4d4f;">82</span></div></td>
-                <td><span class="risk-tag risk-high">🔴 高风险</span></td>
-                <td><a href="warning-detail.html" class="action-link">详情</a></td>
+                <td>刘建国<div style="font-size:11px;color:#999;">3601********5678</div></td>
+                <td>豫章师范学院实训大楼</td>
+                <td>22</td>
+                <td>1</td>
+                <td>20</td>
+                <td>1</td>
+                <td>0</td>
               </tr>
               <tr>
-                <td><strong>3</strong></td>
-                <td>赵监理<div style="font-size:11px;color:#999;">3601********9012</div></td>
-                <td>监理工程师</td><td>南昌市-红谷滩区</td><td>绿地国际博览城二期</td>
-                <td style="color:#fa8c16;font-weight:600;">33%</td><td>20%</td>
-                <td>1次</td><td style="color:#ff4d4f;font-weight:600;">5次</td><td>1次</td>
-                <td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill red" style="width:81%;"></div></div><span class="score-num" style="color:#ff4d4f;">81</span></div></td>
-                <td><span class="risk-tag risk-high">🔴 高风险</span></td>
-                <td><a href="warning-detail.html" class="action-link">详情</a></td>
+                <td>王经理<div style="font-size:11px;color:#999;">3601********9012</div></td>
+                <td>南昌西站配套工程</td>
+                <td>12</td>
+                <td>2</td>
+                <td>7</td>
+                <td>2</td>
+                <td>1</td>
               </tr>
               <tr>
-                <td><strong>4</strong></td>
-                <td>李技术<div style="font-size:11px;color:#999;">3601********3456</div></td>
-                <td>技术负责人</td><td>南昌市-红谷滩区</td><td>绿地国际博览城二期</td>
-                <td>25%</td><td style="color:#ff4d4f;font-weight:600;">33%</td>
-                <td>1次</td><td>2次</td><td>1次</td>
-                <td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill orange" style="width:68%;"></div></div><span class="score-num" style="color:#fa8c16;">68</span></div></td>
-                <td><span class="risk-tag risk-mid">🟠 中风险</span></td>
-                <td><a href="warning-detail.html" class="action-link">详情</a></td>
+                <td>赵监理<div style="font-size:11px;color:#999;">3601********3456</div></td>
+                <td>绿地国际博览城二期</td>
+                <td>10</td>
+                <td>1</td>
+                <td>7</td>
+                <td>1</td>
+                <td>1</td>
               </tr>
               <tr>
-                <td><strong>5</strong></td>
-                <td>马工<div style="font-size:11px;color:#999;">3601********7890</div></td>
-                <td>施工员</td><td>南昌市-红谷滩区</td><td>南昌西站配套工程</td>
-                <td>20%</td><td>17%</td><td>2次</td><td>1次</td><td>0次</td>
-                <td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill orange" style="width:55%;"></div></div><span class="score-num" style="color:#fa8c16;">55</span></div></td>
-                <td><span class="risk-tag risk-mid">🟠 中风险</span></td>
-                <td><a href="warning-detail.html" class="action-link">详情</a></td>
+                <td>张工<div style="font-size:11px;color:#999;">3601********7890</div></td>
+                <td>豫章师范学院实训大楼</td>
+                <td>8</td>
+                <td>0</td>
+                <td>7</td>
+                <td>1</td>
+                <td>0</td>
+              </tr>
+              <tr>
+                <td>马工<div style="font-size:11px;color:#999;">3601********2345</div></td>
+                <td>南昌西站配套工程</td>
+                <td>9</td>
+                <td>1</td>
+                <td>6</td>
+                <td>1</td>
+                <td>1</td>
+              </tr>
+              <tr>
+                <td>李技术<div style="font-size:11px;color:#999;">3601********6789</div></td>
+                <td>绿地国际博览城二期</td>
+                <td>7</td>
+                <td>2</td>
+                <td>4</td>
+                <td>1</td>
+                <td>0</td>
+              </tr>
+              <tr>
+                <td>钟工<div style="font-size:11px;color:#999;">3607********1101</div></td>
+                <td>龙南市安基山景区建设项目</td>
+                <td>6</td>
+                <td>0</td>
+                <td>5</td>
+                <td>1</td>
+                <td>0</td>
               </tr>
             </tbody>
           </table>
-          <div class="pagination"><span>共 38 人</span><button>&lt;</button><button class="active">1</button><button>2</button><button>&gt;</button></div>
+          <div class="pagination"><span>共 156 人</span><button>&lt;</button><button class="active">1</button><button>2</button><button>3</button><button>&gt;</button></div>
         </div>
       </div>
 
-      <!-- Tab 2: 项目风险 -->
+      <!-- Tab 2: 项目统计 -->
       <div class="tab-content" id="tabProject">
         <div class="card-body">
-          <div class="algorithm-info">
-            <strong>评分算法（近 30 天滚动）</strong>：关键岗位拒绝率(30%) + 抽验未通过率(25%) + 超时/降级率(20%) + 合拍人集中度(15%) + 异常打卡人次比(10%) = 综合风险分
-          </div>
           <div class="filter-bar">
-            <div class="filter-item"><label>风险等级：</label><select><option>全部</option><option>高风险 ≥80</option><option>中风险 50-79</option><option>低风险 &lt;50</option></select></div>
             <div class="filter-item"><label>项目区划：</label><select><option>全部</option><option>经开区</option><option>红谷滩区</option></select></div>
             <div class="filter-item"><label>项目名称：</label><input type="text" placeholder="请输入"></div>
             <button class="btn-primary">查询</button>
           </div>
           <table class="table">
             <thead>
-              <tr><th>排名</th><th>项目名称</th><th>项目区划</th><th>关键岗位拒绝率</th><th>抽验未通过率</th><th>超时/降级</th><th>合拍人集中度</th><th>异常打卡比</th><th>风险分</th><th>等级</th><th>操作</th></tr>
+              <tr><th>项目名称</th><th>区县</th><th>累计抽验次数</th><th>通过次数</th><th>未通过次数</th><th>降级次数</th></tr>
             </thead>
             <tbody>
               <tr>
-                <td><strong>1</strong></td>
                 <td>豫章师范学院实训大楼一期<div style="font-size:11px;color:#999;">360100202406270101</div></td>
                 <td>经开区</td>
-                <td style="color:#ff4d4f;font-weight:600;">55%</td>
-                <td style="color:#ff4d4f;font-weight:600;">35%</td>
-                <td>4次</td><td style="color:#fa8c16;">中</td>
-                <td style="color:#ff4d4f;font-weight:600;">18%</td>
-                <td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill red" style="width:88%;"></div></div><span class="score-num" style="color:#ff4d4f;">88</span></div></td>
-                <td><span class="risk-tag risk-high">🔴 高风险</span></td>
-                <td><a href="project-warning-detail.html" class="action-link">详情</a></td>
+                <td>342</td>
+                <td>223</td>
+                <td>87</td>
+                <td>32</td>
               </tr>
               <tr>
-                <td><strong>2</strong></td>
                 <td>南昌西站交通枢纽配套工程<div style="font-size:11px;color:#999;">360100202406270310</div></td>
                 <td>红谷滩区</td>
-                <td style="color:#ff4d4f;font-weight:600;">40%</td>
-                <td style="color:#fa8c16;font-weight:600;">28%</td>
-                <td>5次</td><td style="color:#ff4d4f;font-weight:600;">高</td>
-                <td>12%</td>
-                <td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill red" style="width:83%;"></div></div><span class="score-num" style="color:#ff4d4f;">83</span></div></td>
-                <td><span class="risk-tag risk-high">🔴 高风险</span></td>
-                <td><a href="project-warning-detail.html" class="action-link">详情</a></td>
+                <td>286</td>
+                <td>201</td>
+                <td>58</td>
+                <td>27</td>
               </tr>
               <tr>
-                <td><strong>3</strong></td>
                 <td>绿地国际博览城二期<div style="font-size:11px;color:#999;">360100202406270205</div></td>
                 <td>红谷滩区</td>
-                <td>20%</td><td>25%</td><td>3次</td><td style="color:#fa8c16;">中</td><td>10%</td>
-                <td><div class="score-bar-wrap"><div class="score-bar"><div class="score-fill orange" style="width:65%;"></div></div><span class="score-num" style="color:#fa8c16;">65</span></div></td>
-                <td><span class="risk-tag risk-mid">🟠 中风险</span></td>
-                <td><a href="project-warning-detail.html" class="action-link">详情</a></td>
+                <td>245</td>
+                <td>218</td>
+                <td>19</td>
+                <td>8</td>
+              </tr>
+              <tr>
+                <td>龙南市安基山景区建设项目<div style="font-size:11px;color:#999;">360700202406270102</div></td>
+                <td>龙南市</td>
+                <td>178</td>
+                <td>147</td>
+                <td>21</td>
+                <td>10</td>
+              </tr>
+              <tr>
+                <td>九江市同文中学学生公寓<div style="font-size:11px;color:#999;">360400202406270199</div></td>
+                <td>浔阳区</td>
+                <td>142</td>
+                <td>118</td>
+                <td>17</td>
+                <td>7</td>
               </tr>
             </tbody>
           </table>
